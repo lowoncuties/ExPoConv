@@ -1,0 +1,81 @@
+schema_version: "1.0"
+analysis_id: e11_unet_bounded_profile_accepted
+experiment_id: E11
+description: Accepted bounded Poincare U-Net complete optimizer-step compiler and device-profile attribution.
+variants: [R, F, T]
+expected:
+  workload_id: unet_b8_update
+  protocol_version: "1.8"
+  code_commit: 33331485f6910d9a3db0f83129f31e2576856b7c
+  config_hash: b01b98568bdda382cb84cef8f90197f2f026c4301b3f07d73f5c55727d4cefdc
+  warmup_calls: 10
+  profiled_calls: 20
+  dtype: float32
+  device_id: argexpr3.vsb.cz::gpu:0::Tesla V100-PCIE-32GB
+  jax_device: cuda:0
+  physical_gpu:
+    index: 1
+    uuid: GPU-4e0547c3-d65d-7d8b-9f6a-d40ad61a0f0f
+    name: Tesla V100-PCIE-32GB
+source:
+  profile_root: artifacts/profiles/e11_unet_bounded_3333148_v100_20260912
+  config_path: configs/profiles/e11_unet_bounded.yaml
+  environment_path: artifacts/environment_e11_unet_bounded_3333148_v100_20260912.json
+  log_path: artifacts/logs/e11_unet_bounded_3333148_v100_20260912.log
+  status_path: artifacts/logs/e11_unet_bounded_3333148_v100_20260912.status
+  expected_status: "0"
+rejected_attempts:
+  - id: relative_worker_paths
+    disposition: "Rejected infrastructure attempt: T failed before compilation because fresh workers received relative protocol/config paths; the parent then exited at the idle gate."
+    code_commit: a506d5dc0de030cd11e1d19f3e31031f577d04a9
+    environment_path: artifacts/environment_e11_unet_bounded_a506d5d_v100_20260912.json
+    log_path: artifacts/logs/e11_unet_bounded_a506d5d_v100_20260912.log
+    status_path: artifacts/logs/e11_unet_bounded_a506d5d_v100_20260912.status
+    expected_status: "1"
+    failure_path: artifacts/profiles/e11_unet_bounded_a506d5d_v100_20260912/unet_b8_update/T/failure.json
+    expected_failure: {variant: T, workload_id: unet_b8_update, status: failed, returncode: 1}
+  - id: pathlib_trace_export
+    disposition: "Rejected partial infrastructure attempt: T compiled and executed its traced calls, but trace export rejected pathlib.Path; the parent was intentionally interrupted before repeating the same failure for R/F, so no status file exists."
+    code_commit: e0d72b0a3aae85b09795cfb0484182155ddbecfd
+    environment_path: artifacts/environment_e11_unet_bounded_e0d72b0_v100_20260912.json
+    log_path: artifacts/logs/e11_unet_bounded_e0d72b0_v100_20260912.log
+    status_path: null
+    expected_status: null
+    failure_path: artifacts/profiles/e11_unet_bounded_e0d72b0_v100_20260912/unet_b8_update/T/failure.json
+    retained_hlo_path: artifacts/profiles/e11_unet_bounded_e0d72b0_v100_20260912/unet_b8_update/T/compiled_hlo.txt
+    expected_failure: {variant: T, workload_id: unet_b8_update, status: failed, returncode: 1}
+trace_contract:
+  source_glob: plugins/profile/*/*.trace.json.gz
+  perfetto_glob: plugins/profile/*/perfetto_trace.json.gz
+  xplane_glob: plugins/profile/*/*.xplane.pb
+  device_process_name: /device:GPU:0
+  module_event_name: "jit_complete_update:XLA GPU module"
+  kernel_marker_argument: occupancy_suggested_block_size
+  memset_marker_argument: Memset_details
+  memcpy_marker_argument: memcpy_details
+  duration_units_per_millisecond: 1000.0
+  duration_scope: "Chrome trace-event duration in microseconds; module spans approximate profiled call wall time, while summed device-kernel durations are cumulative and can exceed wall time when streams overlap."
+kernel_categories:
+  - id: convolution
+    needles: [conv_general_dilated, cudnn-conv, wgrad_, convolve, winograd, scudnn]
+  - id: gemm
+    needles: [dot_general, sgemm, gemm]
+  - id: reduction
+    needles: [reduce]
+  - id: transpose
+    needles: [transpose]
+  - id: transcendental
+    needles: [tanh, sinh, cosh, exponential, log, sqrt, erf]
+  - id: other
+    fallback: true
+classification_policy: "Exclusive first-match heuristic over lower-cased device event name, HLO operation name and source operation name. Categories describe trace attribution and are not causal or inferential estimates."
+comparison_pairs:
+  - {baseline: R, candidate: F}
+  - {baseline: R, candidate: T}
+  - {baseline: F, candidate: T}
+compiler_memory_policy: "The installed JAX compiler returned all-zero memory-analysis fields for every variant; these fields are retained but labeled unavailable, not interpreted as zero memory use. E08 process-lifetime allocator peaks remain the accepted memory evidence."
+outputs:
+  profile_summary: profile_summary.csv
+  category_attribution: kernel_category_attribution.csv
+  descriptive_comparison: profile_descriptive_comparison.csv
+  audit_summary: summary.json

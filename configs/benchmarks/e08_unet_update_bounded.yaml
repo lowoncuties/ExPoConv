@@ -1,0 +1,28 @@
+schema_version: "1.0"
+experiment_id: E08
+description: Frozen continuation of bounded complete Poincare U-Net optimizer-step timing after the protocol-1.8 dtype-preservation repair.
+campaign_scope: "Registered U-Net complete-update workload used with the completed protocol-1.7 forward workloads as the model-level gain gate."
+variants: [R, F, T]
+sessions: 5
+warmup_calls: 50
+timed_calls_per_session: 200
+require_idle_gpu: true
+max_preexisting_memory_mib: 512
+max_preexisting_utilization_percent: 5
+shared_state_policy: "Within each session, R/F/T receive identical deterministic initial parameters, inputs, targets, and optimizer state."
+memory_evidence_policy: "Process-lifetime peak after completed outputs are dereferenced before the next call; includes initialization, compilation, and warmup and is not an isolated activation/workspace peak."
+continuation_evidence:
+  completed_forward_results: "artifacts/e08_unet_bounded_c0caba1_v100_20260910.csv"
+  failed_update_results: "artifacts/e08_unet_bounded_c0caba1_v100_20260910.csv.failures.jsonl"
+  failed_group: {workload_id: unet_b8_update, variant: R, session: 0}
+  failed_commit: "c0caba164bdd9b136efb82b64ecc8229ccb370d3"
+  failure_reason: "The first compiled update promoted FP32 state to FP64, so the second invocation did not match the compiled signature."
+completed_workloads: [unet_b1_forward, unet_b8_forward]
+deferred_workloads: [unet_b8_backward, resnet20_b1_forward, resnet20_b128_forward, resnet20_b128_backward, resnet20_b128_update, mlp_b128_forward, mlp_b128_backward, mlp_b128_update]
+workloads:
+  - id: unet_b8_update
+    kind: unet
+    mode: update
+    shape: {batch: 8, height: 256, width: 256}
+    curvature: 0.1
+    dtype: float32

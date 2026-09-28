@@ -1,0 +1,67 @@
+schema_version: "1.0"
+experiment_id: E13
+description: Frozen R/F Poincare U-Net complete-update scaling campaign.
+campaign_scope: "Measure update latency and process-lifetime peak allocation across a one-factor batch-size sweep and a one-factor image-resolution sweep; retain every explicit OOM or failure."
+variants: [R, F]
+sessions: 5
+warmup_calls: 50
+timed_calls_per_session: 200
+require_idle_gpu: true
+max_preexisting_memory_mib: 512
+max_preexisting_utilization_percent: 5
+memory_budget_bytes: 34359738368
+shared_state_policy: "Within each session, R and F receive identical deterministic initial parameters, inputs, targets, and optimizer state, then evolve independently through the same number of complete updates."
+timing_scope: "Each synchronized call includes loss, reverse-mode gradients, gradient clipping, coupled L2, and a complete Adam update; compilation, initialization, and host transfer are excluded from steady-state latency."
+memory_evidence_policy: "Process-lifetime JAX allocator peak through the final synchronized measured update; includes initialization, compilation, first call, and warmup and is not isolated activation memory."
+failure_policy: "Retain every failed group. Explicit allocator diagnostics are classified as oom and the last entered phase distinguishes initialization, compilation, first update, warmup updates, measured updates, and post-measurement work. Signal-only termination is not labeled OOM."
+sweep_policy: "Vary one factor at a time. The batch-8, 256-by-256 pivot belongs to both sweeps and is executed once."
+workloads:
+  - id: unet_update_b1_r256
+    kind: unet
+    mode: update
+    sweep_axes: [batch]
+    shape: {batch: 1, height: 256, width: 256}
+    curvature: 0.1
+    dtype: float32
+  - id: unet_update_b2_r256
+    kind: unet
+    mode: update
+    sweep_axes: [batch]
+    shape: {batch: 2, height: 256, width: 256}
+    curvature: 0.1
+    dtype: float32
+  - id: unet_update_b4_r256
+    kind: unet
+    mode: update
+    sweep_axes: [batch]
+    shape: {batch: 4, height: 256, width: 256}
+    curvature: 0.1
+    dtype: float32
+  - id: unet_update_b8_r256
+    kind: unet
+    mode: update
+    sweep_axes: [batch, resolution]
+    shape: {batch: 8, height: 256, width: 256}
+    curvature: 0.1
+    dtype: float32
+  - id: unet_update_b16_r256
+    kind: unet
+    mode: update
+    sweep_axes: [batch]
+    shape: {batch: 16, height: 256, width: 256}
+    curvature: 0.1
+    dtype: float32
+  - id: unet_update_b8_r128
+    kind: unet
+    mode: update
+    sweep_axes: [resolution]
+    shape: {batch: 8, height: 128, width: 128}
+    curvature: 0.1
+    dtype: float32
+  - id: unet_update_b8_r512
+    kind: unet
+    mode: update
+    sweep_axes: [resolution]
+    shape: {batch: 8, height: 512, width: 512}
+    curvature: 0.1
+    dtype: float32

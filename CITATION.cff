@@ -1,0 +1,9 @@
+cff-version: 1.2.0
+message: "If you use this software, cite the accompanying article and the versioned software release."
+title: "Efficient Poincare Convolutions through Sufficient-Statistics Factorization: Experiments"
+type: software
+authors:
+  - family-names: Jochymek
+    given-names: Lukas
+license: MIT
+version: 0.1.0

@@ -1,0 +1,70 @@
+schema_version: "1.0"
+analysis_id: e08_unet_bounded_accepted
+experiment_id: E08
+description: Accepted bounded Poincare U-Net inference and complete optimizer-step timing evidence.
+variants: [R, F, T]
+sessions: 5
+warmup_calls: 50
+timed_calls_per_session: 200
+physical_gpu:
+  index: 1
+  uuid: GPU-4e0547c3-d65d-7d8b-9f6a-d40ad61a0f0f
+  name: Tesla V100-PCIE-32GB
+speedup_pairs:
+  - {baseline: R, candidate: F}
+  - {baseline: R, candidate: T}
+  - {baseline: F, candidate: T}
+memory_evidence_policy: "Process-lifetime JAX allocator peak after completed outputs are dereferenced before the next invocation; includes initialization, compilation, and warmup and is not an isolated activation/workspace peak."
+statistical_method: "For each variant, take the median of 200 synchronized calls in each fresh-process session. For each registered pair, form matched session-median baseline/candidate ratios and report their geometric mean with a two-sided 95% Student-t interval on log ratios."
+outputs:
+  session_medians: steady_state_session_medians.csv
+  latency_summary: workload_latency_memory_summary.csv
+  speedup_summary: paired_speedup_summary.csv
+  paper_table: paper_timing_table.csv
+  audit_summary: summary.json
+sources:
+  - id: forward_protocol_1_7
+    raw_path: artifacts/e08_unet_bounded_c0caba1_v100_20260910.csv
+    config_path: configs/benchmarks/e08_unet_bounded.yaml
+    environment_path: artifacts/environment_e08_unet_bounded_c0caba1_v100_20260910.json
+    required_protocol_version: "1.7"
+    required_code_commit: c0caba164bdd9b136efb82b64ecc8229ccb370d3
+    workloads:
+      - id: unet_b1_forward
+        label: U-Net batch 1 forward
+        mode: forward
+        config_hash: b46dd93da007f5476f2d995fd5976fddb200294053e5bf5982a7eea17a152b1d
+      - id: unet_b8_forward
+        label: U-Net batch 8 forward
+        mode: forward
+        config_hash: 62eff7278afe16e9da6df273956390a4dc15efd8785c6aa8fa1a95c4948ccfd5
+    wrapper_attempts:
+      - log_path: artifacts/logs/e08_unet_bounded_c0caba1_v100_20260910_run2.log
+        status_path: null
+        expected_status: null
+        disposition: "Accepted forward groups were complete before the coordinator was manually stopped after the first update group recorded the protocol-1.7 dtype failure."
+    benchmark_failure_manifests:
+      - path: artifacts/e08_unet_bounded_c0caba1_v100_20260910.csv.failures.jsonl
+        expected_rows:
+          - {workload_id: unet_b8_update, variant: R, seed_or_session: 0, status: failed, protocol_version: "1.7", code_commit: c0caba164bdd9b136efb82b64ecc8229ccb370d3}
+  - id: update_protocol_1_8
+    raw_path: artifacts/e08_unet_update_50c399b_v100_20260910.csv
+    config_path: configs/benchmarks/e08_unet_update_bounded.yaml
+    environment_path: artifacts/environment_e08_unet_update_50c399b_v100_20260910.json
+    required_protocol_version: "1.8"
+    required_code_commit: 50c399bc7c1194df1496b44b1143cd5077df4af6
+    workloads:
+      - id: unet_b8_update
+        label: U-Net batch 8 complete optimizer step
+        mode: update
+        config_hash: aea6152e33adf1b821d3b69530c35877d6e356eace3b69390a07f839c9ca0799
+    wrapper_attempts:
+      - log_path: artifacts/logs/e08_unet_update_50c399b_v100_20260910.log
+        status_path: artifacts/logs/e08_unet_update_50c399b_v100_20260910.status
+        expected_status: "1"
+        disposition: "Infrastructure interruption after 11 complete groups: the post-run nvidia-smi query for session 3/T exceeded its 30-second timeout before that group was appended."
+      - log_path: artifacts/logs/e08_unet_update_50c399b_v100_20260910_run2.log
+        status_path: artifacts/logs/e08_unet_update_50c399b_v100_20260910_run2.status
+        expected_status: "0"
+        disposition: "Identity-checked resume skipped 11 complete groups and appended the remaining four groups."
+    benchmark_failure_manifests: []

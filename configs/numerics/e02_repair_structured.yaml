@@ -1,0 +1,28 @@
+schema_version: "1.0"
+experiment_id: E02-REPAIR-STRUCTURED
+description: Audit-selected deep directional checks after the derivative repair.
+precisions: [float32, float64]
+realizations: 10
+finite_difference_relative_steps: [0.0001, 0.00001, 0.000001]
+curvature: 0.1
+input_scale: 0.05
+normalization_epsilon: 0.000001
+cases:
+  - id: convolution_stack_8
+    kind: convolution_stack
+    input_shape: [2, 7, 7, 4]
+    input_channels: 4
+    output_channels: 4
+    kernel_size: 3
+    stride: 1
+    padding: SAME
+    depth: 8
+    activation: relu
+  - id: small_unet
+    kind: small_unet
+    input_shape: [2, 16, 16, 3]
+    input_channels: 3
+    classes: 2
+    initial_width: 2
+    depth: 2
+    initial_curvature: 0.1

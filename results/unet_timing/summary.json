@@ -1,0 +1,306 @@
+{
+  "all_checks_pass": true,
+  "analysis_code": {
+    "commit": "a506d5dc0de030cd11e1d19f3e31031f577d04a9",
+    "dirty": false,
+    "status_porcelain": []
+  },
+  "analysis_id": "e08_unet_bounded_accepted",
+  "analysis_manifest": {
+    "byte_size": 3860,
+    "exists": true,
+    "path": "/data2/joc0027/poincare-execution-experiments/configs/analysis/e08_unet_accepted.yaml",
+    "sha256": "838a25b861cf52e6b26922600208d44259dc6019288d915b92f6fe397257830f"
+  },
+  "derivation": "CPU-only audit and aggregation of existing synchronized benchmark rows; no experiment was run by this exporter.",
+  "description": "Accepted bounded Poincare U-Net inference and complete optimizer-step timing evidence.",
+  "experiment_id": "E08",
+  "latency_rows": 9,
+  "memory_evidence_policy": "Process-lifetime JAX allocator peak after completed outputs are dereferenced before the next invocation; includes initialization, compilation, and warmup and is not an isolated activation/workspace peak.",
+  "paper_rows": 3,
+  "schema_version": "1.0",
+  "session_rows": 45,
+  "source_audits": [
+    {
+      "accepted_workloads": [
+        "unet_b1_forward",
+        "unet_b8_forward"
+      ],
+      "all_checks_pass": true,
+      "bad_group_counts": {},
+      "bad_phase_counts": {},
+      "benchmark_failure_manifests": [
+        {
+          "evidence": {
+            "byte_size": 4003,
+            "exists": true,
+            "path": "/data2/joc0027/poincare-execution-experiments/artifacts/e08_unet_bounded_c0caba1_v100_20260910.csv.failures.jsonl",
+            "sha256": "07f0bf2dfba5510493d69b663f3795c80c22ccfe76b5fc22f5be77a9a9f1d843"
+          },
+          "rows": [
+            {
+              "code_commit": "c0caba164bdd9b136efb82b64ecc8229ccb370d3",
+              "code_dirty": false,
+              "config_hash": "637042cf53a7159f00a351a06a0f59b6a3542e8c15ba1813eac9543131f8ae28",
+              "device_id": "argexpr3.vsb.cz::CUDA_VISIBLE_DEVICES=1",
+              "experiment_id": "E08",
+              "gpu_snapshot_after": {
+                "compute_processes": [],
+                "index": 1,
+                "memory.total": 32768,
+                "memory.used": 0,
+                "name": "Tesla V100-PCIE-32GB",
+                "power.draw": "33.45",
+                "process_query_status": "ok",
+                "status": "ok",
+                "temperature.gpu": "31",
+                "utilization.gpu": 1,
+                "uuid": "GPU-4e0547c3-d65d-7d8b-9f6a-d40ad61a0f0f"
+              },
+              "gpu_snapshot_before": {
+                "compute_processes": [],
+                "index": 1,
+                "memory.total": 32768,
+                "memory.used": 0,
+                "name": "Tesla V100-PCIE-32GB",
+                "power.draw": "33.44",
+                "process_query_status": "ok",
+                "status": "ok",
+                "temperature.gpu": "31",
+                "utilization.gpu": 1,
+                "uuid": "GPU-4e0547c3-d65d-7d8b-9f6a-d40ad61a0f0f"
+              },
+              "operation_boundary": "unet:update",
+              "precision_policy": "{\"matmul_precision\":\"highest\",\"oracle\":\"float64\",\"primary\":\"float32\",\"reduced_precision_enabled\":false,\"tf32\":false}",
+              "protocol_version": "1.7",
+              "reference_commit": "{\"hnnpp\":\"28737e22822562ac18d5ea03f8c3e3929e945a83\",\"hyperbolic_unet\":\"bec504e2f4d198ee4c438579b86d72f9d8186d78\",\"poincare_resnet\":\"fbbbbf890571115444b89b114f9ed52d128d5aa3\"}",
+              "returncode": 1,
+              "seed_or_session": 0,
+              "shape": {
+                "batch": 8,
+                "height": 256,
+                "width": 256
+              },
+              "status": "failed",
+              "stderr": "Traceback (most recent call last):\n  File \"<frozen runpy>\", line 198, in _run_module_as_main\n  File \"<frozen runpy>\", line 88, in _run_code\n  File \"/data2/joc0027/poincare-execution-experiments/src/poincare_exec/cli.py\", line 428, in <module>\n    raise SystemExit(main())\n                     ^^^^^^\n  File \"/data2/joc0027/poincare-execution-experiments/src/poincare_exec/cli.py\", line 288, in main\n    benchmark_worker(\n  File \"/data2/joc0027/poincare-execution-experiments/src/poincare_exec/experiments/benchmark.py\", line 528, in benchmark_worker\n    output = compiled(state, inputs, curvature)\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/data2/joc0027/poincare-execution-experiments/.venv/lib/python3.11/site-packages/jax/_src/stages.py\", line 575, in __call__\n    return self._call(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/data2/joc0027/poincare-execution-experiments/.venv/lib/python3.11/site-packages/jax/_src/interpreters/pxla.py\", line 2909, in aot_cache_miss\n    outs, out_flat, args_flat = stages.Compiled.call(params, *args, **kwargs)\n                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/data2/joc0027/poincare-execution-experiments/.venv/lib/python3.11/site-packages/jax/_src/stages.py\", line 544, in call\n    out_flat = params.executable.call(*args_flat)\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/data2/joc0027/poincare-execution-experiments/.venv/lib/python3.11/site-packages/jax/_src/interpreters/pxla.py\", line 2884, in call\n    check_arg_avals_for_call(ref_avals, arg_avals, debug_info)\n  File \"/data2/joc0027/poincare-execution-experiments/.venv/lib/python3.11/site-packages/jax/_src/interpreters/pxla.py\", line 2969, in check_arg_avals_for_call\n    raise TypeError(\nTypeError: Argument types differ from the types for which this computation was compiled. The first 5 of 83 mismatches are:\nArgument 'selected_state[0]['curvature_raw']' compiled with float32[] and called with float64[]\nArgument 'selected_state[0]['down_blocks'][0]['bn1'].bias' compiled with float32[16] and called with float64[16]\nArgument 'selected_state[0]['down_blocks'][0]['bn1'].weight' compiled with float32[] and called with float64[]\nArgument 'selected_state[0]['down_blocks'][0]['bn2'].bias' compiled with float32[16] and called with float64[16]\nArgument 'selected_state[0]['down_blocks'][0]['bn2'].weight' compiled with float32[] and called with float64[]\n",
+              "stdout": "",
+              "timestamp_utc": "2026-09-10T18:18:39.577Z",
+              "variant": "R",
+              "workload_id": "unet_b8_update"
+            }
+          ]
+        }
+      ],
+      "checks": {
+        "all_outputs_and_states_finite": true,
+        "complete_group_set": true,
+        "group_row_counts": true,
+        "no_competing_snapshot_process": true,
+        "one_device_identity": true,
+        "phase_row_counts": true,
+        "physical_gpu_index": true,
+        "physical_gpu_uuid": true,
+        "required_statuses": true
+      },
+      "code_commit": "c0caba164bdd9b136efb82b64ecc8229ccb370d3",
+      "config_evidence": {
+        "byte_size": 1384,
+        "exists": true,
+        "path": "/data2/joc0027/poincare-execution-experiments/configs/benchmarks/e08_unet_bounded.yaml",
+        "sha256": "370afd6ac5082036e19ab4c5f41cce60781d124855f0e4a442c6087774fb06be"
+      },
+      "contaminated_snapshots": 0,
+      "device_identities": [
+        "argexpr3.vsb.cz::gpu:0::Tesla V100-PCIE-32GB"
+      ],
+      "environment_checks": {
+        "clean": true,
+        "commit": true,
+        "device_kind": true,
+        "jax_gpu_backend": true,
+        "one_logical_jax_device": true,
+        "single_gpu_mask": true
+      },
+      "environment_evidence": {
+        "byte_size": 22814,
+        "exists": true,
+        "path": "/data2/joc0027/poincare-execution-experiments/artifacts/environment_e08_unet_bounded_c0caba1_v100_20260910.json",
+        "sha256": "fd173d7c8a9d722e7bc096649dd3214e4c46dd3dcfd6622c18e54da0d788eb3b"
+      },
+      "expected_rows_per_group": 203,
+      "first_timestamp_utc": "2026-09-10T16:14:04.114Z",
+      "groups": 30,
+      "last_timestamp_utc": "2026-09-10T18:11:02.847Z",
+      "missing_groups": [],
+      "nonfinite_rows": 0,
+      "physical_gpu_indices": [
+        1
+      ],
+      "physical_gpu_uuids": [
+        "GPU-4e0547c3-d65d-7d8b-9f6a-d40ad61a0f0f"
+      ],
+      "protocol_version": "1.7",
+      "raw_evidence": {
+        "byte_size": 11403602,
+        "exists": true,
+        "path": "/data2/joc0027/poincare-execution-experiments/artifacts/e08_unet_bounded_c0caba1_v100_20260910.csv",
+        "sha256": "6e9a28095e01ef5cb7be6d4a2f06ab946bdc2d39e21b7dd0a72f3976bcc3e9c8"
+      },
+      "rows": 6090,
+      "source_id": "forward_protocol_1_7",
+      "statuses": {
+        "compilation:ok": 30,
+        "first_compiled_call:ok": 30,
+        "steady_state:ok": 6000,
+        "sustained_sequence:not_applicable": 30
+      },
+      "wrapper_attempts": [
+        {
+          "disposition": "Accepted forward groups were complete before the coordinator was manually stopped after the first update group recorded the protocol-1.7 dtype failure.",
+          "log": {
+            "byte_size": 130,
+            "exists": true,
+            "path": "/data2/joc0027/poincare-execution-experiments/artifacts/logs/e08_unet_bounded_c0caba1_v100_20260910_run2.log",
+            "sha256": "70c52dfb68bd07c86210cdc799d75c56c7a7e4761f134dd295ca3fdfda19eb80"
+          },
+          "status": null,
+          "status_value": null
+        }
+      ]
+    },
+    {
+      "accepted_workloads": [
+        "unet_b8_update"
+      ],
+      "all_checks_pass": true,
+      "bad_group_counts": {},
+      "bad_phase_counts": {},
+      "benchmark_failure_manifests": [],
+      "checks": {
+        "all_outputs_and_states_finite": true,
+        "complete_group_set": true,
+        "group_row_counts": true,
+        "no_competing_snapshot_process": true,
+        "one_device_identity": true,
+        "phase_row_counts": true,
+        "physical_gpu_index": true,
+        "physical_gpu_uuid": true,
+        "required_statuses": true
+      },
+      "code_commit": "50c399bc7c1194df1496b44b1143cd5077df4af6",
+      "config_evidence": {
+        "byte_size": 1708,
+        "exists": true,
+        "path": "/data2/joc0027/poincare-execution-experiments/configs/benchmarks/e08_unet_update_bounded.yaml",
+        "sha256": "432f40d5125a09fa21371983eb47f5fa59ce020ddfde273a310593a8dd595b16"
+      },
+      "contaminated_snapshots": 0,
+      "device_identities": [
+        "argexpr3.vsb.cz::gpu:0::Tesla V100-PCIE-32GB"
+      ],
+      "environment_checks": {
+        "clean": true,
+        "commit": true,
+        "device_kind": true,
+        "jax_gpu_backend": true,
+        "one_logical_jax_device": true,
+        "single_gpu_mask": true
+      },
+      "environment_evidence": {
+        "byte_size": 22814,
+        "exists": true,
+        "path": "/data2/joc0027/poincare-execution-experiments/artifacts/environment_e08_unet_update_50c399b_v100_20260910.json",
+        "sha256": "5fc2aacd530870f99193b3d8a35f8b0b7150f13b5b48d2bb91c19bcd2570060d"
+      },
+      "expected_rows_per_group": 203,
+      "first_timestamp_utc": "2026-09-10T18:30:07.124Z",
+      "groups": 15,
+      "last_timestamp_utc": "2026-09-10T20:08:10.708Z",
+      "missing_groups": [],
+      "nonfinite_rows": 0,
+      "physical_gpu_indices": [
+        1
+      ],
+      "physical_gpu_uuids": [
+        "GPU-4e0547c3-d65d-7d8b-9f6a-d40ad61a0f0f"
+      ],
+      "protocol_version": "1.8",
+      "raw_evidence": {
+        "byte_size": 5715953,
+        "exists": true,
+        "path": "/data2/joc0027/poincare-execution-experiments/artifacts/e08_unet_update_50c399b_v100_20260910.csv",
+        "sha256": "2814e679981e6abc44b636f68ebac8a6028b5b19205fe496796a2dce52e29d3a"
+      },
+      "rows": 3045,
+      "source_id": "update_protocol_1_8",
+      "statuses": {
+        "compilation:ok": 15,
+        "first_compiled_call:ok": 15,
+        "steady_state:ok": 3000,
+        "sustained_sequence:not_applicable": 15
+      },
+      "wrapper_attempts": [
+        {
+          "disposition": "Infrastructure interruption after 11 complete groups: the post-run nvidia-smi query for session 3/T exceeded its 30-second timeout before that group was appended.",
+          "log": {
+            "byte_size": 2041,
+            "exists": true,
+            "path": "/data2/joc0027/poincare-execution-experiments/artifacts/logs/e08_unet_update_50c399b_v100_20260910.log",
+            "sha256": "cbb3d3b3e74641bcfdca9b64bf6ea95b7a5f681fcc57b7f5fd90328814f5e1a4"
+          },
+          "status": {
+            "byte_size": 2,
+            "exists": true,
+            "path": "/data2/joc0027/poincare-execution-experiments/artifacts/logs/e08_unet_update_50c399b_v100_20260910.status",
+            "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+          },
+          "status_value": "1"
+        },
+        {
+          "disposition": "Identity-checked resume skipped 11 complete groups and appended the remaining four groups.",
+          "log": {
+            "byte_size": 158,
+            "exists": true,
+            "path": "/data2/joc0027/poincare-execution-experiments/artifacts/logs/e08_unet_update_50c399b_v100_20260910_run2.log",
+            "sha256": "2d0829b9337b769b366b2ae1ae5410877388fee24c7762bc7c54963e18e36a87"
+          },
+          "status": {
+            "byte_size": 2,
+            "exists": true,
+            "path": "/data2/joc0027/poincare-execution-experiments/artifacts/logs/e08_unet_update_50c399b_v100_20260910_run2.status",
+            "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+          },
+          "status_value": "0"
+        }
+      ]
+    }
+  ],
+  "speedup_rows": 9,
+  "statistical_method": "For each variant, take the median of 200 synchronized calls in each fresh-process session. For each registered pair, form matched session-median baseline/candidate ratios and report their geometric mean with a two-sided 95% Student-t interval on log ratios.",
+  "table_evidence": {
+    "latency_summary": {
+      "byte_size": 6077,
+      "exists": true,
+      "path": "/data2/joc0027/poincare-execution-experiments/artifacts/analysis/e08_unet_accepted_a506d5d/workload_latency_memory_summary.csv",
+      "sha256": "b2997480889fa6c3e3d186043b242dfe496df9039a7f921274391a426d31e86f"
+    },
+    "paper_table": {
+      "byte_size": 2035,
+      "exists": true,
+      "path": "/data2/joc0027/poincare-execution-experiments/artifacts/analysis/e08_unet_accepted_a506d5d/paper_timing_table.csv",
+      "sha256": "a76a5a8ffe8ffd583c61e44eb419a8b44fdd5a8a3f2c9debe859269ecc4b758d"
+    },
+    "session_medians": {
+      "byte_size": 16005,
+      "exists": true,
+      "path": "/data2/joc0027/poincare-execution-experiments/artifacts/analysis/e08_unet_accepted_a506d5d/steady_state_session_medians.csv",
+      "sha256": "675ebbc3cb01573859e4c57cad89852087efd5f6bf4dc0d49c6a54b9edcb821b"
+    },
+    "speedup_summary": {
+      "byte_size": 5104,
+      "exists": true,
+      "path": "/data2/joc0027/poincare-execution-experiments/artifacts/analysis/e08_unet_accepted_a506d5d/paired_speedup_summary.csv",
+      "sha256": "6fde9c58ffac541edb524ad945ab60dea49654a3a63b9f65184cd7d4a0b51831"
+    }
+  }
+}

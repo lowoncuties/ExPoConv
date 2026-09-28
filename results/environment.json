@@ -1,0 +1,60 @@
+{
+  "schema_version": "1.0",
+  "record_type": "measured_environment",
+  "description": "Hardware and software stack of the single GPU host on which every reported measurement was taken. Per-result code commits, configuration hashes and protocol versions are stored in the result tables themselves.",
+  "hardware": {
+    "accelerator": "NVIDIA Tesla V100-PCIE-32GB",
+    "accelerator_memory_mib": 32768,
+    "jax_allocator_bytes_limit": 25567444992,
+    "cpu_model": "Intel Xeon Gold 6154",
+    "architecture": "x86_64"
+  },
+  "operating_system": {
+    "platform": "Linux-6.0.11-1.el7.elrepo.x86_64-x86_64-with-glibc2.17",
+    "glibc": "2.17"
+  },
+  "python": "3.11.16",
+  "framework": {
+    "jax": "0.4.25",
+    "jaxlib_package": "0.4.25+cuda11.cudnn86",
+    "backend": "gpu",
+    "default_x64_enabled_for_fp32_performance_and_training": false,
+    "numerical_validation_exception": "E02 enables JAX x64 for its registered FP64 strata."
+  },
+  "cuda": {
+    "nvidia_driver": "520.61.05",
+    "driver_reported_cuda_compatibility": "11.8",
+    "jax_runtime_family": "CUDA 11",
+    "cuda_runtime_package": "11.8.89",
+    "cuda_nvcc_package": "11.8.89",
+    "cuda_cupti_package": "11.8.87",
+    "cublas_package": "11.11.3.6",
+    "cudnn_package": "8.6.0.163",
+    "cufft_package": "10.9.0.58",
+    "cusolver_package": "11.4.1.48",
+    "cusparse_package": "11.7.5.86",
+    "nccl_package": "2.21.5"
+  },
+  "numerical_policy": {
+    "default_performance_and_training_storage_dtype": "float32",
+    "numerical_validation_storage_dtypes": [
+      "float32",
+      "float64"
+    ],
+    "matmul_precision": "highest",
+    "reduced_precision_reduction": false,
+    "tf32": false
+  },
+  "allocator_environment": {
+    "XLA_PYTHON_CLIENT_PREALLOCATE": "false",
+    "XLA_PYTHON_CLIENT_ALLOCATOR": null,
+    "XLA_PYTHON_CLIENT_MEM_FRACTION": null
+  },
+  "scientific_packages": {
+    "numpy": "1.26.4",
+    "scipy": "1.11.4",
+    "matplotlib": "3.8.4",
+    "pillow": "11.3.0",
+    "pyyaml": "6.0.2"
+  }
+}

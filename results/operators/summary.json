@@ -1,0 +1,112 @@
+{
+  "config_evidence": {
+    "byte_size": 2935,
+    "exists": true,
+    "path": "/data2/joc0027/poincare-execution-experiments/configs/benchmarks/corrected_operator_anchors.yaml",
+    "sha256": "36e7acf027c44b756b1f4d2308a3085fb90d088d6f35e5b41505c5efe64283d4"
+  },
+  "derivation": "CPU-only validation and aggregation of existing synchronized timing rows; no benchmark was run by this exporter.",
+  "environment_evidence": {
+    "byte_size": 22814,
+    "exists": true,
+    "path": "/data2/joc0027/poincare-execution-experiments/artifacts/environment_corrected_operator_anchors_758d182_v100_20260907.json",
+    "sha256": "ad1224ae55c44d5887f86841778046ba524b1aae7ef2169196727212ad3d5cc2"
+  },
+  "failure_sidecar": {
+    "exists": false,
+    "path": "/data2/joc0027/poincare-execution-experiments/artifacts/corrected_operator_anchors_758d182.csv.failures.jsonl"
+  },
+  "latency_rows": 30,
+  "latency_table": {
+    "byte_size": 12061,
+    "exists": true,
+    "path": "/data2/joc0027/poincare-execution-experiments/artifacts/analysis/e03_e05_corrected_758d182/workload_latency_summary.csv",
+    "sha256": "7267d42dc089a308aec28ad4e761b7720ad4991c5e1e8373403c1bfbaee17b85"
+  },
+  "log_evidence": {
+    "byte_size": 130,
+    "exists": true,
+    "path": "/data2/joc0027/poincare-execution-experiments/artifacts/logs/corrected_operator_anchors_758d182_v100_20260907.log",
+    "sha256": "70c52dfb68bd07c86210cdc799d75c56c7a7e4761f134dd295ca3fdfda19eb80"
+  },
+  "memory_evidence_policy": "Diagnostic only; process-lifetime allocation fields are not used as publication memory claims because worker output retention is not isolated.",
+  "raw_evidence": {
+    "all_checks_pass": true,
+    "bad_group_counts": {},
+    "bad_phase_counts": {},
+    "byte_size": 52391840,
+    "checks": {
+      "all_outputs_and_states_finite": true,
+      "expected_group_set": true,
+      "group_row_counts": true,
+      "no_competing_snapshot_process": true,
+      "one_clean_commit": true,
+      "one_config_hash_per_workload": true,
+      "one_device_identity": true,
+      "one_physical_gpu_uuid": true,
+      "phase_row_counts": true,
+      "physical_gpu_matches_mask": true,
+      "required_statuses": true
+    },
+    "code_commits": [
+      "758d182d3d764ba299a76ecba4fbbe944404c55a"
+    ],
+    "code_dirty_values": [
+      false
+    ],
+    "contaminated_snapshots": 0,
+    "device_identities": [
+      "argexpr3.vsb.cz::gpu:0::Tesla V100-PCIE-32GB"
+    ],
+    "expected_rows_per_group": 203,
+    "first_timestamp_utc": "2026-09-07T21:52:52.209Z",
+    "groups": 150,
+    "last_timestamp_utc": "2026-09-08T03:04:37.542Z",
+    "missing_groups": [],
+    "nonfinite_rows": 0,
+    "path": "/data2/joc0027/poincare-execution-experiments/artifacts/corrected_operator_anchors_758d182.csv",
+    "physical_gpu_indices": [
+      1
+    ],
+    "physical_gpu_uuids": [
+      "GPU-4e0547c3-d65d-7d8b-9f6a-d40ad61a0f0f"
+    ],
+    "rows": 30450,
+    "sha256": "07ac81f05894c3445e27ba8279c70672db50276d6d87c2c1702aafc8ab5575ed",
+    "statuses": {
+      "compilation:ok": 150,
+      "first_compiled_call:ok": 150,
+      "steady_state:ok": 30000,
+      "sustained_sequence:not_applicable": 135,
+      "sustained_sequence:ok": 15
+    },
+    "unexpected_groups": []
+  },
+  "schema_version": "1.0",
+  "session_median_evidence": {
+    "byte_size": 385214,
+    "exists": true,
+    "path": "/data2/joc0027/poincare-execution-experiments/artifacts/analysis/e03_e05_corrected_758d182/operator_session_medians.csv",
+    "sha256": "d088a70cedf723dd9805b73677fae23e1994af287296958e10a45e5e8d807065"
+  },
+  "session_rows": 150,
+  "session_table": {
+    "byte_size": 35581,
+    "exists": true,
+    "path": "/data2/joc0027/poincare-execution-experiments/artifacts/analysis/e03_e05_corrected_758d182/steady_state_session_medians.csv",
+    "sha256": "a6eec52f4b53be579a46d2acc8ce16362cf1c02227d016527230c46f325c8de4"
+  },
+  "speedup_rows": 30,
+  "speedup_table": {
+    "byte_size": 14558,
+    "exists": true,
+    "path": "/data2/joc0027/poincare-execution-experiments/artifacts/analysis/e03_e05_corrected_758d182/paired_speedup_summary.csv",
+    "sha256": "d76037caedb883135678848da83c6b2e68a9735f2bb6784cae7b86b8c9268988"
+  },
+  "wrapper_exit_status": "unknown",
+  "wrapper_status_evidence": {
+    "exists": false,
+    "path": "/data2/joc0027/poincare-execution-experiments/artifacts/logs/corrected_operator_anchors_758d182_v100_20260907.status"
+  },
+  "wrapper_status_note": "Unknown: the parent terminal ended after the complete CSV was written; completion is established by the validated complete matrix and absence of a failure sidecar."
+}

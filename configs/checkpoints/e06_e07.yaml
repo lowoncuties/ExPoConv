@@ -1,0 +1,24 @@
+schema_version: "1.0"
+experiment_id: E06-E07
+description: Shared-checkpoint compatibility and 100-update paired continuation.
+variants: [R, F, T]
+update_variants: [R, T]
+development_seed: 3
+continuation_updates: 100
+observation_updates: [0, 1, 10, 50, 100]
+retained_activation_batches: 1
+projection_detection_relative_tolerance: 0.000001
+post_training_splits: [test, test_deduplicated]
+tasks:
+  - task: isic16_poincare_unet
+    dataset: isic16
+    activation_groups:
+      - encoder_level_0
+      - encoder_level_1
+      - encoder_level_2
+      - encoder_level_3
+      - encoder_level_4
+      - decoder_level_1
+      - decoder_level_2
+      - decoder_level_3
+      - decoder_level_4

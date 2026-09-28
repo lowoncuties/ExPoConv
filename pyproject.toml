@@ -1,0 +1,70 @@
+[build-system]
+requires = ["hatchling>=1.25,<2"]
+build-backend = "hatchling.build"
+
+[project]
+name = "poincare-execution-experiments"
+version = "0.1.0"
+description = "Reproducible experiments for factorized execution of HNN++ Poincare networks."
+readme = "README.md"
+requires-python = ">=3.11,<3.12"
+license = {file = "LICENSE"}
+authors = [{name = "Lukas Jochymek"}]
+dependencies = [
+  "jax==0.4.25",
+  "jaxlib==0.4.25",
+  "numpy==1.26.4",
+  "scipy==1.11.4",
+  "PyYAML==6.0.2",
+  "Pillow==11.3.0",
+]
+
+[project.optional-dependencies]
+analysis = [
+  "matplotlib==3.8.4",
+]
+test = [
+  "pytest==8.3.5",
+  "pytest-cov==6.0.0",
+  "ruff==0.11.13",
+]
+dev = [
+  "matplotlib==3.8.4",
+  "pytest==8.3.5",
+  "pytest-cov==6.0.0",
+  "ruff==0.11.13",
+]
+
+# The GPU-specific JAX build is installed by the platform script. The paper's
+# measured environment is the pinned V100/CUDA 11.8 profile.
+
+[project.scripts]
+poincare-exec = "poincare_exec.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/poincare_exec"]
+
+[tool.pytest.ini_options]
+addopts = ["--strict-config", "--strict-markers"]
+pythonpath = ["."]
+testpaths = ["tests"]
+markers = [
+  "gpu: requires a configured CUDA device",
+  "slow: opt-in publication-scale check",
+  "reference: requires an optional upstream reference environment",
+]
+
+[tool.ruff]
+line-length = 92
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "RUF"]
+
+[tool.coverage.run]
+branch = true
+source = ["poincare_exec"]
+
+[tool.coverage.report]
+show_missing = true
+fail_under = 85

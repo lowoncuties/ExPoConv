@@ -1,0 +1,77 @@
+# E13 R/F U-Net scaling analysis
+
+This is a CPU-only analysis path for a future, bounded scaling campaign. It
+does not launch benchmarks and it is not evidence that the campaign has been
+run.
+
+## Registered analysis grid
+
+The grid in `configs/analysis/e13_unet_scaling.yaml` contains seven distinct
+complete-update workloads:
+
+- batch sizes 1, 2, 4, 8, and 16 at 256 x 256;
+- resolutions 128, 256, and 512 at batch 8.
+
+The batch-8, 256 x 256 workload is shared by both sweeps and must be measured
+once. Only R and F are included. This differs from the older R/T wording for
+E13 in the original experiment plan; protocol amendment 1.11 records the R/F
+scope prospectively, before GPU execution. The analysis manifest pins both
+`protocol.yaml` and `configs/benchmarks/e13_unet_scaling.yaml` by SHA-256, and
+the exporter recomputes every expected per-workload configuration hash from
+those two pinned documents.
+
+## Accepted raw formats and identities
+
+`scripts/export_e13_scaling.py` accepts any combination of CSV, JSON
+(`{"rows": [...]}` or a row list), and JSONL files. Pass both the benchmark
+table and its failure sidecar. Records use the existing benchmark schema and
+must contain at least:
+
+- `experiment_id`, `protocol_version`, `code_commit`, `code_dirty`,
+  `config_hash`, `device_id`, and `precision_policy`;
+- `workload_id`, `variant`, `seed_or_session`, `status`, `shape`, and
+  `operation_boundary`;
+- for completed groups, `phase`, `observation`, `latency_ms`, and the measured
+  peak-memory fields.
+
+The exporter requires one clean code revision and one physical GPU UUID across
+the campaign. It normalizes the two supported FP32 precision-policy encodings
+and retains all literal device and precision provenance strings. Each row's
+protocol version and configuration hash must match the pinned documents.
+Shapes must match the analysis grid. Every planned
+workload/session/path appears in `session_outcomes.csv`, including missing,
+partial, failed, nonfinite, and OOM cases.
+
+Failure rows should record `failure_kind: oom` and one of the following
+`failure_phase` values when applicable: `initialization`, `compilation`,
+`first_update`, `warmup_updates`, `measured_updates`, or `post_measurement`.
+A generic worker failure is retained as `failed`/`unknown`; the exporter does
+not guess OOM from free-form stderr. Legacy `failure_stage` is accepted as an
+input alias but the compact table always uses `failure_phase`.
+
+## Export
+
+```bash
+PYTHONPATH=src ./.venv/bin/python scripts/export_e13_scaling.py \
+  --manifest configs/analysis/e13_unet_scaling.yaml \
+  --raw artifacts/e13_unet_scaling.csv \
+  --raw artifacts/e13_unet_scaling.csv.failures.jsonl \
+  --output-dir artifacts/analysis/e13_unet_scaling
+```
+
+The exporter refuses to overwrite an existing output. It writes:
+
+- `session_outcomes.csv`: one row for every planned session and path;
+- `workload_summary.csv`: descriptive latency, peak-allocation, and outcome
+  counts by workload and path;
+- `paired_ratio_summary.csv`: paired R/F latency and peak-allocation ratios
+  using only sessions in which both paths succeeded;
+- `unet_scaling.pdf` and `.png`: a four-panel batch/resolution latency/memory
+  figure; and
+- `summary.json`: source hashes, validated identities, output hashes, and
+  outcome counts.
+
+The figure draws a point only when all five sessions for that path/workload
+completed. OOM and other incomplete outcomes remain visible as markers at the
+top of the affected panel. This prevents a capacity failure from disappearing
+from the visual summary.

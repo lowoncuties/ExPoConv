@@ -1,0 +1,31 @@
+schema_version: "1.0"
+experiment_id: E07-J2
+description: >-
+  Amended retained-state comparison that quantifies the repeated-R numerical
+  floor alongside R/F/T, one complete Adam update, 100-update drift and a
+  declared one-ULP parameter sensitivity control.
+design_document:
+  path: docs/journal_diagnostic_protocol_v2.md
+  sha256: c356b7c7325295b4d93aaaa090bc5f1c47398d975b2293a88bf34512bcc0e31f
+execution_variants: [R, F, T]
+continuation_updates: 100
+observation_updates: [0, 1, 10, 50, 100]
+controls:
+  unperturbed_repeat: true
+  unperturbed_repeat_policy: quantify
+  one_ulp_perturbation: true
+tasks:
+  - task: isic16_poincare_unet
+    training_experiment_id: E09
+    source_seed: 11
+    source_variants: [R, F, T]
+    source_protocol_version: "1.10"
+    source_config_hash: e658aa862e4fe2f9f925cdfa954e78e98ef0f3a32c0f548b1002cc9af2831b14
+    continuation_epoch: 51
+  - task: cifar100_poincare_resnet20
+    training_experiment_id: E10
+    source_seed: 11
+    source_variants: [R, F, T]
+    source_protocol_version: "1.10"
+    source_config_hash: b851c30049080019f48f6298b441c8d1502f8c5734f27f12f45a4e6845962a40
+    continuation_epoch: 101

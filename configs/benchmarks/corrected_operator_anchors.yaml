@@ -1,0 +1,26 @@
+schema_version: "1.0"
+experiment_id: E03-E05-CORRECTED-ANCHORS
+description: Protocol-1.5 corrected latency anchors selected by the external evidence audit.
+workload_experiment_prefixes:
+  E03: [S1_, S2_, S3_, conv_bn_relu_]
+  E05: [dense_]
+variants: [R, F, T]
+sessions: 5
+warmup_calls: 50
+timed_calls_per_session: 200
+sustained_sequence_calls: 1000
+require_idle_gpu: true
+max_preexisting_memory_mib: 512
+max_preexisting_utilization_percent: 5
+memory_evidence_policy: "Diagnostic only; process-lifetime allocation fields are not used as publication memory claims because worker output retention is not isolated."
+workloads:
+  - {id: S1_forward, kind: conv2d, mode: forward, shape: {batch: 8, height: 16, width: 16, input_channels: 256, output_channels: 256}, kernel_size: 3, stride: 1, padding: SAME, depth: 1, curvature: 0.1, dtype: float32}
+  - {id: S1_backward, kind: conv2d, mode: backward, shape: {batch: 8, height: 16, width: 16, input_channels: 256, output_channels: 256}, kernel_size: 3, stride: 1, padding: SAME, depth: 1, curvature: 0.1, dtype: float32}
+  - {id: S2_forward, kind: conv2d, mode: forward, shape: {batch: 8, height: 256, width: 256, input_channels: 32, output_channels: 32}, kernel_size: 3, stride: 1, padding: SAME, depth: 1, curvature: 0.1, dtype: float32}
+  - {id: S2_backward, kind: conv2d, mode: backward, shape: {batch: 8, height: 256, width: 256, input_channels: 32, output_channels: 32}, kernel_size: 3, stride: 1, padding: SAME, depth: 1, curvature: 0.1, dtype: float32}
+  - {id: S3_forward, kind: conv2d, mode: forward, shape: {batch: 8, height: 256, width: 256, input_channels: 96, output_channels: 32}, kernel_size: 3, stride: 1, padding: SAME, depth: 1, curvature: 0.1, dtype: float32}
+  - {id: S3_backward, kind: conv2d, mode: backward, shape: {batch: 8, height: 256, width: 256, input_channels: 96, output_channels: 32}, kernel_size: 3, stride: 1, padding: SAME, depth: 1, curvature: 0.1, dtype: float32}
+  - {id: conv_bn_relu_forward, kind: conv_bn_relu, mode: forward, shape: {batch: 2, height: 32, width: 32, input_channels: 32, output_channels: 32}, kernel_size: 3, stride: 1, padding: SAME, depth: 1, normalization_epsilon: 0.000001, sustained_sequence: true, curvature: 0.1, dtype: float32}
+  - {id: conv_bn_relu_backward, kind: conv_bn_relu, mode: backward, shape: {batch: 2, height: 32, width: 32, input_channels: 32, output_channels: 32}, kernel_size: 3, stride: 1, padding: SAME, depth: 1, normalization_epsilon: 0.000001, curvature: 0.1, dtype: float32}
+  - {id: dense_stack_4_tangent_forward, kind: dense, mode: forward, coordinate_boundary: tangent_to_tangent, shape: {batch: 256, input_channels: 256, output_channels: 256}, depth: 4, curvature: 0.1, dtype: float32}
+  - {id: dense_stack_4_tangent_backward, kind: dense, mode: backward, coordinate_boundary: tangent_to_tangent, shape: {batch: 256, input_channels: 256, output_channels: 256}, depth: 4, curvature: 0.1, dtype: float32}

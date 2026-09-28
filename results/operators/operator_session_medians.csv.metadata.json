@@ -1,0 +1,12 @@
+{
+  "derivation": "Median latency by workload/config/code/variant/session/phase; no new timing measurements and no pooling across code identities.",
+  "incomplete_groups": 0,
+  "mixed_identity_groups": 0,
+  "output_path": "/data2/joc0027/poincare-execution-experiments/artifacts/analysis/e03_e05_corrected_758d182/operator_session_medians.csv",
+  "output_rows": 600,
+  "schema_version": "1.0",
+  "source_byte_size": 52391840,
+  "source_path": "/data2/joc0027/poincare-execution-experiments/artifacts/corrected_operator_anchors_758d182.csv",
+  "source_rows": 30450,
+  "source_sha256": "07ac81f05894c3445e27ba8279c70672db50276d6d87c2c1702aafc8ab5575ed"
+}

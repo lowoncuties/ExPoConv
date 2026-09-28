@@ -1,0 +1,26 @@
+{
+  "linkage_definition": "byte-identical raw input SHA-256",
+  "manifests": [
+    {
+      "exact_duplicate_conflicting_label_groups": 0,
+      "exact_duplicate_groups": 4,
+      "manifest": "isic16.csv",
+      "manifest_sha256": "81cfd817749daf15c4093d3d81d5b5185d8484f7aa6f31658f013c6d58f29466",
+      "official_test_examples_excluded_from_deduplicated_secondary": 3,
+      "official_training_test_overlap_groups": 3,
+      "rows": 1279,
+      "train_development_overlap_groups": 0
+    },
+    {
+      "exact_duplicate_conflicting_label_groups": 17,
+      "exact_duplicate_groups": 26,
+      "manifest": "cifar100.csv",
+      "manifest_sha256": "fb6ed7e666e6f3fde78671be5120df60b580790e57fe698ba38117a2133d1eca",
+      "official_test_examples_excluded_from_deduplicated_secondary": 10,
+      "official_training_test_overlap_groups": 10,
+      "rows": 60000,
+      "train_development_overlap_groups": 0
+    }
+  ],
+  "split_seed": 1729
+}

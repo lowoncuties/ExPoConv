@@ -1,0 +1,33 @@
+schema_version: "1.0"
+experiment_id: E08
+description: Frozen bounded complete Poincare U-Net inference and optimizer-step timing.
+campaign_scope: "Registered U-Net subset used as the complete-model gain gate before broader timing or training."
+variants: [R, F, T]
+sessions: 5
+warmup_calls: 50
+timed_calls_per_session: 200
+require_idle_gpu: true
+max_preexisting_memory_mib: 512
+max_preexisting_utilization_percent: 5
+shared_state_policy: "Within each session, R/F/T receive identical deterministic initial parameters, inputs, targets, and optimizer state."
+memory_evidence_policy: "Process-lifetime peak after completed outputs are dereferenced before the next call; includes initialization, compilation, and warmup and is not an isolated activation/workspace peak."
+deferred_workloads: [unet_b8_backward, resnet20_b1_forward, resnet20_b128_forward, resnet20_b128_backward, resnet20_b128_update, mlp_b128_forward, mlp_b128_backward, mlp_b128_update]
+workloads:
+  - id: unet_b1_forward
+    kind: unet
+    mode: forward
+    shape: {batch: 1, height: 256, width: 256}
+    curvature: 0.1
+    dtype: float32
+  - id: unet_b8_forward
+    kind: unet
+    mode: forward
+    shape: {batch: 8, height: 256, width: 256}
+    curvature: 0.1
+    dtype: float32
+  - id: unet_b8_update
+    kind: unet
+    mode: update
+    shape: {batch: 8, height: 256, width: 256}
+    curvature: 0.1
+    dtype: float32

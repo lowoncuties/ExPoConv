@@ -1,0 +1,144 @@
+{
+  "bounded": {
+    "analytic_passes": 113,
+    "analytic_rows": 114,
+    "code_commit": "d3f3eb80e1a35577d60befdf97ef7430e299d779",
+    "code_dirty": false,
+    "config_hash": "14436593395c86866706f2754f4900ec7e03ca1fe1a80e57b6b5962055ab6c6f",
+    "device_id": "argexpr3.vsb.cz::gpu:0::Tesla V100-PCIE-32GB",
+    "diagnostic_case_ids": [
+      "N083",
+      "N084"
+    ],
+    "diagnostic_same_precision_passes": 11,
+    "diagnostic_same_precision_rows": 20,
+    "exact_cap_kinks_are_diagnostic": true,
+    "experiment_id": "E02-REPAIR",
+    "high_precision_diagnostic_passes": 56,
+    "high_precision_diagnostic_rows": 60,
+    "n084_curvature_oracle_passes": 0,
+    "n084_curvature_oracle_rows": 6,
+    "n088_corrected_finite": true,
+    "n088_mechanism_confirmed": true,
+    "n088_stage_rows": 4,
+    "precision_policy": "{\"matmul_precision\":\"highest\",\"reduced_precision_reduction\":false,\"storage_dtype\":\"mixed_float32_float64\",\"tf32\":false}",
+    "protocol_version": "1.5",
+    "reference_commit": "{\"hnnpp\":\"28737e22822562ac18d5ea03f8c3e3929e945a83\",\"hyperbolic_unet\":\"bec504e2f4d198ee4c438579b86d72f9d8186d78\",\"poincare_resnet\":\"fbbbbf890571115444b89b114f9ed52d128d5aa3\"}",
+    "required_contract_pass": true,
+    "required_same_precision_case_ids": [
+      "N088"
+    ],
+    "required_same_precision_passes": 40,
+    "required_same_precision_rows": 40,
+    "result_rows": 424,
+    "selected_same_precision_nonfinite": 0,
+    "selected_same_precision_passes": 51,
+    "selected_same_precision_rows": 60,
+    "smooth_analytic_passes": 102,
+    "smooth_analytic_rows": 102,
+    "status": "ok",
+    "threshold_diagnostic_passes": 11,
+    "threshold_diagnostic_rows": 12,
+    "timestamp_utc": "2026-09-07T20:23:23.990Z"
+  },
+  "execution_environment": {
+    "cuda_visible_devices": "1",
+    "git": {
+      "commit": "ce009c162672cce28224d7c85782e9acb2ee9505",
+      "dirty": false,
+      "status_porcelain": []
+    },
+    "hostname": "argexpr3.vsb.cz",
+    "jax_backend": "gpu",
+    "jax_devices": [
+      {
+        "device_kind": "Tesla V100-PCIE-32GB",
+        "id": 0,
+        "memory_stats": {
+          "bytes_in_use": 0,
+          "bytes_limit": 25567444992,
+          "bytes_reserved": 0,
+          "largest_alloc_size": 0,
+          "largest_free_block_bytes": 0,
+          "num_allocs": 0,
+          "peak_bytes_in_use": 0,
+          "peak_bytes_reserved": 0,
+          "peak_pool_bytes": 0,
+          "pool_bytes": 0
+        },
+        "platform": "gpu"
+      }
+    ]
+  },
+  "schema_version": "1.0",
+  "source_files": {
+    "/data2/joc0027/poincare-execution-experiments/artifacts/environment_e02_repair_structured_ce009c1_v100_20260907.json": {
+      "bytes": 23095,
+      "sha256": "9a3ccee59c144488068a63b44adf8524d4f4c826e66aa8ff791d18c4eef84cae"
+    },
+    "/data2/joc0027/poincare-execution-experiments/artifacts/numerical_repair/e02_repair_protocol_1_5_d3f3eb8/e02_repair_results.jsonl": {
+      "bytes": 616643,
+      "sha256": "e4302913d7b7695a6ff4367fbccb330a32b85421356c4fb40477d107373607d6"
+    },
+    "/data2/joc0027/poincare-execution-experiments/artifacts/numerical_repair/e02_repair_protocol_1_5_d3f3eb8/summary.json": {
+      "bytes": 1653,
+      "sha256": "85d16d7292782258b85acbbe7715476f73381a466d66fe6203c8740490693eb8"
+    },
+    "/data2/joc0027/poincare-execution-experiments/artifacts/numerical_repair/e02_repair_structured_ce009c1.jsonl": {
+      "bytes": 5330977,
+      "sha256": "0663506dfb3116870f1324be465b17a5fc7723fb190bd53d04840963e07d4e59"
+    },
+    "/data2/joc0027/poincare-execution-experiments/configs/numerics/e02_repair_structured.yaml": {
+      "bytes": 708,
+      "sha256": "48624566404051b76c222cc51f81557d561776b0223156c12f2e745127745c9e"
+    },
+    "/data2/joc0027/poincare-execution-experiments/protocol.yaml": {
+      "bytes": 8772,
+      "sha256": "e753a215affccfe2fb6e84a12a1f245768b6edca25ee2cfcd89aae6c914a2536"
+    }
+  },
+  "structured": {
+    "agreement_acceptance_rule": "finite and max_absolute_error <= absolute_tolerance + relative_tolerance * reference_l2_norm",
+    "agreement_accepted_rows": 2687,
+    "agreement_finite_rows": 2720,
+    "agreement_rows": 2720,
+    "code_commits": [
+      "ce009c162672cce28224d7c85782e9acb2ee9505"
+    ],
+    "code_dirty_values": [
+      false
+    ],
+    "completeness": {
+      "expected_realization_groups": 40,
+      "missing_realization_groups": [],
+      "observed_realization_groups": 40,
+      "rows_per_realization_by_case_dtype": {
+        "convolution_stack_8::float32": [
+          65
+        ],
+        "convolution_stack_8::float64": [
+          65
+        ],
+        "small_unet::float32": [
+          125
+        ],
+        "small_unet::float64": [
+          125
+        ]
+      },
+      "unexpected_realization_groups": [],
+      "uniform_rows_per_case_dtype": true
+    },
+    "config_hashes": [
+      "f8d908b82599976f2df0ca4a38f85b36cedd1c5a2ce1b08e00d16165b0b3cc26"
+    ],
+    "device_ids": [
+      "argexpr3.vsb.cz::gpu:0::Tesla V100-PCIE-32GB"
+    ],
+    "finite_difference_finite_rows": 1080,
+    "finite_difference_interpretation": "descriptive registered step sweep; best steps are selected by minimum relative error and are not an acceptance gate",
+    "finite_difference_rows": 1080,
+    "result_rows": 3800,
+    "status_non_ok_rows": 0
+  }
+}

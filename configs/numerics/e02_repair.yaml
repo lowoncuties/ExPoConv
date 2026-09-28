@@ -1,0 +1,45 @@
+schema_version: "1.0"
+experiment_id: E02-REPAIR
+description: Bounded audit-driven derivative and fixed-margin oracle validation.
+fixed_float32_projection_margin: 0.004
+score_reconstruction:
+  precisions: [float32, float64]
+  curvatures: [0.1, 1.0, 10.0]
+  cases:
+    - id: scalar_zero
+      scores: [0.0]
+      direction: [1.0]
+      scale_by_precision: {float32: 1.0, float64: 1.0}
+      expectation: smooth_origin_jacobian_I_over_2
+    - id: vector_zero
+      scores: [0.0, 0.0, 0.0]
+      direction: [0.25, -0.5, 0.75]
+      scale_by_precision: {float32: 1.0, float64: 1.0}
+      expectation: smooth_origin_jacobian_I_over_2
+    - id: vector_near_zero
+      scores: [1.0, -2.0, 3.0]
+      direction: [0.25, -0.5, 0.75]
+      scale_by_precision: {float32: 0.0001, float64: 1.0e-8}
+      expectation: smooth_origin_limit_jacobian_I_over_2
+projection:
+  precisions: [float32, float64]
+  curvatures: [0.1, 1.0, 10.0]
+  normalized_radii: [0.0, 1.0e-6, 0.995, 0.996, 0.997]
+  exact_cap_normalized_radius: 0.996
+  directions:
+    - {id: radial, value: [1.0, 0.0]}
+    - {id: tangential, value: [0.0, 1.0]}
+  threshold_convention: machine_equal_norm_uses_identity; constructed_cap_is_nondifferentiable_diagnostic
+selected_manifest_cases:
+  - {case_id: N088, realizations: [6, 7, 8, 9]}
+  - {case_id: N083, realizations: [0]}
+  - {case_id: N084, realizations: [1]}
+n088_stage_diagnostic:
+  case_id: N088
+  realizations: [6, 7, 8, 9]
+  archived_nonfinite_expected: [7, 8]
+acceptance:
+  required_same_precision_case_ids: [N088]
+  diagnostic_case_ids: [N083, N084]
+  exact_cap_kinks_are_diagnostic: true
+structured_followup_config: configs/numerics/e02_repair_structured.yaml

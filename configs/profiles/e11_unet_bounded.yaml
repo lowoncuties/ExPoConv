@@ -1,0 +1,17 @@
+schema_version: "1.0"
+experiment_id: E11
+description: Bounded complete Poincare U-Net compiler and device-profile attribution.
+campaign_scope: "Registered U-Net update profile used to explain the bounded E08 complete-model result."
+variants: [R, F, T]
+warmup_calls: 10
+profiled_calls: 20
+require_idle_gpu: true
+max_preexisting_memory_mib: 512
+max_preexisting_utilization_percent: 5
+workloads:
+  - id: unet_b8_update
+    kind: unet
+    mode: update
+    shape: {batch: 8, height: 256, width: 256}
+    curvature: 0.1
+    dtype: float32

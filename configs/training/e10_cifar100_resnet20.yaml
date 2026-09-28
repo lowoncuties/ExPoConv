@@ -1,0 +1,7 @@
+schema_version: "1.0"
+experiment_id: E10
+description: Five matched-seed fixed-budget R/F/T Poincare ResNet-20 training comparisons on CIFAR-100.
+task: cifar100_poincare_resnet20
+dataset: cifar100
+variants: [R, F, T]
+seeds: [11, 29, 47, 71, 101]

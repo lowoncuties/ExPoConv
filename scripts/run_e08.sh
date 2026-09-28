@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+repository_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+environment_dir=${POINCARE_EXEC_ENV_DIR:-$repository_root/.venv}
+artifact_dir=${POINCARE_EXEC_ARTIFACT_DIR:-$repository_root/artifacts}
+config=${POINCARE_EXEC_E08_CONFIG:-configs/benchmarks/e08_unet_bounded.yaml}
+output=${POINCARE_EXEC_E08_OUTPUT:-$artifact_dir/e08_unet_bounded.csv}
+visible_devices=${CUDA_VISIBLE_DEVICES:-}
+
+if [[ ! "$visible_devices" =~ ^[0-9]+$ ]]; then
+  echo "CUDA_VISIBLE_DEVICES must name exactly one physical GPU index" >&2
+  exit 2
+fi
+
+cd "${repository_root}"
+
+"$environment_dir/bin/poincare-exec" benchmark \
+  --protocol protocol.yaml \
+  --config "$config" \
+  --output "$output"

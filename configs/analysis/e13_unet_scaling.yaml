@@ -1,0 +1,53 @@
+schema_version: "1.0"
+analysis_id: e13_unet_scaling_rf
+experiment_id: E13
+description: "Paired R/F Poincare U-Net complete-update scaling across batch size and input resolution."
+variants: [R, F]
+baseline_variant: R
+candidate_variant: F
+sessions: 5
+timed_calls_per_session: 200
+memory_budget_bytes: 34359738368
+require_clean_code: true
+require_physical_gpu_uuid: true
+operation_boundary_prefix: "unet:update"
+precision_contract:
+  storage_dtype: float32
+  matmul_precision: highest
+  reduced_precision_reduction: false
+  tf32: false
+protocol_document:
+  path: protocol.yaml
+  sha256: 5dbd77ce1d6fa7e9a33114093a730208048bcf295012b66c0df00f6e3e8711fe
+benchmark_config:
+  path: configs/benchmarks/e13_unet_scaling.yaml
+  sha256: aba1f0bdf28206f0e2363fad67de641c29a35aeb3f14056c8bd5278c9a3bcd29
+
+# This seven-workload set is the union, not the Cartesian product, of the two
+# sweeps. The batch-8, 256x256 workload belongs to both panels and is run once.
+sweeps:
+  batch:
+    values: [1, 2, 4, 8, 16]
+    fixed: {resolution: 256}
+  resolution:
+    values: [128, 256, 512]
+    fixed: {batch: 8}
+
+workloads:
+  - {id: unet_update_b1_r256, batch: 1, resolution: 256, panels: [batch]}
+  - {id: unet_update_b2_r256, batch: 2, resolution: 256, panels: [batch]}
+  - {id: unet_update_b4_r256, batch: 4, resolution: 256, panels: [batch]}
+  - {id: unet_update_b8_r128, batch: 8, resolution: 128, panels: [resolution]}
+  - {id: unet_update_b8_r256, batch: 8, resolution: 256, panels: [batch, resolution]}
+  - {id: unet_update_b8_r512, batch: 8, resolution: 512, panels: [resolution]}
+  - {id: unet_update_b16_r256, batch: 16, resolution: 256, panels: [batch]}
+
+statistical_method: "For each successful fresh-process path/session, take the median of 200 synchronized complete-update calls. For sessions in which both R and F succeed, form the paired R/F ratio and report its geometric mean with a two-sided 95% Student-t interval on log ratios. Adjacent calls are technical repetitions; sessions are the inferential units."
+memory_scope: "Process-lifetime peak live JAX allocation through the final synchronized output, including initialization, compilation, and warmup; this is not isolated activation memory."
+
+outputs:
+  session_outcomes: session_outcomes.csv
+  workload_summary: workload_summary.csv
+  paired_ratios: paired_ratio_summary.csv
+  figure_stem: unet_scaling
+  audit_summary: summary.json
