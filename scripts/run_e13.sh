@@ -15,6 +15,6 @@ fi
 
 cd "$repository_root"
 "$environment_dir/bin/poincare-exec" benchmark \
-  --protocol protocol.yaml \
+  --protocol configs/protocols/protocol_1_11.yaml \
   --config "$config" \
   --output "$output"

@@ -19,9 +19,13 @@ The batch-8, 256 x 256 workload is shared by both sweeps and must be measured
 once. Only R and F are included. This differs from the older R/T wording for
 E13 in the original experiment plan; protocol amendment 1.11 records the R/F
 scope prospectively, before GPU execution. The analysis manifest pins both
-`protocol.yaml` and `configs/benchmarks/e13_unet_scaling.yaml` by SHA-256, and
-the exporter recomputes every expected per-workload configuration hash from
-those two pinned documents.
+the byte-exact protocol 1.11 snapshot at
+`configs/protocols/protocol_1_11.yaml` and
+`configs/benchmarks/e13_unet_scaling.yaml` by SHA-256. The exporter recomputes
+every expected per-workload configuration hash from those two pinned documents.
+At the recorded E13 code revision, the same protocol bytes were at top-level
+`protocol.yaml`; `results/e13_scaling/summary.json` retains that historical
+path, while the versioned snapshot permits validation after later amendments.
 
 ## Accepted raw formats and identities
 

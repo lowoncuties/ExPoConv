@@ -301,8 +301,11 @@ sanitized derivatives alongside hashes for the preserved originals.
 amended only through its dated amendment log. Its bytes are hashed into the
 configuration hash of every recorded result, and `configs/checkpoints/e07_journal_diagnostics_v2.yaml`
 validates source checkpoints against those hashes, so historical versions are
-not silently relabelled. E12 CUDA-12 timing, a Fashion-MNIST dense task, and
-the original local plan documents remain planned without a result. The hashed
+not silently relabelled. Byte-exact historical protocols needed to replay an
+accepted analysis are retained under `configs/protocols/`; E13 uses the
+protocol 1.11 snapshot there rather than the later-amended top-level file. E12
+CUDA-12 timing, a Fashion-MNIST dense task, and the original local plan
+documents remain planned without a result. The hashed
 E20/E21 configuration descriptions still say "secondary CUDA-12 platform";
 protocol 1.14 and the captured environment record are authoritative that the
 accepted training runtime is the pinned CUDA-11.8 stack on A6000. Likewise,

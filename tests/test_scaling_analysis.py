@@ -11,8 +11,11 @@ from poincare_exec.config.loader import config_hash
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
 MANIFEST_PATH = REPOSITORY_ROOT / "configs" / "analysis" / "e13_unet_scaling.yaml"
+MANIFEST = yaml.safe_load(MANIFEST_PATH.read_text(encoding="utf-8"))
 GPU_UUID = "GPU-00000000-1111-2222-3333-444444444444"
-PROTOCOL = yaml.safe_load((REPOSITORY_ROOT / "protocol.yaml").read_text(encoding="utf-8"))
+PROTOCOL = yaml.safe_load(
+    (REPOSITORY_ROOT / MANIFEST["protocol_document"]["path"]).read_text(encoding="utf-8")
+)
 BENCHMARK = yaml.safe_load(
     (REPOSITORY_ROOT / "configs" / "benchmarks" / "e13_unet_scaling.yaml").read_text(
         encoding="utf-8"
@@ -176,6 +179,13 @@ def test_export_preserves_oom_and_pairs_only_successful_sessions(tmp_path):
 
     assert summary["session_rows"] == 7 * 5 * 2
     assert summary["outcome_counts"] == {"ok": 69, "oom": 1}
+    assert summary["provenance_contract"]["protocol_path"] == (
+        "configs/protocols/protocol_1_11.yaml"
+    )
+    assert summary["provenance_contract"]["protocol_sha256"] == (
+        "5dbd77ce1d6fa7e9a33114093a730208048bcf295012b66c0df00f6e3e8711fe"
+    )
+    assert summary["provenance_contract"]["protocol_version"] == "1.11"
     assert summary["validated_identity"]["physical_gpu_uuid"] == GPU_UUID
     assert len(summary["validated_identity"]["device_id_encodings"]) == 2
     assert len(summary["validated_identity"]["precision_policy_encodings"]) == 2

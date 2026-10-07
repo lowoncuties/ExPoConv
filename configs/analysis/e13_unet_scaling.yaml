@@ -17,7 +17,7 @@ precision_contract:
   reduced_precision_reduction: false
   tf32: false
 protocol_document:
-  path: protocol.yaml
+  path: configs/protocols/protocol_1_11.yaml
   sha256: 5dbd77ce1d6fa7e9a33114093a730208048bcf295012b66c0df00f6e3e8711fe
 benchmark_config:
   path: configs/benchmarks/e13_unet_scaling.yaml

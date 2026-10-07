@@ -1,8 +1,9 @@
+import json
 from pathlib import Path
 
 import pytest
 
-from poincare_exec.config.loader import load_yaml, validate_hashed_document
+from poincare_exec.config.loader import config_hash, load_yaml, validate_hashed_document
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
 
@@ -85,3 +86,28 @@ def test_e13_unet_scaling_is_the_frozen_one_factor_grid() -> None:
     assert all(workload["kind"] == "unet" for workload in workloads)
     assert all(workload["mode"] == "update" for workload in workloads)
     assert all(workload["dtype"] == "float32" for workload in workloads)
+
+
+def test_e13_analysis_uses_the_frozen_protocol_snapshot() -> None:
+    manifest = load_yaml(REPOSITORY_ROOT / "configs" / "analysis" / "e13_unet_scaling.yaml")
+    protocol_path, protocol_digest = validate_hashed_document(
+        manifest, field="protocol_document"
+    )
+    benchmark_path, _ = validate_hashed_document(manifest, field="benchmark_config")
+    protocol = load_yaml(REPOSITORY_ROOT / protocol_path)
+    benchmark = load_yaml(REPOSITORY_ROOT / benchmark_path)
+    accepted_summary = json.loads(
+        (REPOSITORY_ROOT / "results" / "e13_scaling" / "summary.json").read_text(
+            encoding="utf-8"
+        )
+    )
+
+    assert protocol_path == "configs/protocols/protocol_1_11.yaml"
+    assert protocol_digest == (
+        "5dbd77ce1d6fa7e9a33114093a730208048bcf295012b66c0df00f6e3e8711fe"
+    )
+    assert protocol["protocol_version"] == "1.11"
+    assert {
+        workload["id"]: config_hash(protocol, benchmark, workload)
+        for workload in benchmark["workloads"]
+    } == accepted_summary["provenance_contract"]["expected_config_hashes"]
