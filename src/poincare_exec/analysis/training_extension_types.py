@@ -76,6 +76,8 @@ RUN_AUDIT_FIELDS = (
     "attempt_row",
     "accepted_root_attempt_path",
     "accepted_root_attempt_row",
+    "post_worker_snapshot_disposition",
+    "post_worker_evidence_id",
     "summary_path",
     "evidence_root",
     "supporting_files",

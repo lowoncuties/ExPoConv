@@ -1,0 +1,78 @@
+schema_version: "1.0"
+analysis_id: e20_e21_training_replication_v1
+amendment_id: e20_e21_training_replication_v2
+analysis_status: frozen_before_official_test_unblinding
+frozen: "2026-10-07"
+base_analysis_id: e20_e21_training_replication_v1
+
+base_manifest_document:
+  path: configs/analysis/e20_e21_training_replication.yaml
+  sha256: ec7e71303bc90f48bd5acc92714c64c382917a6e98e1619ad4a4bbf24a9b9f11
+base_contract_document:
+  path: docs/e20_e21_analysis_contract.md
+  sha256: 5771c54687e3b70738b37b47136cb4c83b3955cf372456903ab9448d3bbce2d0
+contract_document:
+  path: docs/e20_e21_analysis_contract_amendment_v2.md
+  sha256: 41e58033d37b7d36a42e8b80842c3f17ff2164363c13d7ed54c2204c74aab4b2
+
+post_worker_snapshot_policy:
+  before_snapshot: require_idle
+  after_snapshot: require_identity_and_exact_registration_if_nonidle
+
+post_worker_snapshot_evidence:
+  - evidence_id: e20_r1338995025_post_worker_ollama
+    input_kind: post_worker_evidence_root
+    archived_remote_root: /storage1/users/joc0027/hypergan/expoconv-control/e20-e21-guardian-v3-fef30ec
+    identity:
+      experiment_id: E20
+      variant: R
+      seed: 1338995025
+    required_files:
+      campaign_attempts_snapshot:
+        relative_path: e20_campaign_attempts_pre_v3.jsonl
+        sha256: 451870218f5f51ea08b0ed943fc916ad3e4628dae71c621d3110c56c863d0407
+      wrapper_telemetry:
+        relative_path: e20_remaining/gpu_utilization.csv
+        sha256: eaf68f96c7f6694df2169679d6e3176cd828e3bea814686d49dffd357833ef57
+      wrapper_status:
+        relative_path: e20_remaining/status.tsv
+        sha256: b93f9999a52ec4d6780b3a7e3402747a77e3f487302755713d6fd3fa94396e20
+      wrapper_stderr:
+        relative_path: e20_remaining/command.stderr.log
+        sha256: a9b28004706bcbea27745a3b56dc16f343d3b33c691903034167af9f99ed0581
+      wrapper_command:
+        relative_path: e20_remaining/command.txt
+        sha256: 2f373179fd6cf85d1bb026c8cd27bb4c782fa55bf98acb9e24aebfb38bb26d16
+      wrapper_gpu_phase:
+        relative_path: e20_remaining/gpu_phase.txt
+        sha256: a28785d95c190046afd6c467fd9bf7ed948f9aeabf9e6df4647128b51f8a347e
+    required_text_lines:
+      wrapper_telemetry:
+        - "2026/10/07 20:13:51.779, 1, 59, 27119, 49140, SETUP"
+        - "2026/10/07 20:13:52.817, 1, 90, 18496, 49140, SETUP"
+      wrapper_status:
+        - "status\tFAILED_COMMAND"
+        - "command_exit_status\t1"
+        - "start_utc\t2026-10-07T19:25:06Z"
+        - "end_utc\t2026-10-07T20:14:25Z"
+      wrapper_stderr:
+        - "RuntimeError: selected GPU compute processes did not clear within 30 seconds; refusing final measurement"
+    expected_attempt:
+      canonical_row_sha256: cbccbf06b32f2c7c27f4f688e8b8e6c83c906669019e858f4ef44180c73297fd
+      after_snapshot_sha256: 9dbe90f443748f8bac1f75625cab92e320b2a17abc58c810a25ee382f2ebbf87
+      timestamp_utc: "2026-10-07T20:13:52.671Z"
+    summary_stat:
+      relative_path: R/seed_1338995025/summary.json
+      size: 2137
+      mtime_ns: 1791404030720105567
+    timing_evidence:
+      last_worker_allocation_line: "2026/10/07 20:13:51.779, 1, 59, 27119, 49140, SETUP"
+      first_foreign_only_line: "2026/10/07 20:13:52.817, 1, 90, 18496, 49140, SETUP"
+    classification: foreign_process_started_after_completed_worker
+
+immutability:
+  commit_before_endpoint_unblinding: true
+  frozen_before_endpoint_unblinding: true
+  preserve_base_manifest_and_contract: true
+  amend_in_place_after_unblinding: false
+  correction_policy: create_a_new_version_and_preserve_this_manifest

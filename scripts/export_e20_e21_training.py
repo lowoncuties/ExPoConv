@@ -9,6 +9,7 @@ from pathlib import Path
 from poincare_exec.analysis.training_extensions import (
     export_extension_campaign,
     parse_cohort_roots,
+    parse_post_worker_evidence_roots,
     parse_runtime_evidence_roots,
     parse_supplemental_evidence_roots,
 )
@@ -23,7 +24,7 @@ def main() -> None:
         default=REPOSITORY_ROOT
         / "configs"
         / "analysis"
-        / "e20_e21_training_replication.yaml",
+        / "e20_e21_training_replication_v2.yaml",
     )
     parser.add_argument(
         "--cohort-root",
@@ -49,6 +50,16 @@ def main() -> None:
         metavar="EVIDENCE_ID=PATH",
         help="Registered rejected-attempt evidence root. Repeat when registered.",
     )
+    parser.add_argument(
+        "--post-worker-evidence",
+        action="append",
+        default=[],
+        metavar="EVIDENCE_ID=PATH",
+        help=(
+            "Registered infrastructure evidence for a non-idle snapshot taken "
+            "after a completed worker. Repeat when registered."
+        ),
+    )
     parser.add_argument("--output-dir", type=Path, required=True)
     arguments = parser.parse_args()
     export_extension_campaign(
@@ -59,6 +70,9 @@ def main() -> None:
         runtime_evidence_roots=parse_runtime_evidence_roots(arguments.runtime_evidence),
         supplemental_evidence_roots=parse_supplemental_evidence_roots(
             arguments.supplemental_attempt_evidence
+        ),
+        post_worker_evidence_roots=parse_post_worker_evidence_roots(
+            arguments.post_worker_evidence
         ),
     )
 

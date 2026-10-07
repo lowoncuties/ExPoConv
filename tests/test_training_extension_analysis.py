@@ -5,6 +5,7 @@ from __future__ import annotations
 import csv
 import hashlib
 import json
+import os
 import pickle
 from pathlib import Path
 from typing import Any
@@ -13,6 +14,7 @@ import numpy as np
 import pytest
 import yaml
 
+import poincare_exec.analysis.training_extension_statistics as extension_statistics
 import poincare_exec.analysis.training_extensions as extension_analysis
 from poincare_exec.analysis.training_extensions import (
     ExtensionAnalysisError,
@@ -88,6 +90,20 @@ def _snapshot(device: dict[str, Any]) -> dict[str, Any]:
         "compute_processes": [],
         "process_query_status": "ok",
     }
+
+
+def _canonical_line_digest(value: dict[str, Any]) -> str:
+    payload = (
+        json.dumps(
+            value,
+            sort_keys=True,
+            separators=(",", ":"),
+            ensure_ascii=True,
+            allow_nan=False,
+        )
+        + "\n"
+    ).encode("utf-8")
+    return hashlib.sha256(payload).hexdigest()
 
 
 def _metrics(task: str, value: float, iou: float | None) -> dict[str, Any]:
@@ -621,6 +637,133 @@ def _fixture(
     )
 
 
+def _register_post_worker_disposition(
+    manifest: dict[str, Any],
+    roots: dict[str, Path],
+    tmp_path: Path,
+    *,
+    experiment_id: str = "E20",
+    variant: str = "R",
+    seed: int = 101,
+) -> dict[str, Path]:
+    cohort = manifest["cohorts"][experiment_id]
+    attempts_path = roots[experiment_id] / "campaign_attempts.jsonl"
+    attempts = [
+        json.loads(line)
+        for line in attempts_path.read_text(encoding="utf-8").splitlines()
+        if line.strip()
+    ]
+    selected = [
+        row
+        for row in attempts
+        if row["variant"] == variant and int(row["seed"]) == seed
+    ]
+    assert len(selected) == 1
+    attempt = selected[0]
+    attempt["timestamp_utc"] = "2026-10-07T20:13:52.671Z"
+    attempt["gpu_snapshot_after"] = {
+        **_snapshot(cohort["physical_device"]),
+        "memory.used": 18496,
+        "utilization.gpu": 57,
+        "compute_processes": [
+            {
+                "gpu_uuid": cohort["physical_device"]["uuid"],
+                "pid": 3723741,
+                "process_name": "/usr/local/lib/ollama/llama-server",
+                "used_memory_mib": 18482,
+            }
+        ],
+    }
+    attempts_path.write_text(
+        "".join(json.dumps(row, sort_keys=True) + "\n" for row in attempts),
+        encoding="utf-8",
+    )
+
+    evidence_id = "synthetic_post_worker_occupancy"
+    evidence_root = tmp_path / "post-worker-evidence"
+    evidence_root.mkdir(parents=True)
+    campaign_snapshot = evidence_root / "campaign_attempts_pre_handoff.jsonl"
+    campaign_snapshot.write_text(
+        attempts_path.read_text(encoding="utf-8"), encoding="utf-8"
+    )
+    last_worker_line = "2026/10/07 20:13:51.779, 1, 59, 27119, 49140, SETUP"
+    first_foreign_line = "2026/10/07 20:13:52.817, 1, 90, 18496, 49140, SETUP"
+    file_contents = {
+        "wrapper_telemetry": last_worker_line + "\n" + first_foreign_line + "\n",
+        "wrapper_status": (
+            "status\tFAILED_COMMAND\n"
+            "command_exit_status\t1\n"
+            "end_utc\t2026-10-07T20:14:25Z\n"
+        ),
+        "wrapper_stderr": (
+            "RuntimeError: selected GPU compute processes did not clear within "
+            "30 seconds; refusing final measurement\n"
+        ),
+        "wrapper_command": "synthetic registered campaign command\n",
+        "wrapper_gpu_phase": "SETUP\n",
+    }
+    evidence_paths = {"campaign_attempts_snapshot": campaign_snapshot}
+    for role, contents in file_contents.items():
+        path = evidence_root / f"{role}.txt"
+        path.write_text(contents, encoding="utf-8")
+        evidence_paths[role] = path
+
+    summary = roots[experiment_id] / variant / f"seed_{seed}" / "summary.json"
+    summary_mtime_ns = 1_791_404_030_720_105_567
+    os.utime(summary, ns=(summary_mtime_ns, summary_mtime_ns))
+    manifest["post_worker_snapshot_policy"] = {
+        "before_snapshot": "require_idle",
+        "after_snapshot": "require_identity_and_exact_registration_if_nonidle",
+    }
+    manifest["post_worker_snapshot_evidence"] = [
+        {
+            "evidence_id": evidence_id,
+            "input_kind": "post_worker_evidence_root",
+            "identity": {
+                "experiment_id": experiment_id,
+                "variant": variant,
+                "seed": seed,
+            },
+            "required_files": {
+                role: {
+                    "relative_path": path.relative_to(evidence_root).as_posix(),
+                    "sha256": _digest(path),
+                }
+                for role, path in evidence_paths.items()
+            },
+            "required_text_lines": {
+                "wrapper_telemetry": [last_worker_line, first_foreign_line],
+                "wrapper_status": [
+                    "status\tFAILED_COMMAND",
+                    "command_exit_status\t1",
+                ],
+                "wrapper_stderr": [
+                    "RuntimeError: selected GPU compute processes did not clear "
+                    "within 30 seconds; refusing final measurement"
+                ],
+            },
+            "expected_attempt": {
+                "canonical_row_sha256": _canonical_line_digest(attempt),
+                "after_snapshot_sha256": _canonical_line_digest(
+                    attempt["gpu_snapshot_after"]
+                ),
+                "timestamp_utc": attempt["timestamp_utc"],
+            },
+            "summary_stat": {
+                "relative_path": f"{variant}/seed_{seed}/summary.json",
+                "size": summary.stat().st_size,
+                "mtime_ns": summary_mtime_ns,
+            },
+            "timing_evidence": {
+                "last_worker_allocation_line": last_worker_line,
+                "first_foreign_only_line": first_foreign_line,
+            },
+            "classification": "foreign_process_started_after_completed_worker",
+        }
+    ]
+    return {evidence_id: evidence_root}
+
+
 def _record(rows: list[dict[str, Any]], **identity: Any) -> dict[str, Any]:
     selected = [
         row
@@ -988,6 +1131,212 @@ def test_joint_gate_blocks_all_endpoint_extraction(tmp_path: Path) -> None:
             runtime_evidence_roots=runtime_roots,
             supplemental_evidence_roots=supplemental_roots,
         )
+
+
+def test_foreign_process_before_worker_always_closes_gate(tmp_path: Path) -> None:
+    manifest, roots, runtime_roots, supplemental_roots, repository, _ = _fixture(tmp_path)
+    attempts_path = roots["E20"] / "campaign_attempts.jsonl"
+    attempts = [
+        json.loads(line)
+        for line in attempts_path.read_text(encoding="utf-8").splitlines()
+        if line.strip()
+    ]
+    attempts[0]["gpu_snapshot_before"]["compute_processes"] = [
+        {"process_name": "foreign", "pid": 7}
+    ]
+    attempts_path.write_text(
+        "".join(json.dumps(row, sort_keys=True) + "\n" for row in attempts),
+        encoding="utf-8",
+    )
+
+    with pytest.raises(ExtensionAnalysisError, match="competing compute processes"):
+        analyze_extension_campaign(
+            manifest,
+            roots,
+            repository_root=repository,
+            runtime_evidence_roots=runtime_roots,
+            supplemental_evidence_roots=supplemental_roots,
+        )
+
+
+def test_registered_post_worker_process_is_accepted_exactly(tmp_path: Path) -> None:
+    manifest, roots, runtime_roots, supplemental_roots, repository, _ = _fixture(tmp_path)
+    post_worker_roots = _register_post_worker_disposition(manifest, roots, tmp_path)
+
+    outputs = analyze_extension_campaign(
+        manifest,
+        roots,
+        repository_root=repository,
+        runtime_evidence_roots=runtime_roots,
+        supplemental_evidence_roots=supplemental_roots,
+        post_worker_evidence_roots=post_worker_roots,
+    )
+
+    row = _record(
+        outputs[OUTPUTS["run_audit"]],
+        experiment_id="E20",
+        variant="R",
+        seed=101,
+        record_type="accepted_registered_training_run",
+    )
+    assert row["post_worker_snapshot_disposition"] == (
+        "registered_post_worker_occupancy"
+    )
+    assert row["post_worker_evidence_id"] == "synthetic_post_worker_occupancy"
+
+    attempts_path = roots["E20"] / "campaign_attempts.jsonl"
+    attempts = [
+        json.loads(line)
+        for line in attempts_path.read_text(encoding="utf-8").splitlines()
+        if line.strip()
+    ]
+    selected = [
+        attempt
+        for attempt in attempts
+        if attempt["variant"] == "R" and int(attempt["seed"]) == 101
+    ]
+    assert len(selected) == 1
+    selected[0]["gpu_snapshot_after"]["compute_processes"][0]["pid"] = 8
+    attempts_path.write_text(
+        "".join(json.dumps(attempt, sort_keys=True) + "\n" for attempt in attempts),
+        encoding="utf-8",
+    )
+    with pytest.raises(ExtensionAnalysisError, match="canonical_row_sha256"):
+        analyze_extension_campaign(
+            manifest,
+            roots,
+            repository_root=repository,
+            runtime_evidence_roots=runtime_roots,
+            supplemental_evidence_roots=supplemental_roots,
+            post_worker_evidence_roots=post_worker_roots,
+        )
+
+
+def test_unregistered_post_worker_process_closes_gate(tmp_path: Path) -> None:
+    manifest, roots, runtime_roots, supplemental_roots, repository, _ = _fixture(tmp_path)
+    attempts_path = roots["E20"] / "campaign_attempts.jsonl"
+    attempts = [
+        json.loads(line)
+        for line in attempts_path.read_text(encoding="utf-8").splitlines()
+        if line.strip()
+    ]
+    attempts[0]["gpu_snapshot_after"]["compute_processes"] = [
+        {"process_name": "foreign", "pid": 7}
+    ]
+    attempts_path.write_text(
+        "".join(json.dumps(row, sort_keys=True) + "\n" for row in attempts),
+        encoding="utf-8",
+    )
+
+    with pytest.raises(
+        ExtensionAnalysisError, match="no exact pre-unblinding disposition"
+    ):
+        analyze_extension_campaign(
+            manifest,
+            roots,
+            repository_root=repository,
+            runtime_evidence_roots=runtime_roots,
+            supplemental_evidence_roots=supplemental_roots,
+        )
+
+
+def test_empty_post_worker_process_list_allows_lagging_utilization(
+    tmp_path: Path,
+) -> None:
+    manifest, roots, runtime_roots, supplemental_roots, repository, _ = _fixture(tmp_path)
+    attempts_path = roots["E20"] / "campaign_attempts.jsonl"
+    attempts = [
+        json.loads(line)
+        for line in attempts_path.read_text(encoding="utf-8").splitlines()
+        if line.strip()
+    ]
+    attempts[0]["gpu_snapshot_after"]["memory.used"] = 2
+    attempts[0]["gpu_snapshot_after"]["utilization.gpu"] = 99
+    attempts[0]["gpu_snapshot_after"]["compute_processes"] = []
+    attempts_path.write_text(
+        "".join(json.dumps(row, sort_keys=True) + "\n" for row in attempts),
+        encoding="utf-8",
+    )
+
+    outputs = analyze_extension_campaign(
+        manifest,
+        roots,
+        repository_root=repository,
+        runtime_evidence_roots=runtime_roots,
+        supplemental_evidence_roots=supplemental_roots,
+    )
+    assert outputs[OUTPUTS["run_audit"]]
+
+
+def test_v2_amendment_overlay_preserves_the_frozen_base(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    repository = extension_analysis.SOURCE_REPOSITORY_ROOT
+    manifest_path = (
+        repository
+        / "configs"
+        / "analysis"
+        / "e20_e21_training_replication_v2.yaml"
+    )
+    monkeypatch.setattr(
+        extension_analysis,
+        "_validate_analysis_checkout",
+        lambda *_args, **_kwargs: {"commit": "test"},
+    )
+
+    manifest, selected_path, selected_repository, _ = (
+        extension_analysis._load_checked_manifest(manifest_path, repository)
+    )
+
+    assert selected_path == manifest_path
+    assert selected_repository == repository
+    assert manifest["analysis_id"] == "e20_e21_training_replication_v1"
+    assert manifest["amendment_id"] == "e20_e21_training_replication_v2"
+    assert manifest["base_analysis_id"] == "e20_e21_training_replication_v1"
+    assert manifest["cohorts"]["E20"]["run_config_hash"].startswith("b226335a")
+    assert len(manifest["post_worker_snapshot_evidence"]) == 1
+
+    base = yaml.safe_load(
+        (repository / "configs/analysis/e20_e21_training_replication.yaml").read_text(
+            encoding="utf-8"
+        )
+    )
+    identities = (
+        (
+            "E20",
+            "isic16_poincare_unet",
+            "fixed_final_update",
+            "official_test",
+            "mean_foreground_dice",
+            "F_minus_R",
+            "R",
+            "F",
+            "not_applicable",
+        ),
+        (
+            "E21",
+            "cifar100_poincare_resnet20",
+            "fixed_final_update",
+            "not_applicable",
+            "not_applicable",
+            "R_over_F",
+            "R",
+            "F",
+            "compute_seconds",
+        ),
+    )
+    for identity in identities:
+        _, base_stream = extension_statistics._bootstrap_generator(
+            int(base["bootstrap"]["base_seed"]),
+            str(base["analysis_id"]),
+            *identity,
+        )
+        _, amended_stream = extension_statistics._bootstrap_generator(
+            int(manifest["bootstrap"]["base_seed"]),
+            str(manifest["analysis_id"]),
+            *identity,
+        )
+        assert amended_stream == base_stream
 
 
 def test_gate_does_not_deserialize_any_summary_before_health_is_complete(

@@ -11,6 +11,7 @@ that every registered E20/E21 run is present, successful, and provenance-valid.
 
 from __future__ import annotations
 
+import copy
 import csv
 import hashlib
 import importlib.metadata
@@ -23,6 +24,7 @@ import subprocess
 import sys
 import tempfile
 from collections.abc import Iterable, Mapping, Sequence
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -92,6 +94,11 @@ def _sha256_file(path: Path) -> str:
         for block in iter(lambda: stream.read(1024 * 1024), b""):
             digest.update(block)
     return digest.hexdigest()
+
+
+def _canonical_line_sha256(value: Mapping[str, Any]) -> str:
+    payload = (canonical_json(dict(value)) + "\n").encode("utf-8")
+    return hashlib.sha256(payload).hexdigest()
 
 
 def _validate_document(
@@ -165,6 +172,12 @@ def _validate_analysis_checkout(
         repository_root / contract,
         *(source_root / relative for relative in EXPORTER_SOURCE_FILES),
     ]
+    for field in ("base_manifest_document", "base_contract_document"):
+        if manifest.get(field) is not None:
+            relative = Path(
+                str(_require_mapping(manifest[field], name=field).get("path", ""))
+            )
+            required.append(repository_root / relative)
     relative_paths = []
     for path in required:
         resolved = path.resolve()
@@ -594,11 +607,13 @@ def _validate_supplemental_evidence(
             attempt.get("gpu_snapshot_before"),
             cohort=cohort,
             context=f"{evidence_id} before",
+            require_idle=True,
         )
         _validate_snapshot(
             attempt.get("gpu_snapshot_after"),
             cohort=cohort,
             context=f"{evidence_id} after",
+            require_idle=True,
         )
 
         environment = _require_mapping(
@@ -716,6 +731,250 @@ def _validate_supplemental_evidence(
             }
         )
     return audit_rows
+
+
+def _parse_telemetry_timestamp(value: str, *, context: str) -> datetime:
+    try:
+        return datetime.strptime(value, "%Y/%m/%d %H:%M:%S.%f").replace(tzinfo=UTC)
+    except ValueError as error:
+        raise ExtensionAnalysisError(
+            f"{context}: invalid telemetry timestamp {value!r}"
+        ) from error
+
+
+def _validate_post_worker_evidence(
+    manifest: Mapping[str, Any],
+    evidence_roots: Mapping[str, Path],
+    specs: Mapping[str, CohortSpec],
+) -> dict[tuple[str, str, int], dict[str, Any]]:
+    """Validate exact registrations for non-idle snapshots taken after a worker.
+
+    The before-worker snapshot remains the exclusivity boundary.  A non-idle
+    after-worker snapshot is admissible only when infrastructure evidence fixed
+    before endpoint unblinding establishes that the terminal summary preceded
+    the first foreign-only telemetry sample.
+    """
+
+    raw_specs = _require_sequence(
+        manifest.get("post_worker_snapshot_evidence", ()),
+        name="post_worker_snapshot_evidence",
+    )
+    if not raw_specs:
+        if evidence_roots:
+            raise ExtensionAnalysisError(
+                "post-worker evidence roots were supplied without registrations"
+            )
+        return {}
+
+    policy = _require_mapping(
+        manifest.get("post_worker_snapshot_policy"),
+        name="post_worker_snapshot_policy",
+    )
+    _require_equal(
+        policy.get("before_snapshot"),
+        "require_idle",
+        context="post-worker snapshot policy",
+        field="before_snapshot",
+    )
+    _require_equal(
+        policy.get("after_snapshot"),
+        "require_identity_and_exact_registration_if_nonidle",
+        context="post-worker snapshot policy",
+        field="after_snapshot",
+    )
+
+    registrations: dict[str, Mapping[str, Any]] = {}
+    for raw in raw_specs:
+        registration = _require_mapping(raw, name="post-worker evidence")
+        evidence_id = str(registration.get("evidence_id", ""))
+        if not evidence_id or evidence_id in registrations:
+            raise ValueError("post-worker evidence IDs must be unique and nonempty")
+        registrations[evidence_id] = registration
+    missing = sorted(set(registrations) - set(evidence_roots))
+    extra = sorted(set(evidence_roots) - set(registrations))
+    if missing or extra:
+        raise ExtensionAnalysisError(
+            "post-worker evidence roots disagree with registration; "
+            f"missing={missing}, extra={extra}"
+        )
+
+    dispositions: dict[tuple[str, str, int], dict[str, Any]] = {}
+    required_roles = {
+        "campaign_attempts_snapshot",
+        "wrapper_telemetry",
+        "wrapper_status",
+        "wrapper_stderr",
+        "wrapper_command",
+        "wrapper_gpu_phase",
+    }
+    for evidence_id, registration in sorted(registrations.items()):
+        _require_equal(
+            registration.get("input_kind"),
+            "post_worker_evidence_root",
+            context=evidence_id,
+            field="input_kind",
+        )
+        identity = _require_mapping(
+            registration.get("identity"), name=f"{evidence_id}.identity"
+        )
+        experiment_id = str(identity.get("experiment_id", ""))
+        variant = str(identity.get("variant", ""))
+        seed = int(identity.get("seed", -1))
+        if experiment_id not in specs:
+            raise ExtensionAnalysisError(
+                f"{evidence_id}: unregistered experiment {experiment_id!r}"
+            )
+        cohort = specs[experiment_id]
+        if (variant, seed) not in cohort.expected_run_keys:
+            raise ExtensionAnalysisError(f"{evidence_id}: unregistered run identity")
+        key = (experiment_id, variant, seed)
+        if key in dispositions:
+            raise ExtensionAnalysisError(
+                f"{evidence_id}: duplicate post-worker disposition for {key}"
+            )
+
+        root = Path(evidence_roots[evidence_id]).expanduser().resolve()
+        if not root.is_dir():
+            raise ExtensionAnalysisError(f"{evidence_id}: evidence root is missing")
+        files = _require_mapping(
+            registration.get("required_files"), name=f"{evidence_id}.required_files"
+        )
+        if set(files) != required_roles:
+            raise ExtensionAnalysisError(
+                f"{evidence_id}: required file roles must be {sorted(required_roles)}"
+            )
+        paths = {
+            role: _validate_registered_file(root, metadata, name=f"{evidence_id}.{role}")
+            for role, metadata in files.items()
+        }
+        required_lines = _require_mapping(
+            registration.get("required_text_lines"),
+            name=f"{evidence_id}.required_text_lines",
+        )
+        if not set(required_lines).issubset(
+            required_roles - {"campaign_attempts_snapshot"}
+        ):
+            raise ExtensionAnalysisError(
+                f"{evidence_id}: required_text_lines references an unknown text role"
+            )
+        for role, raw_lines in required_lines.items():
+            lines = paths[str(role)].read_text(encoding="utf-8").splitlines()
+            for expected_line in _require_sequence(
+                raw_lines, name=f"{evidence_id}.required_text_lines.{role}"
+            ):
+                if str(expected_line) not in lines:
+                    raise ExtensionAnalysisError(
+                        f"{evidence_id}: {role} lacks registered line {expected_line!r}"
+                    )
+
+        archived_attempts = _jsonl(paths["campaign_attempts_snapshot"])
+        matching_attempts = [
+            row
+            for row in archived_attempts
+            if str(row.get("experiment_id", "")) == experiment_id
+            and str(row.get("variant", "")) == variant
+            and int(row.get("seed", -1)) == seed
+        ]
+        if len(matching_attempts) != 1:
+            raise ExtensionAnalysisError(
+                f"{evidence_id}: expected one archived attempt; "
+                f"found {len(matching_attempts)}"
+            )
+        archived_attempt = matching_attempts[0]
+        expected_attempt = _require_mapping(
+            registration.get("expected_attempt"),
+            name=f"{evidence_id}.expected_attempt",
+        )
+        _require_equal(
+            _canonical_line_sha256(archived_attempt),
+            expected_attempt.get("canonical_row_sha256"),
+            context=evidence_id,
+            field="canonical_row_sha256",
+        )
+        archived_after = _require_mapping(
+            archived_attempt.get("gpu_snapshot_after"),
+            name=f"{evidence_id}.gpu_snapshot_after",
+        )
+        _require_equal(
+            _canonical_line_sha256(archived_after),
+            expected_attempt.get("after_snapshot_sha256"),
+            context=evidence_id,
+            field="after_snapshot_sha256",
+        )
+        _require_equal(
+            archived_attempt.get("timestamp_utc"),
+            expected_attempt.get("timestamp_utc"),
+            context=evidence_id,
+            field="timestamp_utc",
+        )
+        _validate_snapshot(
+            archived_attempt.get("gpu_snapshot_before"),
+            cohort=cohort,
+            context=f"{evidence_id} archived before",
+            require_idle=True,
+        )
+        _validate_snapshot(
+            archived_after,
+            cohort=cohort,
+            context=f"{evidence_id} archived after",
+            require_idle=False,
+        )
+        if not archived_after.get("compute_processes"):
+            raise ExtensionAnalysisError(
+                f"{evidence_id}: registered after snapshot is already idle"
+            )
+
+        timing = _require_mapping(
+            registration.get("timing_evidence"),
+            name=f"{evidence_id}.timing_evidence",
+        )
+        last_worker_line = str(timing.get("last_worker_allocation_line", ""))
+        first_foreign_line = str(timing.get("first_foreign_only_line", ""))
+        telemetry_lines = paths["wrapper_telemetry"].read_text(
+            encoding="utf-8"
+        ).splitlines()
+        try:
+            last_worker_index = telemetry_lines.index(last_worker_line)
+            first_foreign_index = telemetry_lines.index(first_foreign_line)
+        except ValueError as error:
+            raise ExtensionAnalysisError(
+                f"{evidence_id}: registered telemetry transition is missing"
+            ) from error
+        if first_foreign_index != last_worker_index + 1:
+            raise ExtensionAnalysisError(
+                f"{evidence_id}: telemetry transition is not consecutive"
+            )
+        last_worker_time = _parse_telemetry_timestamp(
+            last_worker_line.split(",", 1)[0], context=evidence_id
+        )
+        first_foreign_time = _parse_telemetry_timestamp(
+            first_foreign_line.split(",", 1)[0], context=evidence_id
+        )
+        if first_foreign_time <= last_worker_time:
+            raise ExtensionAnalysisError(
+                f"{evidence_id}: foreign-only telemetry does not follow worker telemetry"
+            )
+
+        dispositions[key] = {
+            "evidence_id": evidence_id,
+            "identity": dict(identity),
+            "expected_attempt": dict(expected_attempt),
+            "summary_stat": dict(
+                _require_mapping(
+                    registration.get("summary_stat"),
+                    name=f"{evidence_id}.summary_stat",
+                )
+            ),
+            "first_foreign_time": first_foreign_time,
+            "evidence_root": str(root),
+            "supporting_files": {role: str(path) for role, path in sorted(paths.items())},
+            "supporting_sha256": {
+                role: str(_require_mapping(metadata, name=role)["sha256"])
+                for role, metadata in sorted(files.items())
+            },
+            "used": False,
+        }
+    return dispositions
 
 
 def _accepted_commits(
@@ -2101,7 +2360,8 @@ def _validate_snapshot(
     *,
     cohort: CohortSpec,
     context: str,
-) -> None:
+    require_idle: bool,
+) -> Mapping[str, Any]:
     value = _require_mapping(snapshot, name=f"{context} snapshot")
     _require_equal(value.get("status"), "ok", context=context, field="snapshot.status")
     _require_equal(
@@ -2129,16 +2389,31 @@ def _validate_snapshot(
         field="snapshot.process_query_status",
     )
     processes = value.get("compute_processes")
-    if processes != []:
+    if not isinstance(processes, list):
+        raise ExtensionAnalysisError(f"{context}: compute_processes must be a list")
+    if require_idle and processes:
         raise ExtensionAnalysisError(
             f"{context}: registered run has competing compute processes: {processes!r}"
         )
+    if require_idle:
+        memory = int(value.get("memory.used", -1))
+        utilization = int(value.get("utilization.gpu", -1))
+        if memory < 0 or memory > 512:
+            raise ExtensionAnalysisError(
+                f"{context}: pre-worker memory is not idle: {memory} MiB"
+            )
+        if utilization < 0 or utilization > 5:
+            raise ExtensionAnalysisError(
+                f"{context}: pre-worker utilization is not idle: {utilization}%"
+            )
+    return value
 
 
 def _validate_campaign_attempts(
     cohort_root: Path,
     cohort: CohortSpec,
     registered_rejections: Sequence[Mapping[str, Any]],
+    post_worker_dispositions: Mapping[tuple[str, str, int], dict[str, Any]],
 ) -> dict[tuple[str, int], dict[str, Any]]:
     """Audit every accepted-root attempt and return the accepted rows.
 
@@ -2222,11 +2497,13 @@ def _validate_campaign_attempts(
                     attempt.get("gpu_snapshot_before"),
                     cohort=cohort,
                     context=f"{context} before",
+                    require_idle=True,
                 )
                 _validate_snapshot(
                     attempt.get("gpu_snapshot_after"),
                     cohort=cohort,
                     context=f"{context} after",
+                    require_idle=True,
                 )
                 continue
 
@@ -2289,12 +2566,95 @@ def _validate_campaign_attempts(
                 attempt.get("gpu_snapshot_before"),
                 cohort=cohort,
                 context=f"{context} before",
+                require_idle=True,
             )
-            _validate_snapshot(
+            after_snapshot = _validate_snapshot(
                 attempt.get("gpu_snapshot_after"),
                 cohort=cohort,
                 context=f"{context} after",
+                require_idle=False,
             )
+            disposition_key = (cohort.experiment_id, variant, seed)
+            disposition = post_worker_dispositions.get(disposition_key)
+            if after_snapshot["compute_processes"]:
+                if disposition is None:
+                    raise ExtensionAnalysisError(
+                        f"{context}: non-idle post-worker snapshot has no exact "
+                        "pre-unblinding disposition"
+                    )
+                expected_attempt = _require_mapping(
+                    disposition["expected_attempt"],
+                    name=f"{context}.expected_attempt",
+                )
+                _require_equal(
+                    _canonical_line_sha256(attempt),
+                    expected_attempt.get("canonical_row_sha256"),
+                    context=context,
+                    field="canonical_row_sha256",
+                )
+                _require_equal(
+                    _canonical_line_sha256(after_snapshot),
+                    expected_attempt.get("after_snapshot_sha256"),
+                    context=context,
+                    field="after_snapshot_sha256",
+                )
+                _require_equal(
+                    attempt.get("timestamp_utc"),
+                    expected_attempt.get("timestamp_utc"),
+                    context=context,
+                    field="timestamp_utc",
+                )
+                summary_stat = _require_mapping(
+                    disposition["summary_stat"], name=f"{context}.summary_stat"
+                )
+                registered_relative = Path(str(summary_stat.get("relative_path", "")))
+                expected_relative = Path(variant) / f"seed_{seed}" / "summary.json"
+                _require_equal(
+                    registered_relative,
+                    expected_relative,
+                    context=context,
+                    field="summary_stat.relative_path",
+                )
+                registered_summary = (cohort_root / registered_relative).resolve()
+                if not registered_summary.is_relative_to(cohort_root.resolve()):
+                    raise ExtensionAnalysisError(
+                        f"{context}: summary stat path escapes the cohort root"
+                    )
+                stat = registered_summary.stat()
+                _require_equal(
+                    stat.st_size,
+                    int(summary_stat.get("size", -1)),
+                    context=context,
+                    field="summary_stat.size",
+                )
+                _require_equal(
+                    stat.st_mtime_ns,
+                    int(summary_stat.get("mtime_ns", -1)),
+                    context=context,
+                    field="summary_stat.mtime_ns",
+                )
+                summary_time = datetime.fromtimestamp(stat.st_mtime_ns / 1e9, tz=UTC)
+                if summary_time >= disposition["first_foreign_time"]:
+                    raise ExtensionAnalysisError(
+                        f"{context}: summary was not finalized before foreign-only "
+                        "post-worker telemetry"
+                    )
+                disposition["used"] = True
+                accepted[key]["post_worker_snapshot_disposition"] = (
+                    "registered_post_worker_occupancy"
+                )
+                accepted[key]["post_worker_evidence_id"] = disposition["evidence_id"]
+                accepted[key]["post_worker_supporting_files"] = disposition[
+                    "supporting_files"
+                ]
+                accepted[key]["post_worker_supporting_sha256"] = disposition[
+                    "supporting_sha256"
+                ]
+            else:
+                accepted[key]["post_worker_snapshot_disposition"] = (
+                    "idle_no_compute_process"
+                )
+                accepted[key]["post_worker_evidence_id"] = None
     if set(accepted) != cohort.expected_run_keys:
         missing = sorted(cohort.expected_run_keys - set(accepted))
         raise ExtensionAnalysisError(
@@ -2331,6 +2691,7 @@ def _validate_global_embargo_registered(
     repository_root: Path,
     runtime_evidence_roots: Mapping[str, Path] | None = None,
     supplemental_evidence_roots: Mapping[str, Path] | None = None,
+    post_worker_evidence_roots: Mapping[str, Path] | None = None,
 ) -> tuple[
     dict[str, CohortSpec],
     dict[str, dict[tuple[str, int], ValidatedRun]],
@@ -2358,6 +2719,9 @@ def _validate_global_embargo_registered(
     supplemental_audit = _validate_supplemental_evidence(
         manifest, supplemental_evidence_roots or {}, specs
     )
+    post_worker_dispositions = _validate_post_worker_evidence(
+        manifest, post_worker_evidence_roots or {}, specs
+    )
     extension_ids = _registered_extension_ids(manifest)
     missing_specs = sorted(set(extension_ids) - set(specs))
     if missing_specs:
@@ -2379,7 +2743,9 @@ def _validate_global_embargo_registered(
             raise ExtensionAnalysisError(f"{experiment_id}: cohort root is missing: {root}")
         expected_paths = _expected_summary_paths(root, cohort)
         if experiment_id in extension_ids:
-            attempts = _validate_campaign_attempts(root, cohort, supplemental_audit)
+            attempts = _validate_campaign_attempts(
+                root, cohort, supplemental_audit, post_worker_dispositions
+            )
             if set(attempts) != cohort.expected_run_keys:
                 missing = sorted(cohort.expected_run_keys - set(attempts))
                 raise ExtensionAnalysisError(
@@ -2394,6 +2760,17 @@ def _validate_global_embargo_registered(
             )
         summary_paths[experiment_id] = expected_paths
         health_records[experiment_id] = cohort_health
+
+    unused_dispositions = sorted(
+        key
+        for key, disposition in post_worker_dispositions.items()
+        if not disposition["used"]
+    )
+    if unused_dispositions:
+        raise ExtensionAnalysisError(
+            "registered post-worker dispositions were not matched exactly: "
+            f"{unused_dispositions}"
+        )
 
     embargo = _require_mapping(manifest.get("global_embargo"), name="global_embargo")
     expected_runs = int(embargo.get("required_successful_runs", -1))
@@ -2451,6 +2828,7 @@ def _analyze_extension_campaign_registered(
     repository_root: Path,
     runtime_evidence_roots: Mapping[str, Path] | None = None,
     supplemental_evidence_roots: Mapping[str, Path] | None = None,
+    post_worker_evidence_roots: Mapping[str, Path] | None = None,
 ) -> dict[str, list[dict[str, Any]]]:
     """Return all E20/E21 outputs after opening the global endpoint embargo."""
 
@@ -2466,6 +2844,7 @@ def _analyze_extension_campaign_registered(
         repository_root=repository_root,
         runtime_evidence_roots=runtime_evidence_roots,
         supplemental_evidence_roots=supplemental_evidence_roots,
+        post_worker_evidence_roots=post_worker_evidence_roots,
     )
     extension_ids = frozenset(_registered_extension_ids(manifest))
     quality_by_seed, quality_summary = quality_rows(manifest, validated)
@@ -2497,6 +2876,23 @@ def _analyze_extension_campaign_registered(
                 "campaign_attempts": attempt["attempt_path"],
                 "summary": str(run.summary_path),
                 "training_metrics": str(metrics_path),
+                **{
+                    f"post_worker_{role}": path
+                    for role, path in attempt.get(
+                        "post_worker_supporting_files", {}
+                    ).items()
+                },
+            }
+            supporting_sha256 = {
+                "campaign_attempts": attempt["attempt_sha256"],
+                "summary": _sha256_file(run.summary_path),
+                "training_metrics": _sha256_file(metrics_path),
+                **{
+                    f"post_worker_{role}": digest
+                    for role, digest in attempt.get(
+                        "post_worker_supporting_sha256", {}
+                    ).items()
+                },
             }
             inventory.append(
                 {
@@ -2530,15 +2926,13 @@ def _analyze_extension_campaign_registered(
                     "physical_gpu_name": cohort.physical_device.get("name"),
                     "attempt_path": attempt["attempt_path"],
                     "attempt_row": attempt["attempt_row"],
+                    "post_worker_snapshot_disposition": attempt[
+                        "post_worker_snapshot_disposition"
+                    ],
+                    "post_worker_evidence_id": attempt["post_worker_evidence_id"],
                     "summary_path": str(run.summary_path),
                     "supporting_files": canonical_json(supporting_files),
-                    "supporting_sha256": canonical_json(
-                        {
-                            "campaign_attempts": attempt["attempt_sha256"],
-                            "summary": _sha256_file(run.summary_path),
-                            "training_metrics": _sha256_file(metrics_path),
-                        }
-                    ),
+                    "supporting_sha256": canonical_json(supporting_sha256),
                 }
             )
     extension_quality_by_seed = [
@@ -2595,7 +2989,69 @@ def _load_checked_manifest(
 ) -> tuple[dict[str, Any], Path, Path, dict[str, Any]]:
     manifest_file = Path(manifest_path).expanduser().resolve()
     repository = Path(repository_root).expanduser().resolve()
-    manifest = load_yaml(manifest_file)
+    registration = load_yaml(manifest_file)
+    if registration.get("base_manifest_document") is None:
+        manifest = registration
+    else:
+        allowed_fields = {
+            "schema_version",
+            "analysis_id",
+            "amendment_id",
+            "analysis_status",
+            "frozen",
+            "base_analysis_id",
+            "base_manifest_document",
+            "base_contract_document",
+            "contract_document",
+            "post_worker_snapshot_policy",
+            "post_worker_snapshot_evidence",
+            "immutability",
+        }
+        extra = sorted(set(registration) - allowed_fields)
+        if extra:
+            raise ValueError(f"analysis amendment has unsupported fields: {extra}")
+        base_relative, _ = _validate_document(
+            registration["base_manifest_document"],
+            name="base_manifest_document",
+            repository_root=repository,
+        )
+        _validate_document(
+            registration["base_contract_document"],
+            name="base_contract_document",
+            repository_root=repository,
+        )
+        _validate_document(
+            registration["contract_document"],
+            name="contract_document",
+            repository_root=repository,
+        )
+        base = load_yaml(repository / base_relative)
+        _require_equal(
+            base.get("analysis_id"),
+            registration.get("base_analysis_id"),
+            context="analysis amendment",
+            field="base_analysis_id",
+        )
+        _require_equal(
+            registration.get("analysis_id"),
+            base.get("analysis_id"),
+            context="analysis amendment",
+            field="analysis_id",
+        )
+        manifest = copy.deepcopy(base)
+        for field in (
+            "analysis_id",
+            "amendment_id",
+            "analysis_status",
+            "base_analysis_id",
+            "contract_document",
+            "base_manifest_document",
+            "base_contract_document",
+            "post_worker_snapshot_policy",
+            "post_worker_snapshot_evidence",
+            "immutability",
+        ):
+            manifest[field] = copy.deepcopy(registration[field])
     checkout = _validate_analysis_checkout(manifest_file, manifest, repository)
     return manifest, manifest_file, repository, checkout
 
@@ -2607,6 +3063,7 @@ def validate_global_embargo(
     repository_root: str | Path,
     runtime_evidence_roots: Mapping[str, str | Path] | None = None,
     supplemental_evidence_roots: Mapping[str, str | Path] | None = None,
+    post_worker_evidence_roots: Mapping[str, str | Path] | None = None,
 ) -> tuple[
     dict[str, CohortSpec],
     dict[str, dict[tuple[str, int], ValidatedRun]],
@@ -2632,6 +3089,10 @@ def validate_global_embargo(
             str(evidence_id): Path(path).expanduser().resolve()
             for evidence_id, path in (supplemental_evidence_roots or {}).items()
         },
+        post_worker_evidence_roots={
+            str(evidence_id): Path(path).expanduser().resolve()
+            for evidence_id, path in (post_worker_evidence_roots or {}).items()
+        },
     )
 
 
@@ -2642,6 +3103,7 @@ def analyze_extension_campaign(
     repository_root: str | Path,
     runtime_evidence_roots: Mapping[str, str | Path] | None = None,
     supplemental_evidence_roots: Mapping[str, str | Path] | None = None,
+    post_worker_evidence_roots: Mapping[str, str | Path] | None = None,
 ) -> dict[str, list[dict[str, Any]]]:
     """Analyze the campaign only from a clean, committed analysis checkout."""
 
@@ -2660,6 +3122,10 @@ def analyze_extension_campaign(
         supplemental_evidence_roots={
             str(evidence_id): Path(path).expanduser().resolve()
             for evidence_id, path in (supplemental_evidence_roots or {}).items()
+        },
+        post_worker_evidence_roots={
+            str(evidence_id): Path(path).expanduser().resolve()
+            for evidence_id, path in (post_worker_evidence_roots or {}).items()
         },
     )
 
@@ -2760,6 +3226,7 @@ def export_extension_campaign(
     repository_root: str | Path,
     runtime_evidence_roots: Mapping[str, str | Path] | None = None,
     supplemental_evidence_roots: Mapping[str, str | Path] | None = None,
+    post_worker_evidence_roots: Mapping[str, str | Path] | None = None,
 ) -> Path:
     """Serialize one exporter per destination and publish it atomically."""
 
@@ -2780,6 +3247,7 @@ def export_extension_campaign(
             repository_root=repository_root,
             runtime_evidence_roots=runtime_evidence_roots,
             supplemental_evidence_roots=supplemental_evidence_roots,
+            post_worker_evidence_roots=post_worker_evidence_roots,
         )
     finally:
         os.close(descriptor)
@@ -2794,6 +3262,7 @@ def _export_extension_campaign_locked(
     repository_root: str | Path,
     runtime_evidence_roots: Mapping[str, str | Path] | None = None,
     supplemental_evidence_roots: Mapping[str, str | Path] | None = None,
+    post_worker_evidence_roots: Mapping[str, str | Path] | None = None,
 ) -> Path:
     """Validate, analyze, and atomically publish a fresh output directory."""
 
@@ -2818,12 +3287,17 @@ def _export_extension_campaign_locked(
         str(evidence_id): Path(path).expanduser().resolve()
         for evidence_id, path in (runtime_evidence_roots or {}).items()
     }
+    resolved_post_worker = {
+        str(evidence_id): Path(path).expanduser().resolve()
+        for evidence_id, path in (post_worker_evidence_roots or {}).items()
+    }
     outputs = _analyze_extension_campaign_registered(
         manifest,
         resolved_roots,
         repository_root=repository,
         runtime_evidence_roots=resolved_runtime,
         supplemental_evidence_roots=resolved_evidence,
+        post_worker_evidence_roots=resolved_post_worker,
     )
     cohort_audit = outputs.pop("_cohort_audit")
     runtime_audit = outputs.pop("_runtime_audit")
@@ -2936,3 +3410,9 @@ def parse_runtime_evidence_roots(values: Iterable[str]) -> dict[str, Path]:
     """Parse repeatable ``EVIDENCE_ID=PATH`` runtime-evidence arguments."""
 
     return _parse_named_paths(values, kind="runtime evidence root")
+
+
+def parse_post_worker_evidence_roots(values: Iterable[str]) -> dict[str, Path]:
+    """Parse repeatable ``EVIDENCE_ID=PATH`` post-worker evidence arguments."""
+
+    return _parse_named_paths(values, kind="post-worker evidence root")
