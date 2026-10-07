@@ -69,6 +69,7 @@ def run_training_campaign(
     manifest_dir: str | Path,
     output_dir: str | Path,
     accepted_completed_commits: Collection[str] = (),
+    max_attempts: int | None = None,
 ) -> int:
     """Run every frozen variant-seed pair and retain each process outcome."""
 
@@ -96,10 +97,27 @@ def run_training_campaign(
         ("experiment_id", "task", "dataset", "variants", "seeds"),
         name="training campaign config",
     )
-    if list(config["variants"]) != list(protocol["variants"]["core_training"]):
+    extension = protocol.get("training_extensions", {}).get(config["experiment_id"])
+    if extension is None:
+        expected_variants = protocol["variants"]["core_training"]
+        expected_seeds = protocol["seeds"]["training"]
+    else:
+        require_keys(
+            extension,
+            ("task", "dataset", "variants", "seeds"),
+            name=f"training extension {config['experiment_id']}",
+        )
+        for field in ("task", "dataset"):
+            if config[field] != extension[field]:
+                raise ValueError(f"campaign {field} disagrees with the frozen extension")
+        expected_variants = extension["variants"]
+        expected_seeds = extension["seeds"]
+    if list(config["variants"]) != list(expected_variants):
         raise ValueError("campaign variants disagree with the frozen protocol")
-    if list(config["seeds"]) != list(protocol["seeds"]["training"]):
+    if list(config["seeds"]) != list(expected_seeds):
         raise ValueError("campaign seeds disagree with the frozen protocol")
+    if max_attempts is not None and max_attempts < 1:
+        raise ValueError("max_attempts must be positive when provided")
 
     destination.mkdir(parents=True, exist_ok=True)
     attempts_path = destination / "campaign_attempts.jsonl"
@@ -111,6 +129,8 @@ def run_training_campaign(
         order = list(config["variants"])
         randomizer.shuffle(order)
         for variant in order:
+            if max_attempts is not None and attempts >= max_attempts:
+                return attempts
             run_dir = destination / variant / f"seed_{seed}"
             summary_path = run_dir / "summary.json"
             if summary_path.exists():

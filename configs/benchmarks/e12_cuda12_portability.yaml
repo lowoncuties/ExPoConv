@@ -1,0 +1,26 @@
+schema_version: "1.0"
+experiment_id: E12
+description: Prospective R/F portability subset on one secondary RTX A6000 CUDA-12 platform.
+variants: [R, F]
+sessions: 5
+warmup_calls: 50
+timed_calls_per_session: 200
+require_idle_gpu: true
+max_preexisting_memory_mib: 512
+max_preexisting_utilization_percent: 5
+workloads:
+  - {id: S1_backward, kind: conv2d, mode: backward, shape: {batch: 8, height: 16, width: 16, input_channels: 256, output_channels: 256}, kernel_size: 3, stride: 1, padding: SAME, depth: 1, curvature: 0.1, dtype: float32}
+  - {id: S2_backward, kind: conv2d, mode: backward, shape: {batch: 8, height: 256, width: 256, input_channels: 32, output_channels: 32}, kernel_size: 3, stride: 1, padding: SAME, depth: 1, curvature: 0.1, dtype: float32}
+  - {id: S3_backward, kind: conv2d, mode: backward, shape: {batch: 8, height: 256, width: 256, input_channels: 96, output_channels: 32}, kernel_size: 3, stride: 1, padding: SAME, depth: 1, curvature: 0.1, dtype: float32}
+  - id: unet_b8_update
+    kind: unet
+    mode: update
+    shape: {batch: 8, height: 256, width: 256}
+    curvature: 0.1
+    dtype: float32
+  - id: resnet20_b128_update
+    kind: resnet20
+    mode: update
+    shape: {batch: 128, height: 32, width: 32}
+    curvature: 0.1
+    dtype: float32

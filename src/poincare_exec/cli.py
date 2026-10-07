@@ -46,9 +46,7 @@ def _parser() -> argparse.ArgumentParser:
         "numerical-repair",
         help="run the bounded audit-driven E02 derivative-repair matrix",
     )
-    numerical_repair.add_argument(
-        "--protocol", type=Path, default=DEFAULT_PROTOCOL_PATH
-    )
+    numerical_repair.add_argument("--protocol", type=Path, default=DEFAULT_PROTOCOL_PATH)
     numerical_repair.add_argument("--config", type=Path, required=True)
     numerical_repair.add_argument("--cases", type=Path, required=True)
     numerical_repair.add_argument("--output-dir", type=Path, required=True)
@@ -92,9 +90,7 @@ def _parser() -> argparse.ArgumentParser:
         "training-campaign",
         help="run or resume every frozen variant-seed pair in fresh processes",
     )
-    training_campaign.add_argument(
-        "--protocol", type=Path, default=DEFAULT_PROTOCOL_PATH
-    )
+    training_campaign.add_argument("--protocol", type=Path, default=DEFAULT_PROTOCOL_PATH)
     training_campaign.add_argument("--config", type=Path, required=True)
     training_campaign.add_argument("--data-root", type=Path, required=True)
     training_campaign.add_argument("--manifest-dir", type=Path, required=True)
@@ -108,14 +104,17 @@ def _parser() -> argparse.ArgumentParser:
             "repeat once per explicitly reviewed compatible commit"
         ),
     )
+    training_campaign.add_argument(
+        "--max-attempts",
+        type=int,
+        help="stop after this many new full training workers; completed runs do not count",
+    )
 
     retained_checkpoint = subparsers.add_parser(
         "checkpoint-evaluation",
         help="run E06 R/F/T evaluation for one retained final R/T checkpoint",
     )
-    retained_checkpoint.add_argument(
-        "--protocol", type=Path, default=DEFAULT_PROTOCOL_PATH
-    )
+    retained_checkpoint.add_argument("--protocol", type=Path, default=DEFAULT_PROTOCOL_PATH)
     retained_checkpoint.add_argument("--config", type=Path, required=True)
     retained_checkpoint.add_argument("--training-config", type=Path, required=True)
     retained_checkpoint.add_argument("--checkpoint", type=Path, required=True)
@@ -127,13 +126,9 @@ def _parser() -> argparse.ArgumentParser:
         "checkpoint-campaign",
         help="evaluate every retained final checkpoint through R/F/T",
     )
-    checkpoint_campaign.add_argument(
-        "--protocol", type=Path, default=DEFAULT_PROTOCOL_PATH
-    )
+    checkpoint_campaign.add_argument("--protocol", type=Path, default=DEFAULT_PROTOCOL_PATH)
     checkpoint_campaign.add_argument("--config", type=Path, required=True)
-    checkpoint_campaign.add_argument(
-        "--training-config", type=Path, required=True
-    )
+    checkpoint_campaign.add_argument("--training-config", type=Path, required=True)
     checkpoint_campaign.add_argument("--data-root", type=Path, required=True)
     checkpoint_campaign.add_argument("--manifest-dir", type=Path, required=True)
     checkpoint_campaign.add_argument("--training-dir", type=Path, required=True)
@@ -160,13 +155,9 @@ def _parser() -> argparse.ArgumentParser:
         "--protocol", type=Path, default=DEFAULT_PROTOCOL_PATH
     )
     retained_diagnostic_campaign.add_argument("--config", type=Path, required=True)
-    retained_diagnostic_campaign.add_argument(
-        "--training-config", type=Path, required=True
-    )
+    retained_diagnostic_campaign.add_argument("--training-config", type=Path, required=True)
     retained_diagnostic_campaign.add_argument("--data-root", type=Path, required=True)
-    retained_diagnostic_campaign.add_argument(
-        "--manifest-dir", type=Path, required=True
-    )
+    retained_diagnostic_campaign.add_argument("--manifest-dir", type=Path, required=True)
     retained_diagnostic_campaign.add_argument("--training-dir", type=Path, required=True)
     retained_diagnostic_campaign.add_argument("--output-dir", type=Path, required=True)
 
@@ -177,9 +168,7 @@ def _parser() -> argparse.ArgumentParser:
     profile.add_argument("--config", type=Path, required=True)
     profile.add_argument("--output-dir", type=Path, required=True)
 
-    profile_worker_parser = subparsers.add_parser(
-        "profile-worker", help=argparse.SUPPRESS
-    )
+    profile_worker_parser = subparsers.add_parser("profile-worker", help=argparse.SUPPRESS)
     profile_worker_parser.add_argument("--protocol", type=Path, required=True)
     profile_worker_parser.add_argument("--config", type=Path, required=True)
     profile_worker_parser.add_argument("--workload-id", required=True)
@@ -264,6 +253,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             manifest_dir=arguments.manifest_dir,
             output_dir=arguments.output_dir,
             accepted_completed_commits=arguments.accept_completed_commit,
+            max_attempts=arguments.max_attempts,
         )
         print(f"completed {attempts} training process attempts")
         return 0

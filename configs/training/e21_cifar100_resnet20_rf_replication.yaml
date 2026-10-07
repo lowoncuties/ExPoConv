@@ -1,0 +1,8 @@
+schema_version: "1.0"
+experiment_id: E21
+description: Prospective 15-seed R/F replication of fixed-budget Poincare ResNet-20 training on CIFAR-100 using the secondary CUDA-12 platform.
+task: cifar100_poincare_resnet20
+dataset: cifar100
+variants: [R, F]
+seeds: [1898335833, 205785622, 1338995025, 1192596770, 864171589, 1052495617, 1147609747, 1619140427, 458014223, 646228129, 821637680, 1059645469, 1209522243, 1985788232, 565813932]
+analysis_role: prospective_independent_platform_replication

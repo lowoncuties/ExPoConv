@@ -1,0 +1,13 @@
+# Secondary RTX A6000/CUDA 12 profile. Results from this environment are a
+# joint hardware/runtime portability cohort and are not pooled silently with
+# the V100/JAX 0.4.25 cohort.
+jax==0.5.3
+jaxlib==0.5.3
+jax-cuda12-pjrt==0.5.3
+jax-cuda12-plugin[with-cuda]==0.5.3
+ml-dtypes==0.5.3
+numpy==1.26.4
+scipy==1.13.1
+PyYAML==6.0.2
+Pillow==11.3.0
+matplotlib==3.8.4

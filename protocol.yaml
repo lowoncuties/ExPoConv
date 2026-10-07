@@ -1,10 +1,10 @@
-protocol_version: "1.11"
-protocol_date: "2026-09-06"
+protocol_version: "1.12"
+protocol_date: "2026-10-07"
 target_journal: "Neural Networks"
 working_title: "Exact and Efficient Execution of Poincare Neural Networks"
 study_scope: "HNN++ and Poincare operator-preserving execution"
 framework: "JAX standalone; HyperJAX-independent"
-confirmatory_status: "task_quality_training_pending"
+confirmatory_status: "initial_task_quality_complete; prospective replication frozen"
 
 source_documents:
   experiment_plan:
@@ -76,6 +76,11 @@ protocol_amendments:
     affected_experiments: [E13]
     reason: "Before E13 execution, replace the older R/T capacity wording with the reference-versus-primary R/F comparison selected after corrected E08. Restrict E13 to the prespecified one-factor Poincare U-Net complete-update batch and resolution sweeps; retain every planned case and any failure or OOM. The model, loss, optimizer, precision, timing boundary, session count, warmup count, and observation count are unchanged."
     case_manifest_changed: true
+  - version: "1.12"
+    date: "2026-10-07"
+    affected_experiments: [E12, E20, E21]
+    reason: "Before any extension run, freeze a prospective R/F-only replication cohort of 15 new matched seeds per task and a bounded R/F CUDA-12 portability timing matrix. The new training cohort is analyzed separately from the completed five-seed V100 study, has no interim endpoint stopping or seed replacement, and is not silently pooled across platforms. T remains an ablation and is not extended."
+    case_manifest_changed: true
 
 variants:
   numerical: [R, F, T]
@@ -95,6 +100,27 @@ seeds:
   measurement_order: 314159
   numerical: 20260906
   bootstrap: 20260907
+
+training_extensions:
+  E20:
+    role: "prospective independent-platform replication"
+    task: isic16_poincare_unet
+    dataset: isic16
+    variants: [R, F]
+    seeds: [1898335833, 205785622, 1338995025, 1192596770, 864171589, 1052495617, 1147609747, 1619140427, 458014223, 646228129, 821637680, 1059645469, 1209522243, 1985788232, 565813932]
+  E21:
+    role: "prospective independent-platform replication"
+    task: cifar100_poincare_resnet20
+    dataset: cifar100
+    variants: [R, F]
+    seeds: [1898335833, 205785622, 1338995025, 1192596770, 864171589, 1052495617, 1147609747, 1619140427, 458014223, 646228129, 821637680, 1059645469, 1209522243, 1985788232, 565813932]
+  analysis_policy:
+    seed_rule: "SHA-256 first-31-bit values of ExPoConv-E09E10-RF-extension-v1:{i}, rejecting zero, prior seeds, and duplicates"
+    no_interim_endpoint_stopping: true
+    replace_failed_seeds: false
+    inspect_official_test_aggregate_only_after_all_pairs_complete: true
+    primary_reporting: "report E20/E21 separately from E09/E10"
+    pooled_reporting: "secondary descriptive platform-stratified estimate only"
 
 precision:
   oracle: float64
@@ -263,4 +289,12 @@ hardware:
       model: "NVIDIA RTX A6000"
       driver: "560.35.03"
       advertised_cuda: "12.6"
+    - host: "aibox2a6000"
+      endpoint_alias: "AIVSBCLUSTER1B"
+      physical_index: 1
+      uuid: "GPU-6daddab9-4b59-fdde-bf0b-09ecd8f31723"
+      model: "NVIDIA RTX A6000"
+      driver: "560.35.03"
+      advertised_cuda: "12.6"
+      authorization: "user-authorized for E12/E20/E21 on 2026-10-07 when idle"
   memory_budget_bytes: 34359738368
