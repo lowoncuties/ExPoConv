@@ -1,4 +1,4 @@
-protocol_version: "1.12"
+protocol_version: "1.13"
 protocol_date: "2026-10-07"
 target_journal: "Neural Networks"
 working_title: "Exact and Efficient Execution of Poincare Neural Networks"
@@ -81,6 +81,11 @@ protocol_amendments:
     affected_experiments: [E12, E20, E21]
     reason: "Before any extension run, freeze a prospective R/F-only replication cohort of 15 new matched seeds per task and a bounded R/F CUDA-12 portability timing matrix. The new training cohort is analyzed separately from the completed five-seed V100 study, has no interim endpoint stopping or seed replacement, and is not silently pooled across platforms. T remains an ablation and is not extended."
     case_manifest_changed: true
+  - version: "1.13"
+    date: "2026-10-07"
+    affected_experiments: [E12, E20, E21]
+    reason: "After the retained pre-update E20/JAX 0.5.3 compile failure, lower the U-Net's kernel-equals-stride, zero-padding transpose fold as an exact reshape and transpose instead of four disjoint scatter-adds. The general overlapping fold is unchanged. Targeted forward, cotangent-gradient, and complete-update checks are required before restarting the frozen campaigns; no failed seed is replaced."
+    case_manifest_changed: false
 
 variants:
   numerical: [R, F, T]
