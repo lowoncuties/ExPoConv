@@ -41,6 +41,20 @@ Experiments reported in the manuscript, with the identifiers used in
 | E11 | descriptive device-kernel profile of the U-Net update |
 | E13 | complete-update scaling across U-Net batch size and input resolution, including retained OOM outcomes |
 
+Two prospective R/F replications are registered and running, but are not part
+of the compact results in this repository snapshot:
+
+| ID | Registered extension |
+|---|---|
+| E20 | ISIC16 Poincaré U-Net, 15 new matched R/F seeds on one RTX A6000 |
+| E21 | CIFAR-100 Poincaré ResNet-20, the same 15 new matched R/F seeds and platform |
+
+Their official-test endpoints remain jointly blinded until all 60 runs pass
+the frozen health and provenance gate in
+[`docs/e20_e21_analysis_contract.md`](docs/e20_e21_analysis_contract.md).
+E20/E21 are reported as separate A6000 cohorts and are never silently pooled
+with E09/E10.
+
 Two completed diagnostics are included as supporting evidence but are not
 reported in the manuscript:
 
@@ -49,16 +63,20 @@ reported in the manuscript:
 | E06 | replay of the ten final R/T U-Net checkpoints through R/F/T at fixed weights |
 | E07-J2 | gradient, update, and 100-update drift comparison at six seed-11 checkpoints, with repeated-R and one-ULP controls |
 
-All GPU measurements come from one platform (Section 3). CUDA 12, other
-accelerators, reduced precision, and a dense-only training task were planned
-in the frozen protocol but were not run and are not reported (Section 8).
+All results currently included in `results/` come from the V100 platform in
+Section 3. E20/E21 add an RTX A6000 hardware cohort using the same pinned
+JAX/CUDA-11.8 user-space runtime; they are not CUDA-12 software-stack runs and
+have no accepted result until their joint gate passes. The separate E12
+CUDA-12 timing study, reduced precision, and a dense-only training task remain
+unrun and unreported (Section 8).
 
 The original experiment-plan document is an archival design record rather
 than a live status page. The bounded E02, E03/E05, E06, E07-J2, E08--E11
 evidence listed above is complete. E13 completed its registered R/F scaling
 grid, including five retained reference-path OOM outcomes at batch 8 and
-512 × 512 resolution. E12 and E14--E18 are unrun strengthening or
-conditional extensions, and E19
+512 × 512 resolution. E20/E21 are in-progress prospective replications;
+their presence in the protocol is not a result. E12 and E14--E18 are unrun
+strengthening or conditional extensions, and E19
 independent reproduction remains a release gate rather than a completed
 result. The bounded handoff is documented in
 [`docs/e19_independent_reproduction.md`](docs/e19_independent_reproduction.md),
@@ -98,7 +116,10 @@ matrix-multiplication precision, TF32 disabled, and JAX preallocation
 disabled. The machine-readable record is `results/environment.json`. A CUDA
 GPU is needed only to rerun experiments. The CPU environment is enough for
 the tests, table inspection, and figure regeneration. Other hardware is
-untested.
+untested in the accepted results snapshot. The in-progress E20/E21 campaigns
+run on one NVIDIA RTX A6000 with the same JAX/JAXLIB 0.4.25 CUDA-11.8 and
+cuDNN-8.6 user-space packages. A driver advertising CUDA 12 compatibility
+does not make that environment a CUDA-12 software stack.
 
 ## 4. Installation
 
@@ -128,8 +149,8 @@ sequentially on that device. `0` above is an example index.
 
 | Dataset | Source | Used by | Terms |
 |---|---|---|---|
-| ISIC 2016 challenge, Part 1 | four archives from the [ISIC challenge object store](https://isic-archive.s3.amazonaws.com/challenges/2016/) ([Gutman et al., 2016](https://arxiv.org/abs/1605.01397)) | E09, E06, E07-J2 | [ISIC terms of use](https://challenge.isic-archive.com/terms-of-use/) |
-| CIFAR-100 | Python archive from the [CIFAR page](https://www.cs.toronto.edu/~kriz/cifar.html) (Krizhevsky, 2009) | E10, E07-J2 | citation requested by the source page |
+| ISIC 2016 challenge, Part 1 | four archives from the [ISIC challenge object store](https://isic-archive.s3.amazonaws.com/challenges/2016/) ([Gutman et al., 2016](https://arxiv.org/abs/1605.01397)) | E09, E20, E06, E07-J2 | [ISIC terms of use](https://challenge.isic-archive.com/terms-of-use/) |
+| CIFAR-100 | Python archive from the [CIFAR page](https://www.cs.toronto.edu/~kriz/cifar.html) (Krizhevsky, 2009) | E10, E21, E07-J2 | citation requested by the source page |
 
 No image bytes are redistributed, and the MIT license covers only the code
 and documentation in this repository.
@@ -153,8 +174,9 @@ cmp splits/cifar100.csv "$candidate/cifar100.csv"
 
 All commands run from the repository root on the GPU environment of
 Section 4. New outputs go to `artifacts/` (ignored) and never overwrite
-`results/`. The training campaigns are 30 publication-scale runs and take
-hours each; nothing is launched by installation or tests.
+`results/`. E09/E10 contain 30 publication-scale runs in total; E20/E21 add
+60 registered R/F runs. They take hours and nothing is launched by
+installation or tests.
 
 ```bash
 export CUDA_VISIBLE_DEVICES=0
@@ -178,6 +200,11 @@ $W ./scripts/run_e13.sh
 $W ./scripts/run_training_campaign.sh configs/training/e09_isic16_unet.yaml
 $W ./scripts/run_training_campaign.sh configs/training/e10_cifar100_resnet20.yaml
 
+# E20, E21: 15 new matched seeds per path (R/F run sequentially)
+# Do not inspect official-test endpoints until both campaigns pass the joint gate.
+$W ./scripts/run_training_campaign.sh configs/training/e20_isic16_unet_rf_replication.yaml
+$W ./scripts/run_training_campaign.sh configs/training/e21_cifar100_resnet20_rf_replication.yaml
+
 # E06, E07-J2: checkpoint replay and retained-state diagnostic (need the E09/E10 checkpoints)
 $W ./scripts/run_trained_checkpoint_campaign.sh configs/training/e09_isic16_unet.yaml
 $W ./scripts/run_journal_retained_diagnostics_v2.sh
@@ -185,7 +212,8 @@ $W ./scripts/run_journal_retained_diagnostics_v2.sh
 
 `scripts/run_training.sh CONFIG VARIANT SEED` runs a single training worker.
 Settings that must not change between the recorded and a new run: the
-tracked manifests, seeds `11, 29, 47, 71, 101` (split seed `1729`),
+tracked manifests, registered seeds in the selected configuration (split seed
+`1729`),
 preprocessing, loss reductions, optimizer, batching, checkpoint selection,
 metric aggregation, precision policy, synchronization, and timing scope.
 Timing uses five fresh-process paired sessions with 50 warm-up and 200
@@ -198,6 +226,14 @@ is never replaced.
 
 Rebuilding the compact tables from the raw outputs of a new run:
 
+For the E20/E21 exporter, set `E09_ROOT`, `E10_ROOT`, `E20_ROOT`, and
+`E21_ROOT` to the corresponding cohort directories (each containing the
+variant/seed directories). Set `ACCEPTED_RUNTIME_ROOT` to the registered
+protocol-1.14 evidence root and `REJECTED_ATTEMPT_ROOT` to the registered
+pre-update failure evidence root. Run it only from a clean committed checkout
+and give it a new, nonexistent output directory; it validates the joint gate
+before opening any endpoint-bearing summary and otherwise fails closed.
+
 ```bash
 ./.venv/bin/python scripts/export_e02_repair_tables.py --help
 ./.venv/bin/python scripts/export_corrected_anchor_tables.py --help
@@ -208,6 +244,15 @@ Rebuilding the compact tables from the raw outputs of a new run:
     --raw artifacts/e13_unet_scaling.csv \
     --raw artifacts/e13_unet_scaling.csv.failures.jsonl \
     --output-dir artifacts/analysis/e13_unet_scaling
+# Run only after all 60 E20/E21 runs pass the joint endpoint gate.
+# Each cohort root contains R/seed_<seed>/ and F/seed_<seed>/ directories.
+./.venv/bin/python scripts/export_e20_e21_training.py \
+    --manifest configs/analysis/e20_e21_training_replication.yaml \
+    --cohort-root E09="$E09_ROOT" --cohort-root E10="$E10_ROOT" \
+    --cohort-root E20="$E20_ROOT" --cohort-root E21="$E21_ROOT" \
+    --runtime-evidence e20_e21_fef30ec_environment_before="$ACCEPTED_RUNTIME_ROOT" \
+    --supplemental-attempt-evidence e20_p112_jax053_preupdate_compile_failure="$REJECTED_ATTEMPT_ROOT" \
+    --output-dir artifacts/analysis/e20_e21_training_replication
 ./.venv/bin/python -m poincare_exec.analysis.build_all \
     --artifact-dir artifacts --table-dir out/tables --figure-dir out/figures
 ./.venv/bin/python scripts/export_retained_diagnostic_tables.py --output-dir out/diagnostics
@@ -252,13 +297,16 @@ sanitized derivatives alongside hashes for the preserved originals.
 
 ## 8. Frozen protocol
 
-`protocol.yaml` is the preregistered protocol, frozen before the results and
+`protocol.yaml` is the preregistered protocol, frozen before each result and
 amended only through its dated amendment log. Its bytes are hashed into the
 configuration hash of every recorded result, and `configs/checkpoints/e07_journal_diagnostics_v2.yaml`
-validates source checkpoints against those hashes, so the file is kept
-verbatim. It therefore still lists items that were planned but never run and
-carry no result: a secondary CUDA 12 platform, a Fashion-MNIST dense task, and
-the original local plan documents. Likewise, `docs/journal_diagnostic_protocol_v2.md`
+validates source checkpoints against those hashes, so historical versions are
+not silently relabelled. E12 CUDA-12 timing, a Fashion-MNIST dense task, and
+the original local plan documents remain planned without a result. The hashed
+E20/E21 configuration descriptions still say "secondary CUDA-12 platform";
+protocol 1.14 and the captured environment record are authoritative that the
+accepted training runtime is the pinned CUDA-11.8 stack on A6000. Likewise,
+`docs/journal_diagnostic_protocol_v2.md`
 is bound by SHA-256 to the E07-J2 configuration and is kept verbatim; it
 refers to the earlier, superseded first attempt that it amends.
 The top-level `confirmatory_status` field is likewise historical protocol
