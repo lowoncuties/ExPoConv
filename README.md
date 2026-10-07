@@ -36,9 +36,10 @@ Experiments reported in the manuscript, with the identifiers used in
 | E02 | bounded numerical validation (derivative repair suite, structured Conv-stack and small-U-Net agreement in FP32/FP64) |
 | E03, E05 | paired operator and block timing: three convolution shapes, Conv-BN-ReLU, depth-four dense stack |
 | E08 | complete Poincaré U-Net forward and optimizer-update latency and process-lifetime peak allocation |
-| E11 | descriptive device-kernel profile of the U-Net update |
 | E09 | ISIC16 Poincaré U-Net, five matched seeds, fixed 5,100-update budget |
 | E10 | CIFAR-100 Poincaré ResNet-20, five matched seeds, fixed 35,200-update budget |
+| E11 | descriptive device-kernel profile of the U-Net update |
+| E13 | complete-update scaling across U-Net batch size and input resolution, including retained OOM outcomes |
 
 Two completed diagnostics are included as supporting evidence but are not
 reported in the manuscript:
@@ -49,16 +50,19 @@ reported in the manuscript:
 | E07-J2 | gradient, update, and 100-update drift comparison at six seed-11 checkpoints, with repeated-R and one-ULP controls |
 
 All GPU measurements come from one platform (Section 3). CUDA 12, other
-accelerators, reduced precision, a dense-only task, and capacity scaling were
-planned in the frozen protocol but were not run and are not reported
-(Section 8).
+accelerators, reduced precision, and a dense-only training task were planned
+in the frozen protocol but were not run and are not reported (Section 8).
 
 The original experiment-plan document is an archival design record rather
 than a live status page. The bounded E02, E03/E05, E06, E07-J2, E08--E11
-evidence listed above is complete. E13 is registered but unrun. E12 and
-E14--E18 are unrun strengthening or conditional extensions, and E19
+evidence listed above is complete. E13 completed its registered R/F scaling
+grid, including five retained reference-path OOM outcomes at batch 8 and
+512 × 512 resolution. E12 and E14--E18 are unrun strengthening or
+conditional extensions, and E19
 independent reproduction remains a release gate rather than a completed
-result.
+result. The bounded handoff is documented in
+[`docs/e19_independent_reproduction.md`](docs/e19_independent_reproduction.md),
+with a separate signed-record template for the independent reproducer.
 
 ## 2. Repository structure
 
@@ -167,7 +171,7 @@ $W ./scripts/run_corrected_operator_anchors.sh
 $W ./scripts/run_e08.sh
 $W ./scripts/run_e11.sh
 
-# E13: optional registered R/F U-Net update scaling campaign (not yet run)
+# E13: registered R/F U-Net update scaling campaign
 $W ./scripts/run_e13.sh
 
 # E09, E10: five matched seeds per path (R/F/T run sequentially)
@@ -215,6 +219,12 @@ configuration hash, and code identity declared in `configs/analysis/`, so a
 new run must declare its own identities. Generated numbers are comparable
 with `results/`; byte identity is not expected after paths, timestamps, or
 code revisions change.
+
+E19 is not an additional author-run benchmark. After an immutable release is
+frozen, a person who did not implement the method must follow the E19 runbook,
+retain unfavorable or failed outcomes, sign the reproduction record, and
+archive it outside this working repository. An author- or agent-operated clean
+clone is only a technical preflight and does not close that gate.
 
 ## 7. Results and provenance
 

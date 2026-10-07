@@ -1,0 +1,1381 @@
+experiment_id,workload_id,panels,batch,resolution,variant,session,expected_steady_state_observations,outcome,steady_state_observations,median_latency_ms,peak_live_gib,peak_pool_gib,failure_kind,failure_phase,failure_message,returncodes,protocol_version,code_commit,config_hash,device_id,physical_gpu_uuid,operation_boundary,source_files
+E13,unet_update_b1_r256,batch,1,256,R,0,200,ok,200,37.512893000000005,0.6434953212738037,1.513671875,,,,[],1.11,75f10dd9f671f12df7fe4f357f061341f9041bc7,05ec05903f13077d20f0672b865a21631198daefff423622298f59071860af63,argexpr3.vsb.cz::gpu:0::Tesla V100-PCIE-32GB,GPU-4e0547c3-d65d-7d8b-9f6a-d40ad61a0f0f,unet:update:depth=1,"[""/data2/joc0027/ExPoConv/artifacts/e13_unet_scaling.csv""]"
+E13,unet_update_b1_r256,batch,1,256,F,0,200,ok,200,28.14383,0.39728283882141113,1.013671875,,,,[],1.11,75f10dd9f671f12df7fe4f357f061341f9041bc7,05ec05903f13077d20f0672b865a21631198daefff423622298f59071860af63,argexpr3.vsb.cz::gpu:0::Tesla V100-PCIE-32GB,GPU-4e0547c3-d65d-7d8b-9f6a-d40ad61a0f0f,unet:update:depth=1,"[""/data2/joc0027/ExPoConv/artifacts/e13_unet_scaling.csv""]"
+E13,unet_update_b1_r256,batch,1,256,R,1,200,ok,200,30.789226,0.6434953212738037,1.513671875,,,,[],1.11,75f10dd9f671f12df7fe4f357f061341f9041bc7,05ec05903f13077d20f0672b865a21631198daefff423622298f59071860af63,argexpr3.vsb.cz::gpu:0::Tesla V100-PCIE-32GB,GPU-4e0547c3-d65d-7d8b-9f6a-d40ad61a0f0f,unet:update:depth=1,"[""/data2/joc0027/ExPoConv/artifacts/e13_unet_scaling.csv""]"
+E13,unet_update_b1_r256,batch,1,256,F,1,200,ok,200,26.943883,0.39728283882141113,1.013671875,,,,[],1.11,75f10dd9f671f12df7fe4f357f061341f9041bc7,05ec05903f13077d20f0672b865a21631198daefff423622298f59071860af63,argexpr3.vsb.cz::gpu:0::Tesla V100-PCIE-32GB,GPU-4e0547c3-d65d-7d8b-9f6a-d40ad61a0f0f,unet:update:depth=1,"[""/data2/joc0027/ExPoConv/artifacts/e13_unet_scaling.csv""]"
+E13,unet_update_b1_r256,batch,1,256,R,2,200,ok,200,34.322779499999996,0.6434953212738037,1.513671875,,,,[],1.11,75f10dd9f671f12df7fe4f357f061341f9041bc7,05ec05903f13077d20f0672b865a21631198daefff423622298f59071860af63,argexpr3.vsb.cz::gpu:0::Tesla V100-PCIE-32GB,GPU-4e0547c3-d65d-7d8b-9f6a-d40ad61a0f0f,unet:update:depth=1,"[""/data2/joc0027/ExPoConv/artifacts/e13_unet_scaling.csv""]"
+E13,unet_update_b1_r256,batch,1,256,F,2,200,ok,200,20.639044,0.39728283882141113,1.013671875,,,,[],1.11,75f10dd9f671f12df7fe4f357f061341f9041bc7,05ec05903f13077d20f0672b865a21631198daefff423622298f59071860af63,argexpr3.vsb.cz::gpu:0::Tesla V100-PCIE-32GB,GPU-4e0547c3-d65d-7d8b-9f6a-d40ad61a0f0f,unet:update:depth=1,"[""/data2/joc0027/ExPoConv/artifacts/e13_unet_scaling.csv""]"
+E13,unet_update_b1_r256,batch,1,256,R,3,200,ok,200,28.0312795,0.6434953212738037,1.513671875,,,,[],1.11,75f10dd9f671f12df7fe4f357f061341f9041bc7,05ec05903f13077d20f0672b865a21631198daefff423622298f59071860af63,argexpr3.vsb.cz::gpu:0::Tesla V100-PCIE-32GB,GPU-4e0547c3-d65d-7d8b-9f6a-d40ad61a0f0f,unet:update:depth=1,"[""/data2/joc0027/ExPoConv/artifacts/e13_unet_scaling.csv""]"
+E13,unet_update_b1_r256,batch,1,256,F,3,200,ok,200,21.578012,0.39728283882141113,1.013671875,,,,[],1.11,75f10dd9f671f12df7fe4f357f061341f9041bc7,05ec05903f13077d20f0672b865a21631198daefff423622298f59071860af63,argexpr3.vsb.cz::gpu:0::Tesla V100-PCIE-32GB,GPU-4e0547c3-d65d-7d8b-9f6a-d40ad61a0f0f,unet:update:depth=1,"[""/data2/joc0027/ExPoConv/artifacts/e13_unet_scaling.csv""]"
+E13,unet_update_b1_r256,batch,1,256,R,4,200,ok,200,28.144916000000002,0.6434953212738037,1.513671875,,,,[],1.11,75f10dd9f671f12df7fe4f357f061341f9041bc7,05ec05903f13077d20f0672b865a21631198daefff423622298f59071860af63,argexpr3.vsb.cz::gpu:0::Tesla V100-PCIE-32GB,GPU-4e0547c3-d65d-7d8b-9f6a-d40ad61a0f0f,unet:update:depth=1,"[""/data2/joc0027/ExPoConv/artifacts/e13_unet_scaling.csv""]"
+E13,unet_update_b1_r256,batch,1,256,F,4,200,ok,200,25.523293000000002,0.39728283882141113,1.013671875,,,,[],1.11,75f10dd9f671f12df7fe4f357f061341f9041bc7,05ec05903f13077d20f0672b865a21631198daefff423622298f59071860af63,argexpr3.vsb.cz::gpu:0::Tesla V100-PCIE-32GB,GPU-4e0547c3-d65d-7d8b-9f6a-d40ad61a0f0f,unet:update:depth=1,"[""/data2/joc0027/ExPoConv/artifacts/e13_unet_scaling.csv""]"
+E13,unet_update_b2_r256,batch,2,256,R,0,200,ok,200,41.3902115,1.391861915588379,2.513671875,,,,[],1.11,75f10dd9f671f12df7fe4f357f061341f9041bc7,d296e59e0f3187edf3e2eb50f97dbab1659d984a90b239507cc8632fa3549f58,argexpr3.vsb.cz::gpu:0::Tesla V100-PCIE-32GB,GPU-4e0547c3-d65d-7d8b-9f6a-d40ad61a0f0f,unet:update:depth=1,"[""/data2/joc0027/ExPoConv/artifacts/e13_unet_scaling.csv""]"
+E13,unet_update_b2_r256,batch,2,256,F,0,200,ok,200,26.544781,0.6563336849212646,2.013671875,,,,[],1.11,75f10dd9f671f12df7fe4f357f061341f9041bc7,d296e59e0f3187edf3e2eb50f97dbab1659d984a90b239507cc8632fa3549f58,argexpr3.vsb.cz::gpu:0::Tesla V100-PCIE-32GB,GPU-4e0547c3-d65d-7d8b-9f6a-d40ad61a0f0f,unet:update:depth=1,"[""/data2/joc0027/ExPoConv/artifacts/e13_unet_scaling.csv""]"
+E13,unet_update_b2_r256,batch,2,256,R,1,200,ok,200,43.5509605,1.391861915588379,2.513671875,,,,[],1.11,75f10dd9f671f12df7fe4f357f061341f9041bc7,d296e59e0f3187edf3e2eb50f97dbab1659d984a90b239507cc8632fa3549f58,argexpr3.vsb.cz::gpu:0::Tesla V100-PCIE-32GB,GPU-4e0547c3-d65d-7d8b-9f6a-d40ad61a0f0f,unet:update:depth=1,"[""/data2/joc0027/ExPoConv/artifacts/e13_unet_scaling.csv""]"
+E13,unet_update_b2_r256,batch,2,256,F,1,200,ok,200,26.730485,0.6563336849212646,2.013671875,,,,[],1.11,75f10dd9f671f12df7fe4f357f061341f9041bc7,d296e59e0f3187edf3e2eb50f97dbab1659d984a90b239507cc8632fa3549f58,argexpr3.vsb.cz::gpu:0::Tesla V100-PCIE-32GB,GPU-4e0547c3-d65d-7d8b-9f6a-d40ad61a0f0f,unet:update:depth=1,"[""/data2/joc0027/ExPoConv/artifacts/e13_unet_scaling.csv""]"
+E13,unet_update_b2_r256,batch,2,256,R,2,200,ok,200,51.032225,1.391861915588379,2.513671875,,,,[],1.11,75f10dd9f671f12df7fe4f357f061341f9041bc7,d296e59e0f3187edf3e2eb50f97dbab1659d984a90b239507cc8632fa3549f58,argexpr3.vsb.cz::gpu:0::Tesla V100-PCIE-32GB,GPU-4e0547c3-d65d-7d8b-9f6a-d40ad61a0f0f,unet:update:depth=1,"[""/data2/joc0027/ExPoConv/artifacts/e13_unet_scaling.csv""]"
+E13,unet_update_b2_r256,batch,2,256,F,2,200,ok,200,26.437875,0.6563336849212646,2.013671875,,,,[],1.11,75f10dd9f671f12df7fe4f357f061341f9041bc7,d296e59e0f3187edf3e2eb50f97dbab1659d984a90b239507cc8632fa3549f58,argexpr3.vsb.cz::gpu:0::Tesla V100-PCIE-32GB,GPU-4e0547c3-d65d-7d8b-9f6a-d40ad61a0f0f,unet:update:depth=1,"[""/data2/joc0027/ExPoConv/artifacts/e13_unet_scaling.csv""]"
+E13,unet_update_b2_r256,batch,2,256,R,3,200,ok,200,50.5134135,1.391861915588379,2.513671875,,,,[],1.11,75f10dd9f671f12df7fe4f357f061341f9041bc7,d296e59e0f3187edf3e2eb50f97dbab1659d984a90b239507cc8632fa3549f58,argexpr3.vsb.cz::gpu:0::Tesla V100-PCIE-32GB,GPU-4e0547c3-d65d-7d8b-9f6a-d40ad61a0f0f,unet:update:depth=1,"[""/data2/joc0027/ExPoConv/artifacts/e13_unet_scaling.csv""]"
+E13,unet_update_b2_r256,batch,2,256,F,3,200,ok,200,32.287724,0.6563336849212646,2.013671875,,,,[],1.11,75f10dd9f671f12df7fe4f357f061341f9041bc7,d296e59e0f3187edf3e2eb50f97dbab1659d984a90b239507cc8632fa3549f58,argexpr3.vsb.cz::gpu:0::Tesla V100-PCIE-32GB,GPU-4e0547c3-d65d-7d8b-9f6a-d40ad61a0f0f,unet:update:depth=1,"[""/data2/joc0027/ExPoConv/artifacts/e13_unet_scaling.csv""]"
+E13,unet_update_b2_r256,batch,2,256,R,4,200,ok,200,41.1087065,1.391861915588379,2.513671875,,,,[],1.11,75f10dd9f671f12df7fe4f357f061341f9041bc7,d296e59e0f3187edf3e2eb50f97dbab1659d984a90b239507cc8632fa3549f58,argexpr3.vsb.cz::gpu:0::Tesla V100-PCIE-32GB,GPU-4e0547c3-d65d-7d8b-9f6a-d40ad61a0f0f,unet:update:depth=1,"[""/data2/joc0027/ExPoConv/artifacts/e13_unet_scaling.csv""]"
+E13,unet_update_b2_r256,batch,2,256,F,4,200,ok,200,26.7469095,0.6563336849212646,2.013671875,,,,[],1.11,75f10dd9f671f12df7fe4f357f061341f9041bc7,d296e59e0f3187edf3e2eb50f97dbab1659d984a90b239507cc8632fa3549f58,argexpr3.vsb.cz::gpu:0::Tesla V100-PCIE-32GB,GPU-4e0547c3-d65d-7d8b-9f6a-d40ad61a0f0f,unet:update:depth=1,"[""/data2/joc0027/ExPoConv/artifacts/e13_unet_scaling.csv""]"
+E13,unet_update_b4_r256,batch,4,256,R,0,200,ok,200,67.146649,2.968965768814087,5.013671875,,,,[],1.11,75f10dd9f671f12df7fe4f357f061341f9041bc7,d85bdc4114c023499bedfbdbe6cc3791cc2d2a15ad80aff1340098833ecfe660,argexpr3.vsb.cz::gpu:0::Tesla V100-PCIE-32GB,GPU-4e0547c3-d65d-7d8b-9f6a-d40ad61a0f0f,unet:update:depth=1,"[""/data2/joc0027/ExPoConv/artifacts/e13_unet_scaling.csv""]"
+E13,unet_update_b4_r256,batch,4,256,F,0,200,ok,200,39.1831295,1.3512914180755615,3.013671875,,,,[],1.11,75f10dd9f671f12df7fe4f357f061341f9041bc7,d85bdc4114c023499bedfbdbe6cc3791cc2d2a15ad80aff1340098833ecfe660,argexpr3.vsb.cz::gpu:0::Tesla V100-PCIE-32GB,GPU-4e0547c3-d65d-7d8b-9f6a-d40ad61a0f0f,unet:update:depth=1,"[""/data2/joc0027/ExPoConv/artifacts/e13_unet_scaling.csv""]"
+E13,unet_update_b4_r256,batch,4,256,R,1,200,ok,200,66.055834,2.968965768814087,5.013671875,,,,[],1.11,75f10dd9f671f12df7fe4f357f061341f9041bc7,d85bdc4114c023499bedfbdbe6cc3791cc2d2a15ad80aff1340098833ecfe660,argexpr3.vsb.cz::gpu:0::Tesla V100-PCIE-32GB,GPU-4e0547c3-d65d-7d8b-9f6a-d40ad61a0f0f,unet:update:depth=1,"[""/data2/joc0027/ExPoConv/artifacts/e13_unet_scaling.csv""]"
+E13,unet_update_b4_r256,batch,4,256,F,1,200,ok,200,43.6718185,1.3512914180755615,3.013671875,,,,[],1.11,75f10dd9f671f12df7fe4f357f061341f9041bc7,d85bdc4114c023499bedfbdbe6cc3791cc2d2a15ad80aff1340098833ecfe660,argexpr3.vsb.cz::gpu:0::Tesla V100-PCIE-32GB,GPU-4e0547c3-d65d-7d8b-9f6a-d40ad61a0f0f,unet:update:depth=1,"[""/data2/joc0027/ExPoConv/artifacts/e13_unet_scaling.csv""]"
+E13,unet_update_b4_r256,batch,4,256,R,2,200,ok,200,66.901658,2.968965768814087,5.013671875,,,,[],1.11,75f10dd9f671f12df7fe4f357f061341f9041bc7,d85bdc4114c023499bedfbdbe6cc3791cc2d2a15ad80aff1340098833ecfe660,argexpr3.vsb.cz::gpu:0::Tesla V100-PCIE-32GB,GPU-4e0547c3-d65d-7d8b-9f6a-d40ad61a0f0f,unet:update:depth=1,"[""/data2/joc0027/ExPoConv/artifacts/e13_unet_scaling.csv""]"
+E13,unet_update_b4_r256,batch,4,256,F,2,200,ok,200,38.118156,1.3512914180755615,3.013671875,,,,[],1.11,75f10dd9f671f12df7fe4f357f061341f9041bc7,d85bdc4114c023499bedfbdbe6cc3791cc2d2a15ad80aff1340098833ecfe660,argexpr3.vsb.cz::gpu:0::Tesla V100-PCIE-32GB,GPU-4e0547c3-d65d-7d8b-9f6a-d40ad61a0f0f,unet:update:depth=1,"[""/data2/joc0027/ExPoConv/artifacts/e13_unet_scaling.csv""]"
+E13,unet_update_b4_r256,batch,4,256,R,3,200,ok,200,66.19382250000001,2.968965768814087,5.013671875,,,,[],1.11,75f10dd9f671f12df7fe4f357f061341f9041bc7,d85bdc4114c023499bedfbdbe6cc3791cc2d2a15ad80aff1340098833ecfe660,argexpr3.vsb.cz::gpu:0::Tesla V100-PCIE-32GB,GPU-4e0547c3-d65d-7d8b-9f6a-d40ad61a0f0f,unet:update:depth=1,"[""/data2/joc0027/ExPoConv/artifacts/e13_unet_scaling.csv""]"
+E13,unet_update_b4_r256,batch,4,256,F,3,200,ok,200,41.492227,1.3512914180755615,3.013671875,,,,[],1.11,75f10dd9f671f12df7fe4f357f061341f9041bc7,d85bdc4114c023499bedfbdbe6cc3791cc2d2a15ad80aff1340098833ecfe660,argexpr3.vsb.cz::gpu:0::Tesla V100-PCIE-32GB,GPU-4e0547c3-d65d-7d8b-9f6a-d40ad61a0f0f,unet:update:depth=1,"[""/data2/joc0027/ExPoConv/artifacts/e13_unet_scaling.csv""]"
+E13,unet_update_b4_r256,batch,4,256,R,4,200,ok,200,67.3944635,2.968965768814087,5.013671875,,,,[],1.11,75f10dd9f671f12df7fe4f357f061341f9041bc7,d85bdc4114c023499bedfbdbe6cc3791cc2d2a15ad80aff1340098833ecfe660,argexpr3.vsb.cz::gpu:0::Tesla V100-PCIE-32GB,GPU-4e0547c3-d65d-7d8b-9f6a-d40ad61a0f0f,unet:update:depth=1,"[""/data2/joc0027/ExPoConv/artifacts/e13_unet_scaling.csv""]"
+E13,unet_update_b4_r256,batch,4,256,F,4,200,ok,200,38.111515499999996,1.3512914180755615,3.013671875,,,,[],1.11,75f10dd9f671f12df7fe4f357f061341f9041bc7,d85bdc4114c023499bedfbdbe6cc3791cc2d2a15ad80aff1340098833ecfe660,argexpr3.vsb.cz::gpu:0::Tesla V100-PCIE-32GB,GPU-4e0547c3-d65d-7d8b-9f6a-d40ad61a0f0f,unet:update:depth=1,"[""/data2/joc0027/ExPoConv/artifacts/e13_unet_scaling.csv""]"
+E13,unet_update_b8_r128,resolution,8,128,R,0,200,ok,200,40.3832735,1.4040145874023438,3.013671875,,,,[],1.11,75f10dd9f671f12df7fe4f357f061341f9041bc7,f86206ed7ebc50c92cd2db900b22ad1ea5fb08a3019131b5dcdb5c908931bdfb,argexpr3.vsb.cz::gpu:0::Tesla V100-PCIE-32GB,GPU-4e0547c3-d65d-7d8b-9f6a-d40ad61a0f0f,unet:update:depth=1,"[""/data2/joc0027/ExPoConv/artifacts/e13_unet_scaling.csv""]"
+E13,unet_update_b8_r128,resolution,8,128,F,0,200,ok,200,27.2156095,0.6543700695037842,1.513671875,,,,[],1.11,75f10dd9f671f12df7fe4f357f061341f9041bc7,f86206ed7ebc50c92cd2db900b22ad1ea5fb08a3019131b5dcdb5c908931bdfb,argexpr3.vsb.cz::gpu:0::Tesla V100-PCIE-32GB,GPU-4e0547c3-d65d-7d8b-9f6a-d40ad61a0f0f,unet:update:depth=1,"[""/data2/joc0027/ExPoConv/artifacts/e13_unet_scaling.csv""]"
+E13,unet_update_b8_r128,resolution,8,128,R,1,200,ok,200,41.1435525,1.4040145874023438,3.013671875,,,,[],1.11,75f10dd9f671f12df7fe4f357f061341f9041bc7,f86206ed7ebc50c92cd2db900b22ad1ea5fb08a3019131b5dcdb5c908931bdfb,argexpr3.vsb.cz::gpu:0::Tesla V100-PCIE-32GB,GPU-4e0547c3-d65d-7d8b-9f6a-d40ad61a0f0f,unet:update:depth=1,"[""/data2/joc0027/ExPoConv/artifacts/e13_unet_scaling.csv""]"
+E13,unet_update_b8_r128,resolution,8,128,F,1,200,ok,200,26.475661000000002,0.6543700695037842,1.513671875,,,,[],1.11,75f10dd9f671f12df7fe4f357f061341f9041bc7,f86206ed7ebc50c92cd2db900b22ad1ea5fb08a3019131b5dcdb5c908931bdfb,argexpr3.vsb.cz::gpu:0::Tesla V100-PCIE-32GB,GPU-4e0547c3-d65d-7d8b-9f6a-d40ad61a0f0f,unet:update:depth=1,"[""/data2/joc0027/ExPoConv/artifacts/e13_unet_scaling.csv""]"
+E13,unet_update_b8_r128,resolution,8,128,R,2,200,ok,200,49.994449,1.4040145874023438,3.013671875,,,,[],1.11,75f10dd9f671f12df7fe4f357f061341f9041bc7,f86206ed7ebc50c92cd2db900b22ad1ea5fb08a3019131b5dcdb5c908931bdfb,argexpr3.vsb.cz::gpu:0::Tesla V100-PCIE-32GB,GPU-4e0547c3-d65d-7d8b-9f6a-d40ad61a0f0f,unet:update:depth=1,"[""/data2/joc0027/ExPoConv/artifacts/e13_unet_scaling.csv""]"
+E13,unet_update_b8_r128,resolution,8,128,F,2,200,ok,200,26.602772,0.6543700695037842,1.513671875,,,,[],1.11,75f10dd9f671f12df7fe4f357f061341f9041bc7,f86206ed7ebc50c92cd2db900b22ad1ea5fb08a3019131b5dcdb5c908931bdfb,argexpr3.vsb.cz::gpu:0::Tesla V100-PCIE-32GB,GPU-4e0547c3-d65d-7d8b-9f6a-d40ad61a0f0f,unet:update:depth=1,"[""/data2/joc0027/ExPoConv/artifacts/e13_unet_scaling.csv""]"
+E13,unet_update_b8_r128,resolution,8,128,R,3,200,ok,200,44.7510795,1.4040145874023438,3.013671875,,,,[],1.11,75f10dd9f671f12df7fe4f357f061341f9041bc7,f86206ed7ebc50c92cd2db900b22ad1ea5fb08a3019131b5dcdb5c908931bdfb,argexpr3.vsb.cz::gpu:0::Tesla V100-PCIE-32GB,GPU-4e0547c3-d65d-7d8b-9f6a-d40ad61a0f0f,unet:update:depth=1,"[""/data2/joc0027/ExPoConv/artifacts/e13_unet_scaling.csv""]"
+E13,unet_update_b8_r128,resolution,8,128,F,3,200,ok,200,28.292599,0.6543700695037842,1.513671875,,,,[],1.11,75f10dd9f671f12df7fe4f357f061341f9041bc7,f86206ed7ebc50c92cd2db900b22ad1ea5fb08a3019131b5dcdb5c908931bdfb,argexpr3.vsb.cz::gpu:0::Tesla V100-PCIE-32GB,GPU-4e0547c3-d65d-7d8b-9f6a-d40ad61a0f0f,unet:update:depth=1,"[""/data2/joc0027/ExPoConv/artifacts/e13_unet_scaling.csv""]"
+E13,unet_update_b8_r128,resolution,8,128,R,4,200,ok,200,41.245692000000005,1.4040145874023438,3.013671875,,,,[],1.11,75f10dd9f671f12df7fe4f357f061341f9041bc7,f86206ed7ebc50c92cd2db900b22ad1ea5fb08a3019131b5dcdb5c908931bdfb,argexpr3.vsb.cz::gpu:0::Tesla V100-PCIE-32GB,GPU-4e0547c3-d65d-7d8b-9f6a-d40ad61a0f0f,unet:update:depth=1,"[""/data2/joc0027/ExPoConv/artifacts/e13_unet_scaling.csv""]"
+E13,unet_update_b8_r128,resolution,8,128,F,4,200,ok,200,26.5834975,0.6543700695037842,1.513671875,,,,[],1.11,75f10dd9f671f12df7fe4f357f061341f9041bc7,f86206ed7ebc50c92cd2db900b22ad1ea5fb08a3019131b5dcdb5c908931bdfb,argexpr3.vsb.cz::gpu:0::Tesla V100-PCIE-32GB,GPU-4e0547c3-d65d-7d8b-9f6a-d40ad61a0f0f,unet:update:depth=1,"[""/data2/joc0027/ExPoConv/artifacts/e13_unet_scaling.csv""]"
+E13,unet_update_b8_r256,batch|resolution,8,256,R,0,200,ok,200,116.4195215,5.9552161693573,10.087890625,,,,[],1.11,75f10dd9f671f12df7fe4f357f061341f9041bc7,aea17d6bf3a5c279cd8509c85e8645a98a12a04e37d032e8f1e2ef1e19718b70,argexpr3.vsb.cz::gpu:0::Tesla V100-PCIE-32GB,GPU-4e0547c3-d65d-7d8b-9f6a-d40ad61a0f0f,unet:update:depth=1,"[""/data2/joc0027/ExPoConv/artifacts/e13_unet_scaling.csv""]"
+E13,unet_update_b8_r256,batch|resolution,8,256,F,0,200,ok,200,60.978587000000005,2.7212514877319336,5.025390625,,,,[],1.11,75f10dd9f671f12df7fe4f357f061341f9041bc7,aea17d6bf3a5c279cd8509c85e8645a98a12a04e37d032e8f1e2ef1e19718b70,argexpr3.vsb.cz::gpu:0::Tesla V100-PCIE-32GB,GPU-4e0547c3-d65d-7d8b-9f6a-d40ad61a0f0f,unet:update:depth=1,"[""/data2/joc0027/ExPoConv/artifacts/e13_unet_scaling.csv""]"
+E13,unet_update_b8_r256,batch|resolution,8,256,R,1,200,ok,200,116.14768649999999,5.9552161693573,10.087890625,,,,[],1.11,75f10dd9f671f12df7fe4f357f061341f9041bc7,aea17d6bf3a5c279cd8509c85e8645a98a12a04e37d032e8f1e2ef1e19718b70,argexpr3.vsb.cz::gpu:0::Tesla V100-PCIE-32GB,GPU-4e0547c3-d65d-7d8b-9f6a-d40ad61a0f0f,unet:update:depth=1,"[""/data2/joc0027/ExPoConv/artifacts/e13_unet_scaling.csv""]"
+E13,unet_update_b8_r256,batch|resolution,8,256,F,1,200,ok,200,59.4919345,2.7212514877319336,5.025390625,,,,[],1.11,75f10dd9f671f12df7fe4f357f061341f9041bc7,aea17d6bf3a5c279cd8509c85e8645a98a12a04e37d032e8f1e2ef1e19718b70,argexpr3.vsb.cz::gpu:0::Tesla V100-PCIE-32GB,GPU-4e0547c3-d65d-7d8b-9f6a-d40ad61a0f0f,unet:update:depth=1,"[""/data2/joc0027/ExPoConv/artifacts/e13_unet_scaling.csv""]"
+E13,unet_update_b8_r256,batch|resolution,8,256,R,2,200,ok,200,115.53207499999999,5.9552161693573,10.087890625,,,,[],1.11,75f10dd9f671f12df7fe4f357f061341f9041bc7,aea17d6bf3a5c279cd8509c85e8645a98a12a04e37d032e8f1e2ef1e19718b70,argexpr3.vsb.cz::gpu:0::Tesla V100-PCIE-32GB,GPU-4e0547c3-d65d-7d8b-9f6a-d40ad61a0f0f,unet:update:depth=1,"[""/data2/joc0027/ExPoConv/artifacts/e13_unet_scaling.csv""]"
+E13,unet_update_b8_r256,batch|resolution,8,256,F,2,200,ok,200,60.346108,2.7212514877319336,5.025390625,,,,[],1.11,75f10dd9f671f12df7fe4f357f061341f9041bc7,aea17d6bf3a5c279cd8509c85e8645a98a12a04e37d032e8f1e2ef1e19718b70,argexpr3.vsb.cz::gpu:0::Tesla V100-PCIE-32GB,GPU-4e0547c3-d65d-7d8b-9f6a-d40ad61a0f0f,unet:update:depth=1,"[""/data2/joc0027/ExPoConv/artifacts/e13_unet_scaling.csv""]"
+E13,unet_update_b8_r256,batch|resolution,8,256,R,3,200,ok,200,115.3819745,5.9552161693573,10.087890625,,,,[],1.11,75f10dd9f671f12df7fe4f357f061341f9041bc7,aea17d6bf3a5c279cd8509c85e8645a98a12a04e37d032e8f1e2ef1e19718b70,argexpr3.vsb.cz::gpu:0::Tesla V100-PCIE-32GB,GPU-4e0547c3-d65d-7d8b-9f6a-d40ad61a0f0f,unet:update:depth=1,"[""/data2/joc0027/ExPoConv/artifacts/e13_unet_scaling.csv""]"
+E13,unet_update_b8_r256,batch|resolution,8,256,F,3,200,ok,200,59.478189,2.7212514877319336,5.025390625,,,,[],1.11,75f10dd9f671f12df7fe4f357f061341f9041bc7,aea17d6bf3a5c279cd8509c85e8645a98a12a04e37d032e8f1e2ef1e19718b70,argexpr3.vsb.cz::gpu:0::Tesla V100-PCIE-32GB,GPU-4e0547c3-d65d-7d8b-9f6a-d40ad61a0f0f,unet:update:depth=1,"[""/data2/joc0027/ExPoConv/artifacts/e13_unet_scaling.csv""]"
+E13,unet_update_b8_r256,batch|resolution,8,256,R,4,200,ok,200,116.54081550000001,5.9552161693573,10.087890625,,,,[],1.11,75f10dd9f671f12df7fe4f357f061341f9041bc7,aea17d6bf3a5c279cd8509c85e8645a98a12a04e37d032e8f1e2ef1e19718b70,argexpr3.vsb.cz::gpu:0::Tesla V100-PCIE-32GB,GPU-4e0547c3-d65d-7d8b-9f6a-d40ad61a0f0f,unet:update:depth=1,"[""/data2/joc0027/ExPoConv/artifacts/e13_unet_scaling.csv""]"
+E13,unet_update_b8_r256,batch|resolution,8,256,F,4,200,ok,200,59.442988,2.7212514877319336,5.025390625,,,,[],1.11,75f10dd9f671f12df7fe4f357f061341f9041bc7,aea17d6bf3a5c279cd8509c85e8645a98a12a04e37d032e8f1e2ef1e19718b70,argexpr3.vsb.cz::gpu:0::Tesla V100-PCIE-32GB,GPU-4e0547c3-d65d-7d8b-9f6a-d40ad61a0f0f,unet:update:depth=1,"[""/data2/joc0027/ExPoConv/artifacts/e13_unet_scaling.csv""]"
+E13,unet_update_b8_r512,resolution,8,512,R,0,200,oom,0,,,,oom,first_update,"2026-09-29 00:58:25.842446: W external/tsl/tsl/framework/bfc_allocator.cc:482] Allocator (GPU_0_bfc) ran out of memory trying to allocate 22.97GiB (rounded to 24664834816)requested by op 
+2026-09-29 00:58:25.843700: W external/tsl/tsl/framework/bfc_allocator.cc:494] __________________________________________________________________________________________________*_
+E0929 00:58:25.859340  299378 pjrt_stream_executor_client.cc:2804] Execution of replica 0 failed: RESOURCE_EXHAUSTED: Out of memory while trying to allocate 24664834784 bytes.
+BufferAssignment OOM Debugging.
+BufferAssignment stats:
+             parameter allocation:   29.57MiB
+              constant allocation:    8.00MiB
+        maybe_live_out allocation:    5.57MiB
+     preallocated temp allocation:   22.97GiB
+  preallocated temp fragmentation:   16.05MiB (0.07%)
+                 total allocation:   23.01GiB
+              total fragmentation:   10.15MiB (0.04%)
+Peak buffers:
+	Buffer 1:
+		Size: 1.12GiB
+		Operator: op_name=""jit(complete_update)/jit(main)/conv_general_dilated[window_strides=(1, 1) padding=((1, 1), (1, 1)) lhs_dilation=(1, 1) rhs_dilation=(1, 1) dimension_numbers=ConvDimensionNumbers(lhs_spec=(0, 3, 1, 2), rhs_spec=(3, 2, 0, 1), out_spec=(0, 3, 1, 2)) feature_group_count=16 batch_group_count=1 precision=(<Precision.HIGHEST: 2>, <Precision.HIGHEST: 2>) preferred_element_type=None]"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/hnnpp.py"" source_line=366
+		XLA Label: custom-call
+		Shape: f32[8,144,512,512]
+		==========================
+
+	Buffer 2:
+		Size: 1.12GiB
+		Operator: op_name=""jit(complete_update)/jit(main)/reduce_sum[axes=(3,)]"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/hnnpp.py"" source_line=178
+		XLA Label: fusion
+		Shape: f32[8,144,512,512]
+		==========================
+
+	Buffer 3:
+		Size: 1.12GiB
+		Operator: op_name=""jit(complete_update)/jit(main)/jvp(jit(_where))/select_n"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/geometry.py"" source_line=64
+		XLA Label: fusion
+		Shape: f32[8,512,512,144]
+		==========================
+
+	Buffer 4:
+		Size: 576.00MiB
+		Operator: op_name=""jit(complete_update)/jit(main)/transpose(jvp(...i,io->...o))/dot_general[dimension_numbers=(((3,), (1,)), ((), ())) precision=(<Precision.HIGHEST: 2>, <Precision.HIGHEST: 2>) preferred_element_type=float32]"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/hnnpp.py"" source_line=180
+		XLA Label: custom-call
+		Shape: f32[2097152,72]
+		==========================
+
+	Buffer 5:
+		Size: 576.00MiB
+		Operator: op_name=""jit(complete_update)/jit(main)/conv_general_dilated[window_strides=(1, 1) padding=((1, 1), (1, 1)) lhs_dilation=(1, 1) rhs_dilation=(1, 1) dimension_numbers=ConvDimensionNumbers(lhs_spec=(0, 3, 1, 2), rhs_spec=(3, 2, 0, 1), out_spec=(0, 3, 1, 2)) feature_group_count=8 batch_group_count=1 precision=(<Precision.HIGHEST: 2>, <Precision.HIGHEST: 2>) preferred_element_type=None]"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/hnnpp.py"" source_line=366
+		XLA Label: custom-call
+		Shape: f32[8,72,512,512]
+		==========================
+
+	Buffer 6:
+		Size: 576.00MiB
+		Operator: op_name=""jit(complete_update)/jit(main)/conv_general_dilated[window_strides=(1, 1) padding=((1, 1), (1, 1)) lhs_dilation=(1, 1) rhs_dilation=(1, 1) dimension_numbers=ConvDimensionNumbers(lhs_spec=(0, 3, 1, 2), rhs_spec=(3, 2, 0, 1), out_spec=(0, 3, 1, 2)) feature_group_count=32 batch_group_count=1 precision=(<Precision.HIGHEST: 2>, <Precision.HIGHEST: 2>) preferred_element_type=None]"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/hnnpp.py"" source_line=366
+		XLA Label: custom-call
+		Shape: f32[8,288,256,256]
+		==========================
+
+	Buffer 7:
+		Size: 576.00MiB
+		Operator: op_name=""jit(complete_update)/jit(main)/conv_general_dilated[window_strides=(1, 1) padding=((1, 1), (1, 1)) lhs_dilation=(1, 1) rhs_dilation=(1, 1) dimension_numbers=ConvDimensionNumbers(lhs_spec=(0, 3, 1, 2), rhs_spec=(3, 2, 0, 1), out_spec=(0, 3, 1, 2)) feature_group_count=8 batch_group_count=1 precision=(<Precision.HIGHEST: 2>, <Precision.HIGHEST: 2>) preferred_element_type=None]"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/hnnpp.py"" source_line=366
+		XLA Label: custom-call
+		Shape: f32[8,72,512,512]
+		==========================
+
+	Buffer 8:
+		Size: 576.00MiB
+		Operator: op_name=""jit(complete_update)/jit(main)/transpose(jvp(jit(_where)))/select_n"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/geometry.py"" source_line=64 deduplicated_name=""input_transpose_fusion.56""
+		XLA Label: fusion
+		Shape: f32[8,72,512,512]
+		==========================
+
+	Buffer 9:
+		Size: 576.00MiB
+		Operator: op_name=""jit(complete_update)/jit(main)/jvp(jit(_where))/select_n"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/geometry.py"" source_line=64
+		XLA Label: fusion
+		Shape: f32[8,512,512,72]
+		==========================
+
+	Buffer 10:
+		Size: 576.00MiB
+		Operator: op_name=""jit(complete_update)/jit(main)/reduce_sum[axes=(3,)]"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/hnnpp.py"" source_line=178 deduplicated_name=""input_reduce_select_fusion.50""
+		XLA Label: fusion
+		Shape: f32[8,72,512,512]
+		==========================
+
+	Buffer 11:
+		Size: 576.00MiB
+		Operator: op_name=""jit(complete_update)/jit(main)/reduce_sum[axes=(3,)]"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/hnnpp.py"" source_line=178 deduplicated_name=""input_reduce_select_fusion.50""
+		XLA Label: fusion
+		Shape: f32[8,72,512,512]
+		==========================
+
+	Buffer 12:
+		Size: 576.00MiB
+		Operator: op_name=""jit(complete_update)/jit(main)/jvp(jit(_where))/select_n"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/geometry.py"" source_line=64
+		XLA Label: fusion
+		Shape: f32[8,256,256,288]
+		==========================
+
+	Buffer 13:
+		Size: 576.00MiB
+		Operator: op_name=""jit(complete_update)/jit(main)/jvp(jit(_where))/select_n"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/geometry.py"" source_line=64
+		XLA Label: fusion
+		Shape: f32[8,512,512,72]
+		==========================
+
+	Buffer 14:
+		Size: 288.00MiB
+		Operator: op_name=""jit(complete_update)/jit(main)/conv_general_dilated[window_strides=(1, 1) padding=((1, 1), (1, 1)) lhs_dilation=(1, 1) rhs_dilation=(1, 1) dimension_numbers=ConvDimensionNumbers(lhs_spec=(0, 3, 1, 2), rhs_spec=(3, 2, 0, 1), out_spec=(0, 3, 1, 2)) feature_group_count=64 batch_group_count=1 precision=(<Precision.HIGHEST: 2>, <Precision.HIGHEST: 2>) preferred_element_type=None]"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/hnnpp.py"" source_line=366
+		XLA Label: custom-call
+		Shape: f32[8,576,128,128]
+		==========================
+
+	Buffer 15:
+		Size: 288.00MiB
+		Operator: op_name=""jit(complete_update)/jit(main)/conv_general_dilated[window_strides=(1, 1) padding=((1, 1), (1, 1)) lhs_dilation=(1, 1) rhs_dilation=(1, 1) dimension_numbers=ConvDimensionNumbers(lhs_spec=(0, 3, 1, 2), rhs_spec=(3, 2, 0, 1), out_spec=(0, 3, 1, 2)) feature_group_count=16 batch_group_count=1 precision=(<Precision.HIGHEST: 2>, <Precision.HIGHEST: 2>) preferred_element_type=None]"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/hnnpp.py"" source_line=366
+		XLA Label: custom-call
+		Shape: f32[8,144,256,256]
+		==========================
+
+
+Traceback (most recent call last):
+  File ""<frozen runpy>"", line 198, in _run_module_as_main
+  File ""<frozen runpy>"", line 88, in _run_code
+  File ""/data2/joc0027/ExPoConv/src/poincare_exec/cli.py"", line 342, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File ""/data2/joc0027/ExPoConv/src/poincare_exec/cli.py"", line 230, in main
+    benchmark_worker(
+  File ""/data2/joc0027/ExPoConv/src/poincare_exec/experiments/benchmark.py"", line 558, in benchmark_worker
+    first_output = compiled(initial_state, inputs, curvature)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/data2/joc0027/poincare-execution-experiments/.venv/lib/python3.11/site-packages/jax/_src/stages.py"", line 575, in __call__
+    return self._call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/data2/joc0027/poincare-execution-experiments/.venv/lib/python3.11/site-packages/jax/_src/interpreters/pxla.py"", line 2909, in aot_cache_miss
+    outs, out_flat, args_flat = stages.Compiled.call(params, *args, **kwargs)
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/data2/joc0027/poincare-execution-experiments/.venv/lib/python3.11/site-packages/jax/_src/stages.py"", line 544, in call
+    out_flat = params.executable.call(*args_flat)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/data2/joc0027/poincare-execution-experiments/.venv/lib/python3.11/site-packages/jax/_src/interpreters/pxla.py"", line 2887, in call
+    return self.unsafe_call(*args)  # pylint: disable=not-callable
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/data2/joc0027/poincare-execution-experiments/.venv/lib/python3.11/site-packages/jax/_src/profiler.py"", line 336, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File ""/data2/joc0027/poincare-execution-experiments/.venv/lib/python3.11/site-packages/jax/_src/interpreters/pxla.py"", line 1209, in __call__
+    results = self.xla_executable.execute_sharded(input_bufs)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+jaxlib.xla_extension.XlaRuntimeError: RESOURCE_EXHAUSTED: Out of memory while trying to allocate 24664834784 bytes.
+BufferAssignment OOM Debugging.
+BufferAssignment stats:
+             parameter allocation:   29.57MiB
+              constant allocation:    8.00MiB
+        maybe_live_out allocation:    5.57MiB
+     preallocated temp allocation:   22.97GiB
+  preallocated temp fragmentation:   16.05MiB (0.07%)
+                 total allocation:   23.01GiB
+              total fragmentation:   10.15MiB (0.04%)
+Peak buffers:
+	Buffer 1:
+		Size: 1.12GiB
+		Operator: op_name=""jit(complete_update)/jit(main)/conv_general_dilated[window_strides=(1, 1) padding=((1, 1), (1, 1)) lhs_dilation=(1, 1) rhs_dilation=(1, 1) dimension_numbers=ConvDimensionNumbers(lhs_spec=(0, 3, 1, 2), rhs_spec=(3, 2, 0, 1), out_spec=(0, 3, 1, 2)) feature_group_count=16 batch_group_count=1 precision=(<Precision.HIGHEST: 2>, <Precision.HIGHEST: 2>) preferred_element_type=None]"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/hnnpp.py"" source_line=366
+		XLA Label: custom-call
+		Shape: f32[8,144,512,512]
+		==========================
+
+	Buffer 2:
+		Size: 1.12GiB
+		Operator: op_name=""jit(complete_update)/jit(main)/reduce_sum[axes=(3,)]"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/hnnpp.py"" source_line=178
+		XLA Label: fusion
+		Shape: f32[8,144,512,512]
+		==========================
+
+	Buffer 3:
+		Size: 1.12GiB
+		Operator: op_name=""jit(complete_update)/jit(main)/jvp(jit(_where))/select_n"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/geometry.py"" source_line=64
+		XLA Label: fusion
+		Shape: f32[8,512,512,144]
+		==========================
+
+	Buffer 4:
+		Size: 576.00MiB
+		Operator: op_name=""jit(complete_update)/jit(main)/transpose(jvp(...i,io->...o))/dot_general[dimension_numbers=(((3,), (1,)), ((), ())) precision=(<Precision.HIGHEST: 2>, <Precision.HIGHEST: 2>) preferred_element_type=float32]"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/hnnpp.py"" source_line=180
+		XLA Label: custom-call
+		Shape: f32[2097152,72]
+		==========================
+
+	Buffer 5:
+		Size: 576.00MiB
+		Operator: op_name=""jit(complete_update)/jit(main)/conv_general_dilated[window_strides=(1, 1) padding=((1, 1), (1, 1)) lhs_dilation=(1, 1) rhs_dilation=(1, 1) dimension_numbers=ConvDimensionNumbers(lhs_spec=(0, 3, 1, 2), rhs_spec=(3, 2, 0, 1), out_spec=(0, 3, 1, 2)) feature_group_count=8 batch_group_count=1 precision=(<Precision.HIGHEST: 2>, <Precision.HIGHEST: 2>) preferred_element_type=None]"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/hnnpp.py"" source_line=366
+		XLA Label: custom-call
+		Shape: f32[8,72,512,512]
+		==========================
+
+	Buffer 6:
+		Size: 576.00MiB
+		Operator: op_name=""jit(complete_update)/jit(main)/conv_general_dilated[window_strides=(1, 1) padding=((1, 1), (1, 1)) lhs_dilation=(1, 1) rhs_dilation=(1, 1) dimension_numbers=ConvDimensionNumbers(lhs_spec=(0, 3, 1, 2), rhs_spec=(3, 2, 0, 1), out_spec=(0, 3, 1, 2)) feature_group_count=32 batch_group_count=1 precision=(<Precision.HIGHEST: 2>, <Precision.HIGHEST: 2>) preferred_element_type=None]"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/hnnpp.py"" source_line=366
+		XLA Label: custom-call
+		Shape: f32[8,288,256,256]
+		==========================
+
+	Buffer 7:
+		Size: 576.00MiB
+		Operator: op_name=""jit(complete_update)/jit(main)/conv_general_dilated[window_strides=(1, 1) padding=((1, 1), (1, 1)) lhs_dilation=(1, 1) rhs_dilation=(1, 1) dimension_numbers=ConvDimensionNumbers(lhs_spec=(0, 3, 1, 2), rhs_spec=(3, 2, 0, 1), out_spec=(0, 3, 1, 2)) feature_group_count=8 batch_group_count=1 precision=(<Precision.HIGHEST: 2>, <Precision.HIGHEST: 2>) preferred_element_type=None]"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/hnnpp.py"" source_line=366
+		XLA Label: custom-call
+		Shape: f32[8,72,512,512]
+		==========================
+
+	Buffer 8:
+		Size: 576.00MiB
+		Operator: op_name=""jit(complete_update)/jit(main)/transpose(jvp(jit(_where)))/select_n"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/geometry.py"" source_line=64 deduplicated_name=""input_transpose_fusion.56""
+		XLA Label: fusion
+		Shape: f32[8,72,512,512]
+		==========================
+
+	Buffer 9:
+		Size: 576.00MiB
+		Operator: op_name=""jit(complete_update)/jit(main)/jvp(jit(_where))/select_n"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/geometry.py"" source_line=64
+		XLA Label: fusion
+		Shape: f32[8,512,512,72]
+		==========================
+
+	Buffer 10:
+		Size: 576.00MiB
+		Operator: op_name=""jit(complete_update)/jit(main)/reduce_sum[axes=(3,)]"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/hnnpp.py"" source_line=178 deduplicated_name=""input_reduce_select_fusion.50""
+		XLA Label: fusion
+		Shape: f32[8,72,512,512]
+		==========================
+
+	Buffer 11:
+		Size: 576.00MiB
+		Operator: op_name=""jit(complete_update)/jit(main)/reduce_sum[axes=(3,)]"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/hnnpp.py"" source_line=178 deduplicated_name=""input_reduce_select_fusion.50""
+		XLA Label: fusion
+		Shape: f32[8,72,512,512]
+		==========================
+
+	Buffer 12:
+		Size: 576.00MiB
+		Operator: op_name=""jit(complete_update)/jit(main)/jvp(jit(_where))/select_n"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/geometry.py"" source_line=64
+		XLA Label: fusion
+		Shape: f32[8,256,256,288]
+		==========================
+
+	Buffer 13:
+		Size: 576.00MiB
+		Operator: op_name=""jit(complete_update)/jit(main)/jvp(jit(_where))/select_n"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/geometry.py"" source_line=64
+		XLA Label: fusion
+		Shape: f32[8,512,512,72]
+		==========================
+
+	Buffer 14:
+		Size: 288.00MiB
+		Operator: op_name=""jit(complete_update)/jit(main)/conv_general_dilated[window_strides=(1, 1) padding=((1, 1), (1, 1)) lhs_dilation=(1, 1) rhs_dilation=(1, 1) dimension_numbers=ConvDimensionNumbers(lhs_spec=(0, 3, 1, 2), rhs_spec=(3, 2, 0, 1), out_spec=(0, 3, 1, 2)) feature_group_count=64 batch_group_count=1 precision=(<Precision.HIGHEST: 2>, <Precision.HIGHEST: 2>) preferred_element_type=None]"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/hnnpp.py"" source_line=366
+		XLA Label: custom-call
+		Shape: f32[8,576,128,128]
+		==========================
+
+	Buffer 15:
+		Size: 288.00MiB
+		Operator: op_name=""jit(complete_update)/jit(main)/conv_general_dilated[window_strides=(1, 1) padding=((1, 1), (1, 1)) lhs_dilation=(1, 1) rhs_dilation=(1, 1) dimension_numbers=ConvDimensionNumbers(lhs_spec=(0, 3, 1, 2), rhs_spec=(3, 2, 0, 1), out_spec=(0, 3, 1, 2)) feature_group_count=16 batch_group_count=1 precision=(<Precision.HIGHEST: 2>, <Precision.HIGHEST: 2>) preferred_element_type=None]"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/hnnpp.py"" source_line=366
+		XLA Label: custom-call
+		Shape: f32[8,144,256,256]
+		==========================",[1],1.11,75f10dd9f671f12df7fe4f357f061341f9041bc7,f0604c9ca563f1fd41281ae1f988103de068aba57a46b64feae3d7cb58c54f6d,argexpr3.vsb.cz::gpu:0::Tesla V100-PCIE-32GB,GPU-4e0547c3-d65d-7d8b-9f6a-d40ad61a0f0f,unet:update,"[""/data2/joc0027/ExPoConv/artifacts/e13_unet_scaling.csv.failures.jsonl""]"
+E13,unet_update_b8_r512,resolution,8,512,F,0,200,ok,200,196.5267325,12.75775671005249,20.033203125,,,,[],1.11,75f10dd9f671f12df7fe4f357f061341f9041bc7,f0604c9ca563f1fd41281ae1f988103de068aba57a46b64feae3d7cb58c54f6d,argexpr3.vsb.cz::gpu:0::Tesla V100-PCIE-32GB,GPU-4e0547c3-d65d-7d8b-9f6a-d40ad61a0f0f,unet:update:depth=1,"[""/data2/joc0027/ExPoConv/artifacts/e13_unet_scaling.csv""]"
+E13,unet_update_b8_r512,resolution,8,512,R,1,200,oom,0,,,,oom,first_update,"2026-09-29 01:07:24.689402: W external/tsl/tsl/framework/bfc_allocator.cc:482] Allocator (GPU_0_bfc) ran out of memory trying to allocate 22.97GiB (rounded to 24664834816)requested by op 
+2026-09-29 01:07:24.690704: W external/tsl/tsl/framework/bfc_allocator.cc:494] __________________________________________________________________________________________________*_
+E0929 01:07:24.705165  306750 pjrt_stream_executor_client.cc:2804] Execution of replica 0 failed: RESOURCE_EXHAUSTED: Out of memory while trying to allocate 24664834784 bytes.
+BufferAssignment OOM Debugging.
+BufferAssignment stats:
+             parameter allocation:   29.57MiB
+              constant allocation:    8.00MiB
+        maybe_live_out allocation:    5.57MiB
+     preallocated temp allocation:   22.97GiB
+  preallocated temp fragmentation:   16.05MiB (0.07%)
+                 total allocation:   23.01GiB
+              total fragmentation:   10.15MiB (0.04%)
+Peak buffers:
+	Buffer 1:
+		Size: 1.12GiB
+		Operator: op_name=""jit(complete_update)/jit(main)/conv_general_dilated[window_strides=(1, 1) padding=((1, 1), (1, 1)) lhs_dilation=(1, 1) rhs_dilation=(1, 1) dimension_numbers=ConvDimensionNumbers(lhs_spec=(0, 3, 1, 2), rhs_spec=(3, 2, 0, 1), out_spec=(0, 3, 1, 2)) feature_group_count=16 batch_group_count=1 precision=(<Precision.HIGHEST: 2>, <Precision.HIGHEST: 2>) preferred_element_type=None]"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/hnnpp.py"" source_line=366
+		XLA Label: custom-call
+		Shape: f32[8,144,512,512]
+		==========================
+
+	Buffer 2:
+		Size: 1.12GiB
+		Operator: op_name=""jit(complete_update)/jit(main)/reduce_sum[axes=(3,)]"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/hnnpp.py"" source_line=178
+		XLA Label: fusion
+		Shape: f32[8,144,512,512]
+		==========================
+
+	Buffer 3:
+		Size: 1.12GiB
+		Operator: op_name=""jit(complete_update)/jit(main)/jvp(jit(_where))/select_n"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/geometry.py"" source_line=64
+		XLA Label: fusion
+		Shape: f32[8,512,512,144]
+		==========================
+
+	Buffer 4:
+		Size: 576.00MiB
+		Operator: op_name=""jit(complete_update)/jit(main)/transpose(jvp(...i,io->...o))/dot_general[dimension_numbers=(((3,), (1,)), ((), ())) precision=(<Precision.HIGHEST: 2>, <Precision.HIGHEST: 2>) preferred_element_type=float32]"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/hnnpp.py"" source_line=180
+		XLA Label: custom-call
+		Shape: f32[2097152,72]
+		==========================
+
+	Buffer 5:
+		Size: 576.00MiB
+		Operator: op_name=""jit(complete_update)/jit(main)/conv_general_dilated[window_strides=(1, 1) padding=((1, 1), (1, 1)) lhs_dilation=(1, 1) rhs_dilation=(1, 1) dimension_numbers=ConvDimensionNumbers(lhs_spec=(0, 3, 1, 2), rhs_spec=(3, 2, 0, 1), out_spec=(0, 3, 1, 2)) feature_group_count=8 batch_group_count=1 precision=(<Precision.HIGHEST: 2>, <Precision.HIGHEST: 2>) preferred_element_type=None]"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/hnnpp.py"" source_line=366
+		XLA Label: custom-call
+		Shape: f32[8,72,512,512]
+		==========================
+
+	Buffer 6:
+		Size: 576.00MiB
+		Operator: op_name=""jit(complete_update)/jit(main)/conv_general_dilated[window_strides=(1, 1) padding=((1, 1), (1, 1)) lhs_dilation=(1, 1) rhs_dilation=(1, 1) dimension_numbers=ConvDimensionNumbers(lhs_spec=(0, 3, 1, 2), rhs_spec=(3, 2, 0, 1), out_spec=(0, 3, 1, 2)) feature_group_count=32 batch_group_count=1 precision=(<Precision.HIGHEST: 2>, <Precision.HIGHEST: 2>) preferred_element_type=None]"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/hnnpp.py"" source_line=366
+		XLA Label: custom-call
+		Shape: f32[8,288,256,256]
+		==========================
+
+	Buffer 7:
+		Size: 576.00MiB
+		Operator: op_name=""jit(complete_update)/jit(main)/conv_general_dilated[window_strides=(1, 1) padding=((1, 1), (1, 1)) lhs_dilation=(1, 1) rhs_dilation=(1, 1) dimension_numbers=ConvDimensionNumbers(lhs_spec=(0, 3, 1, 2), rhs_spec=(3, 2, 0, 1), out_spec=(0, 3, 1, 2)) feature_group_count=8 batch_group_count=1 precision=(<Precision.HIGHEST: 2>, <Precision.HIGHEST: 2>) preferred_element_type=None]"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/hnnpp.py"" source_line=366
+		XLA Label: custom-call
+		Shape: f32[8,72,512,512]
+		==========================
+
+	Buffer 8:
+		Size: 576.00MiB
+		Operator: op_name=""jit(complete_update)/jit(main)/transpose(jvp(jit(_where)))/select_n"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/geometry.py"" source_line=64 deduplicated_name=""input_transpose_fusion.56""
+		XLA Label: fusion
+		Shape: f32[8,72,512,512]
+		==========================
+
+	Buffer 9:
+		Size: 576.00MiB
+		Operator: op_name=""jit(complete_update)/jit(main)/jvp(jit(_where))/select_n"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/geometry.py"" source_line=64
+		XLA Label: fusion
+		Shape: f32[8,512,512,72]
+		==========================
+
+	Buffer 10:
+		Size: 576.00MiB
+		Operator: op_name=""jit(complete_update)/jit(main)/reduce_sum[axes=(3,)]"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/hnnpp.py"" source_line=178 deduplicated_name=""input_reduce_select_fusion.50""
+		XLA Label: fusion
+		Shape: f32[8,72,512,512]
+		==========================
+
+	Buffer 11:
+		Size: 576.00MiB
+		Operator: op_name=""jit(complete_update)/jit(main)/reduce_sum[axes=(3,)]"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/hnnpp.py"" source_line=178 deduplicated_name=""input_reduce_select_fusion.50""
+		XLA Label: fusion
+		Shape: f32[8,72,512,512]
+		==========================
+
+	Buffer 12:
+		Size: 576.00MiB
+		Operator: op_name=""jit(complete_update)/jit(main)/jvp(jit(_where))/select_n"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/geometry.py"" source_line=64
+		XLA Label: fusion
+		Shape: f32[8,256,256,288]
+		==========================
+
+	Buffer 13:
+		Size: 576.00MiB
+		Operator: op_name=""jit(complete_update)/jit(main)/jvp(jit(_where))/select_n"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/geometry.py"" source_line=64
+		XLA Label: fusion
+		Shape: f32[8,512,512,72]
+		==========================
+
+	Buffer 14:
+		Size: 288.00MiB
+		Operator: op_name=""jit(complete_update)/jit(main)/conv_general_dilated[window_strides=(1, 1) padding=((1, 1), (1, 1)) lhs_dilation=(1, 1) rhs_dilation=(1, 1) dimension_numbers=ConvDimensionNumbers(lhs_spec=(0, 3, 1, 2), rhs_spec=(3, 2, 0, 1), out_spec=(0, 3, 1, 2)) feature_group_count=64 batch_group_count=1 precision=(<Precision.HIGHEST: 2>, <Precision.HIGHEST: 2>) preferred_element_type=None]"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/hnnpp.py"" source_line=366
+		XLA Label: custom-call
+		Shape: f32[8,576,128,128]
+		==========================
+
+	Buffer 15:
+		Size: 288.00MiB
+		Operator: op_name=""jit(complete_update)/jit(main)/conv_general_dilated[window_strides=(1, 1) padding=((1, 1), (1, 1)) lhs_dilation=(1, 1) rhs_dilation=(1, 1) dimension_numbers=ConvDimensionNumbers(lhs_spec=(0, 3, 1, 2), rhs_spec=(3, 2, 0, 1), out_spec=(0, 3, 1, 2)) feature_group_count=16 batch_group_count=1 precision=(<Precision.HIGHEST: 2>, <Precision.HIGHEST: 2>) preferred_element_type=None]"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/hnnpp.py"" source_line=366
+		XLA Label: custom-call
+		Shape: f32[8,144,256,256]
+		==========================
+
+
+Traceback (most recent call last):
+  File ""<frozen runpy>"", line 198, in _run_module_as_main
+  File ""<frozen runpy>"", line 88, in _run_code
+  File ""/data2/joc0027/ExPoConv/src/poincare_exec/cli.py"", line 342, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File ""/data2/joc0027/ExPoConv/src/poincare_exec/cli.py"", line 230, in main
+    benchmark_worker(
+  File ""/data2/joc0027/ExPoConv/src/poincare_exec/experiments/benchmark.py"", line 558, in benchmark_worker
+    first_output = compiled(initial_state, inputs, curvature)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/data2/joc0027/poincare-execution-experiments/.venv/lib/python3.11/site-packages/jax/_src/stages.py"", line 575, in __call__
+    return self._call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/data2/joc0027/poincare-execution-experiments/.venv/lib/python3.11/site-packages/jax/_src/interpreters/pxla.py"", line 2909, in aot_cache_miss
+    outs, out_flat, args_flat = stages.Compiled.call(params, *args, **kwargs)
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/data2/joc0027/poincare-execution-experiments/.venv/lib/python3.11/site-packages/jax/_src/stages.py"", line 544, in call
+    out_flat = params.executable.call(*args_flat)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/data2/joc0027/poincare-execution-experiments/.venv/lib/python3.11/site-packages/jax/_src/interpreters/pxla.py"", line 2887, in call
+    return self.unsafe_call(*args)  # pylint: disable=not-callable
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/data2/joc0027/poincare-execution-experiments/.venv/lib/python3.11/site-packages/jax/_src/profiler.py"", line 336, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File ""/data2/joc0027/poincare-execution-experiments/.venv/lib/python3.11/site-packages/jax/_src/interpreters/pxla.py"", line 1209, in __call__
+    results = self.xla_executable.execute_sharded(input_bufs)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+jaxlib.xla_extension.XlaRuntimeError: RESOURCE_EXHAUSTED: Out of memory while trying to allocate 24664834784 bytes.
+BufferAssignment OOM Debugging.
+BufferAssignment stats:
+             parameter allocation:   29.57MiB
+              constant allocation:    8.00MiB
+        maybe_live_out allocation:    5.57MiB
+     preallocated temp allocation:   22.97GiB
+  preallocated temp fragmentation:   16.05MiB (0.07%)
+                 total allocation:   23.01GiB
+              total fragmentation:   10.15MiB (0.04%)
+Peak buffers:
+	Buffer 1:
+		Size: 1.12GiB
+		Operator: op_name=""jit(complete_update)/jit(main)/conv_general_dilated[window_strides=(1, 1) padding=((1, 1), (1, 1)) lhs_dilation=(1, 1) rhs_dilation=(1, 1) dimension_numbers=ConvDimensionNumbers(lhs_spec=(0, 3, 1, 2), rhs_spec=(3, 2, 0, 1), out_spec=(0, 3, 1, 2)) feature_group_count=16 batch_group_count=1 precision=(<Precision.HIGHEST: 2>, <Precision.HIGHEST: 2>) preferred_element_type=None]"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/hnnpp.py"" source_line=366
+		XLA Label: custom-call
+		Shape: f32[8,144,512,512]
+		==========================
+
+	Buffer 2:
+		Size: 1.12GiB
+		Operator: op_name=""jit(complete_update)/jit(main)/reduce_sum[axes=(3,)]"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/hnnpp.py"" source_line=178
+		XLA Label: fusion
+		Shape: f32[8,144,512,512]
+		==========================
+
+	Buffer 3:
+		Size: 1.12GiB
+		Operator: op_name=""jit(complete_update)/jit(main)/jvp(jit(_where))/select_n"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/geometry.py"" source_line=64
+		XLA Label: fusion
+		Shape: f32[8,512,512,144]
+		==========================
+
+	Buffer 4:
+		Size: 576.00MiB
+		Operator: op_name=""jit(complete_update)/jit(main)/transpose(jvp(...i,io->...o))/dot_general[dimension_numbers=(((3,), (1,)), ((), ())) precision=(<Precision.HIGHEST: 2>, <Precision.HIGHEST: 2>) preferred_element_type=float32]"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/hnnpp.py"" source_line=180
+		XLA Label: custom-call
+		Shape: f32[2097152,72]
+		==========================
+
+	Buffer 5:
+		Size: 576.00MiB
+		Operator: op_name=""jit(complete_update)/jit(main)/conv_general_dilated[window_strides=(1, 1) padding=((1, 1), (1, 1)) lhs_dilation=(1, 1) rhs_dilation=(1, 1) dimension_numbers=ConvDimensionNumbers(lhs_spec=(0, 3, 1, 2), rhs_spec=(3, 2, 0, 1), out_spec=(0, 3, 1, 2)) feature_group_count=8 batch_group_count=1 precision=(<Precision.HIGHEST: 2>, <Precision.HIGHEST: 2>) preferred_element_type=None]"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/hnnpp.py"" source_line=366
+		XLA Label: custom-call
+		Shape: f32[8,72,512,512]
+		==========================
+
+	Buffer 6:
+		Size: 576.00MiB
+		Operator: op_name=""jit(complete_update)/jit(main)/conv_general_dilated[window_strides=(1, 1) padding=((1, 1), (1, 1)) lhs_dilation=(1, 1) rhs_dilation=(1, 1) dimension_numbers=ConvDimensionNumbers(lhs_spec=(0, 3, 1, 2), rhs_spec=(3, 2, 0, 1), out_spec=(0, 3, 1, 2)) feature_group_count=32 batch_group_count=1 precision=(<Precision.HIGHEST: 2>, <Precision.HIGHEST: 2>) preferred_element_type=None]"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/hnnpp.py"" source_line=366
+		XLA Label: custom-call
+		Shape: f32[8,288,256,256]
+		==========================
+
+	Buffer 7:
+		Size: 576.00MiB
+		Operator: op_name=""jit(complete_update)/jit(main)/conv_general_dilated[window_strides=(1, 1) padding=((1, 1), (1, 1)) lhs_dilation=(1, 1) rhs_dilation=(1, 1) dimension_numbers=ConvDimensionNumbers(lhs_spec=(0, 3, 1, 2), rhs_spec=(3, 2, 0, 1), out_spec=(0, 3, 1, 2)) feature_group_count=8 batch_group_count=1 precision=(<Precision.HIGHEST: 2>, <Precision.HIGHEST: 2>) preferred_element_type=None]"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/hnnpp.py"" source_line=366
+		XLA Label: custom-call
+		Shape: f32[8,72,512,512]
+		==========================
+
+	Buffer 8:
+		Size: 576.00MiB
+		Operator: op_name=""jit(complete_update)/jit(main)/transpose(jvp(jit(_where)))/select_n"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/geometry.py"" source_line=64 deduplicated_name=""input_transpose_fusion.56""
+		XLA Label: fusion
+		Shape: f32[8,72,512,512]
+		==========================
+
+	Buffer 9:
+		Size: 576.00MiB
+		Operator: op_name=""jit(complete_update)/jit(main)/jvp(jit(_where))/select_n"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/geometry.py"" source_line=64
+		XLA Label: fusion
+		Shape: f32[8,512,512,72]
+		==========================
+
+	Buffer 10:
+		Size: 576.00MiB
+		Operator: op_name=""jit(complete_update)/jit(main)/reduce_sum[axes=(3,)]"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/hnnpp.py"" source_line=178 deduplicated_name=""input_reduce_select_fusion.50""
+		XLA Label: fusion
+		Shape: f32[8,72,512,512]
+		==========================
+
+	Buffer 11:
+		Size: 576.00MiB
+		Operator: op_name=""jit(complete_update)/jit(main)/reduce_sum[axes=(3,)]"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/hnnpp.py"" source_line=178 deduplicated_name=""input_reduce_select_fusion.50""
+		XLA Label: fusion
+		Shape: f32[8,72,512,512]
+		==========================
+
+	Buffer 12:
+		Size: 576.00MiB
+		Operator: op_name=""jit(complete_update)/jit(main)/jvp(jit(_where))/select_n"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/geometry.py"" source_line=64
+		XLA Label: fusion
+		Shape: f32[8,256,256,288]
+		==========================
+
+	Buffer 13:
+		Size: 576.00MiB
+		Operator: op_name=""jit(complete_update)/jit(main)/jvp(jit(_where))/select_n"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/geometry.py"" source_line=64
+		XLA Label: fusion
+		Shape: f32[8,512,512,72]
+		==========================
+
+	Buffer 14:
+		Size: 288.00MiB
+		Operator: op_name=""jit(complete_update)/jit(main)/conv_general_dilated[window_strides=(1, 1) padding=((1, 1), (1, 1)) lhs_dilation=(1, 1) rhs_dilation=(1, 1) dimension_numbers=ConvDimensionNumbers(lhs_spec=(0, 3, 1, 2), rhs_spec=(3, 2, 0, 1), out_spec=(0, 3, 1, 2)) feature_group_count=64 batch_group_count=1 precision=(<Precision.HIGHEST: 2>, <Precision.HIGHEST: 2>) preferred_element_type=None]"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/hnnpp.py"" source_line=366
+		XLA Label: custom-call
+		Shape: f32[8,576,128,128]
+		==========================
+
+	Buffer 15:
+		Size: 288.00MiB
+		Operator: op_name=""jit(complete_update)/jit(main)/conv_general_dilated[window_strides=(1, 1) padding=((1, 1), (1, 1)) lhs_dilation=(1, 1) rhs_dilation=(1, 1) dimension_numbers=ConvDimensionNumbers(lhs_spec=(0, 3, 1, 2), rhs_spec=(3, 2, 0, 1), out_spec=(0, 3, 1, 2)) feature_group_count=16 batch_group_count=1 precision=(<Precision.HIGHEST: 2>, <Precision.HIGHEST: 2>) preferred_element_type=None]"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/hnnpp.py"" source_line=366
+		XLA Label: custom-call
+		Shape: f32[8,144,256,256]
+		==========================",[1],1.11,75f10dd9f671f12df7fe4f357f061341f9041bc7,f0604c9ca563f1fd41281ae1f988103de068aba57a46b64feae3d7cb58c54f6d,argexpr3.vsb.cz::gpu:0::Tesla V100-PCIE-32GB,GPU-4e0547c3-d65d-7d8b-9f6a-d40ad61a0f0f,unet:update,"[""/data2/joc0027/ExPoConv/artifacts/e13_unet_scaling.csv.failures.jsonl""]"
+E13,unet_update_b8_r512,resolution,8,512,F,1,200,ok,200,197.78422949999998,12.75775671005249,20.033203125,,,,[],1.11,75f10dd9f671f12df7fe4f357f061341f9041bc7,f0604c9ca563f1fd41281ae1f988103de068aba57a46b64feae3d7cb58c54f6d,argexpr3.vsb.cz::gpu:0::Tesla V100-PCIE-32GB,GPU-4e0547c3-d65d-7d8b-9f6a-d40ad61a0f0f,unet:update:depth=1,"[""/data2/joc0027/ExPoConv/artifacts/e13_unet_scaling.csv""]"
+E13,unet_update_b8_r512,resolution,8,512,R,2,200,oom,0,,,,oom,first_update,"2026-09-29 01:16:32.439963: W external/tsl/tsl/framework/bfc_allocator.cc:482] Allocator (GPU_0_bfc) ran out of memory trying to allocate 22.97GiB (rounded to 24664834816)requested by op 
+2026-09-29 01:16:32.441259: W external/tsl/tsl/framework/bfc_allocator.cc:494] __________________________________________________________________________________________________*_
+E0929 01:16:32.468220  314110 pjrt_stream_executor_client.cc:2804] Execution of replica 0 failed: RESOURCE_EXHAUSTED: Out of memory while trying to allocate 24664834784 bytes.
+BufferAssignment OOM Debugging.
+BufferAssignment stats:
+             parameter allocation:   29.57MiB
+              constant allocation:    8.00MiB
+        maybe_live_out allocation:    5.57MiB
+     preallocated temp allocation:   22.97GiB
+  preallocated temp fragmentation:   16.05MiB (0.07%)
+                 total allocation:   23.01GiB
+              total fragmentation:   10.15MiB (0.04%)
+Peak buffers:
+	Buffer 1:
+		Size: 1.12GiB
+		Operator: op_name=""jit(complete_update)/jit(main)/conv_general_dilated[window_strides=(1, 1) padding=((1, 1), (1, 1)) lhs_dilation=(1, 1) rhs_dilation=(1, 1) dimension_numbers=ConvDimensionNumbers(lhs_spec=(0, 3, 1, 2), rhs_spec=(3, 2, 0, 1), out_spec=(0, 3, 1, 2)) feature_group_count=16 batch_group_count=1 precision=(<Precision.HIGHEST: 2>, <Precision.HIGHEST: 2>) preferred_element_type=None]"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/hnnpp.py"" source_line=366
+		XLA Label: custom-call
+		Shape: f32[8,144,512,512]
+		==========================
+
+	Buffer 2:
+		Size: 1.12GiB
+		Operator: op_name=""jit(complete_update)/jit(main)/reduce_sum[axes=(3,)]"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/hnnpp.py"" source_line=178
+		XLA Label: fusion
+		Shape: f32[8,144,512,512]
+		==========================
+
+	Buffer 3:
+		Size: 1.12GiB
+		Operator: op_name=""jit(complete_update)/jit(main)/jvp(jit(_where))/select_n"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/geometry.py"" source_line=64
+		XLA Label: fusion
+		Shape: f32[8,512,512,144]
+		==========================
+
+	Buffer 4:
+		Size: 576.00MiB
+		Operator: op_name=""jit(complete_update)/jit(main)/transpose(jvp(...i,io->...o))/dot_general[dimension_numbers=(((3,), (1,)), ((), ())) precision=(<Precision.HIGHEST: 2>, <Precision.HIGHEST: 2>) preferred_element_type=float32]"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/hnnpp.py"" source_line=180
+		XLA Label: custom-call
+		Shape: f32[2097152,72]
+		==========================
+
+	Buffer 5:
+		Size: 576.00MiB
+		Operator: op_name=""jit(complete_update)/jit(main)/conv_general_dilated[window_strides=(1, 1) padding=((1, 1), (1, 1)) lhs_dilation=(1, 1) rhs_dilation=(1, 1) dimension_numbers=ConvDimensionNumbers(lhs_spec=(0, 3, 1, 2), rhs_spec=(3, 2, 0, 1), out_spec=(0, 3, 1, 2)) feature_group_count=8 batch_group_count=1 precision=(<Precision.HIGHEST: 2>, <Precision.HIGHEST: 2>) preferred_element_type=None]"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/hnnpp.py"" source_line=366
+		XLA Label: custom-call
+		Shape: f32[8,72,512,512]
+		==========================
+
+	Buffer 6:
+		Size: 576.00MiB
+		Operator: op_name=""jit(complete_update)/jit(main)/conv_general_dilated[window_strides=(1, 1) padding=((1, 1), (1, 1)) lhs_dilation=(1, 1) rhs_dilation=(1, 1) dimension_numbers=ConvDimensionNumbers(lhs_spec=(0, 3, 1, 2), rhs_spec=(3, 2, 0, 1), out_spec=(0, 3, 1, 2)) feature_group_count=32 batch_group_count=1 precision=(<Precision.HIGHEST: 2>, <Precision.HIGHEST: 2>) preferred_element_type=None]"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/hnnpp.py"" source_line=366
+		XLA Label: custom-call
+		Shape: f32[8,288,256,256]
+		==========================
+
+	Buffer 7:
+		Size: 576.00MiB
+		Operator: op_name=""jit(complete_update)/jit(main)/conv_general_dilated[window_strides=(1, 1) padding=((1, 1), (1, 1)) lhs_dilation=(1, 1) rhs_dilation=(1, 1) dimension_numbers=ConvDimensionNumbers(lhs_spec=(0, 3, 1, 2), rhs_spec=(3, 2, 0, 1), out_spec=(0, 3, 1, 2)) feature_group_count=8 batch_group_count=1 precision=(<Precision.HIGHEST: 2>, <Precision.HIGHEST: 2>) preferred_element_type=None]"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/hnnpp.py"" source_line=366
+		XLA Label: custom-call
+		Shape: f32[8,72,512,512]
+		==========================
+
+	Buffer 8:
+		Size: 576.00MiB
+		Operator: op_name=""jit(complete_update)/jit(main)/transpose(jvp(jit(_where)))/select_n"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/geometry.py"" source_line=64 deduplicated_name=""input_transpose_fusion.56""
+		XLA Label: fusion
+		Shape: f32[8,72,512,512]
+		==========================
+
+	Buffer 9:
+		Size: 576.00MiB
+		Operator: op_name=""jit(complete_update)/jit(main)/jvp(jit(_where))/select_n"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/geometry.py"" source_line=64
+		XLA Label: fusion
+		Shape: f32[8,512,512,72]
+		==========================
+
+	Buffer 10:
+		Size: 576.00MiB
+		Operator: op_name=""jit(complete_update)/jit(main)/reduce_sum[axes=(3,)]"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/hnnpp.py"" source_line=178 deduplicated_name=""input_reduce_select_fusion.50""
+		XLA Label: fusion
+		Shape: f32[8,72,512,512]
+		==========================
+
+	Buffer 11:
+		Size: 576.00MiB
+		Operator: op_name=""jit(complete_update)/jit(main)/reduce_sum[axes=(3,)]"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/hnnpp.py"" source_line=178 deduplicated_name=""input_reduce_select_fusion.50""
+		XLA Label: fusion
+		Shape: f32[8,72,512,512]
+		==========================
+
+	Buffer 12:
+		Size: 576.00MiB
+		Operator: op_name=""jit(complete_update)/jit(main)/jvp(jit(_where))/select_n"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/geometry.py"" source_line=64
+		XLA Label: fusion
+		Shape: f32[8,256,256,288]
+		==========================
+
+	Buffer 13:
+		Size: 576.00MiB
+		Operator: op_name=""jit(complete_update)/jit(main)/jvp(jit(_where))/select_n"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/geometry.py"" source_line=64
+		XLA Label: fusion
+		Shape: f32[8,512,512,72]
+		==========================
+
+	Buffer 14:
+		Size: 288.00MiB
+		Operator: op_name=""jit(complete_update)/jit(main)/conv_general_dilated[window_strides=(1, 1) padding=((1, 1), (1, 1)) lhs_dilation=(1, 1) rhs_dilation=(1, 1) dimension_numbers=ConvDimensionNumbers(lhs_spec=(0, 3, 1, 2), rhs_spec=(3, 2, 0, 1), out_spec=(0, 3, 1, 2)) feature_group_count=64 batch_group_count=1 precision=(<Precision.HIGHEST: 2>, <Precision.HIGHEST: 2>) preferred_element_type=None]"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/hnnpp.py"" source_line=366
+		XLA Label: custom-call
+		Shape: f32[8,576,128,128]
+		==========================
+
+	Buffer 15:
+		Size: 288.00MiB
+		Operator: op_name=""jit(complete_update)/jit(main)/conv_general_dilated[window_strides=(1, 1) padding=((1, 1), (1, 1)) lhs_dilation=(1, 1) rhs_dilation=(1, 1) dimension_numbers=ConvDimensionNumbers(lhs_spec=(0, 3, 1, 2), rhs_spec=(3, 2, 0, 1), out_spec=(0, 3, 1, 2)) feature_group_count=16 batch_group_count=1 precision=(<Precision.HIGHEST: 2>, <Precision.HIGHEST: 2>) preferred_element_type=None]"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/hnnpp.py"" source_line=366
+		XLA Label: custom-call
+		Shape: f32[8,144,256,256]
+		==========================
+
+
+Traceback (most recent call last):
+  File ""<frozen runpy>"", line 198, in _run_module_as_main
+  File ""<frozen runpy>"", line 88, in _run_code
+  File ""/data2/joc0027/ExPoConv/src/poincare_exec/cli.py"", line 342, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File ""/data2/joc0027/ExPoConv/src/poincare_exec/cli.py"", line 230, in main
+    benchmark_worker(
+  File ""/data2/joc0027/ExPoConv/src/poincare_exec/experiments/benchmark.py"", line 558, in benchmark_worker
+    first_output = compiled(initial_state, inputs, curvature)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/data2/joc0027/poincare-execution-experiments/.venv/lib/python3.11/site-packages/jax/_src/stages.py"", line 575, in __call__
+    return self._call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/data2/joc0027/poincare-execution-experiments/.venv/lib/python3.11/site-packages/jax/_src/interpreters/pxla.py"", line 2909, in aot_cache_miss
+    outs, out_flat, args_flat = stages.Compiled.call(params, *args, **kwargs)
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/data2/joc0027/poincare-execution-experiments/.venv/lib/python3.11/site-packages/jax/_src/stages.py"", line 544, in call
+    out_flat = params.executable.call(*args_flat)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/data2/joc0027/poincare-execution-experiments/.venv/lib/python3.11/site-packages/jax/_src/interpreters/pxla.py"", line 2887, in call
+    return self.unsafe_call(*args)  # pylint: disable=not-callable
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/data2/joc0027/poincare-execution-experiments/.venv/lib/python3.11/site-packages/jax/_src/profiler.py"", line 336, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File ""/data2/joc0027/poincare-execution-experiments/.venv/lib/python3.11/site-packages/jax/_src/interpreters/pxla.py"", line 1209, in __call__
+    results = self.xla_executable.execute_sharded(input_bufs)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+jaxlib.xla_extension.XlaRuntimeError: RESOURCE_EXHAUSTED: Out of memory while trying to allocate 24664834784 bytes.
+BufferAssignment OOM Debugging.
+BufferAssignment stats:
+             parameter allocation:   29.57MiB
+              constant allocation:    8.00MiB
+        maybe_live_out allocation:    5.57MiB
+     preallocated temp allocation:   22.97GiB
+  preallocated temp fragmentation:   16.05MiB (0.07%)
+                 total allocation:   23.01GiB
+              total fragmentation:   10.15MiB (0.04%)
+Peak buffers:
+	Buffer 1:
+		Size: 1.12GiB
+		Operator: op_name=""jit(complete_update)/jit(main)/conv_general_dilated[window_strides=(1, 1) padding=((1, 1), (1, 1)) lhs_dilation=(1, 1) rhs_dilation=(1, 1) dimension_numbers=ConvDimensionNumbers(lhs_spec=(0, 3, 1, 2), rhs_spec=(3, 2, 0, 1), out_spec=(0, 3, 1, 2)) feature_group_count=16 batch_group_count=1 precision=(<Precision.HIGHEST: 2>, <Precision.HIGHEST: 2>) preferred_element_type=None]"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/hnnpp.py"" source_line=366
+		XLA Label: custom-call
+		Shape: f32[8,144,512,512]
+		==========================
+
+	Buffer 2:
+		Size: 1.12GiB
+		Operator: op_name=""jit(complete_update)/jit(main)/reduce_sum[axes=(3,)]"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/hnnpp.py"" source_line=178
+		XLA Label: fusion
+		Shape: f32[8,144,512,512]
+		==========================
+
+	Buffer 3:
+		Size: 1.12GiB
+		Operator: op_name=""jit(complete_update)/jit(main)/jvp(jit(_where))/select_n"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/geometry.py"" source_line=64
+		XLA Label: fusion
+		Shape: f32[8,512,512,144]
+		==========================
+
+	Buffer 4:
+		Size: 576.00MiB
+		Operator: op_name=""jit(complete_update)/jit(main)/transpose(jvp(...i,io->...o))/dot_general[dimension_numbers=(((3,), (1,)), ((), ())) precision=(<Precision.HIGHEST: 2>, <Precision.HIGHEST: 2>) preferred_element_type=float32]"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/hnnpp.py"" source_line=180
+		XLA Label: custom-call
+		Shape: f32[2097152,72]
+		==========================
+
+	Buffer 5:
+		Size: 576.00MiB
+		Operator: op_name=""jit(complete_update)/jit(main)/conv_general_dilated[window_strides=(1, 1) padding=((1, 1), (1, 1)) lhs_dilation=(1, 1) rhs_dilation=(1, 1) dimension_numbers=ConvDimensionNumbers(lhs_spec=(0, 3, 1, 2), rhs_spec=(3, 2, 0, 1), out_spec=(0, 3, 1, 2)) feature_group_count=8 batch_group_count=1 precision=(<Precision.HIGHEST: 2>, <Precision.HIGHEST: 2>) preferred_element_type=None]"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/hnnpp.py"" source_line=366
+		XLA Label: custom-call
+		Shape: f32[8,72,512,512]
+		==========================
+
+	Buffer 6:
+		Size: 576.00MiB
+		Operator: op_name=""jit(complete_update)/jit(main)/conv_general_dilated[window_strides=(1, 1) padding=((1, 1), (1, 1)) lhs_dilation=(1, 1) rhs_dilation=(1, 1) dimension_numbers=ConvDimensionNumbers(lhs_spec=(0, 3, 1, 2), rhs_spec=(3, 2, 0, 1), out_spec=(0, 3, 1, 2)) feature_group_count=32 batch_group_count=1 precision=(<Precision.HIGHEST: 2>, <Precision.HIGHEST: 2>) preferred_element_type=None]"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/hnnpp.py"" source_line=366
+		XLA Label: custom-call
+		Shape: f32[8,288,256,256]
+		==========================
+
+	Buffer 7:
+		Size: 576.00MiB
+		Operator: op_name=""jit(complete_update)/jit(main)/conv_general_dilated[window_strides=(1, 1) padding=((1, 1), (1, 1)) lhs_dilation=(1, 1) rhs_dilation=(1, 1) dimension_numbers=ConvDimensionNumbers(lhs_spec=(0, 3, 1, 2), rhs_spec=(3, 2, 0, 1), out_spec=(0, 3, 1, 2)) feature_group_count=8 batch_group_count=1 precision=(<Precision.HIGHEST: 2>, <Precision.HIGHEST: 2>) preferred_element_type=None]"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/hnnpp.py"" source_line=366
+		XLA Label: custom-call
+		Shape: f32[8,72,512,512]
+		==========================
+
+	Buffer 8:
+		Size: 576.00MiB
+		Operator: op_name=""jit(complete_update)/jit(main)/transpose(jvp(jit(_where)))/select_n"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/geometry.py"" source_line=64 deduplicated_name=""input_transpose_fusion.56""
+		XLA Label: fusion
+		Shape: f32[8,72,512,512]
+		==========================
+
+	Buffer 9:
+		Size: 576.00MiB
+		Operator: op_name=""jit(complete_update)/jit(main)/jvp(jit(_where))/select_n"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/geometry.py"" source_line=64
+		XLA Label: fusion
+		Shape: f32[8,512,512,72]
+		==========================
+
+	Buffer 10:
+		Size: 576.00MiB
+		Operator: op_name=""jit(complete_update)/jit(main)/reduce_sum[axes=(3,)]"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/hnnpp.py"" source_line=178 deduplicated_name=""input_reduce_select_fusion.50""
+		XLA Label: fusion
+		Shape: f32[8,72,512,512]
+		==========================
+
+	Buffer 11:
+		Size: 576.00MiB
+		Operator: op_name=""jit(complete_update)/jit(main)/reduce_sum[axes=(3,)]"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/hnnpp.py"" source_line=178 deduplicated_name=""input_reduce_select_fusion.50""
+		XLA Label: fusion
+		Shape: f32[8,72,512,512]
+		==========================
+
+	Buffer 12:
+		Size: 576.00MiB
+		Operator: op_name=""jit(complete_update)/jit(main)/jvp(jit(_where))/select_n"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/geometry.py"" source_line=64
+		XLA Label: fusion
+		Shape: f32[8,256,256,288]
+		==========================
+
+	Buffer 13:
+		Size: 576.00MiB
+		Operator: op_name=""jit(complete_update)/jit(main)/jvp(jit(_where))/select_n"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/geometry.py"" source_line=64
+		XLA Label: fusion
+		Shape: f32[8,512,512,72]
+		==========================
+
+	Buffer 14:
+		Size: 288.00MiB
+		Operator: op_name=""jit(complete_update)/jit(main)/conv_general_dilated[window_strides=(1, 1) padding=((1, 1), (1, 1)) lhs_dilation=(1, 1) rhs_dilation=(1, 1) dimension_numbers=ConvDimensionNumbers(lhs_spec=(0, 3, 1, 2), rhs_spec=(3, 2, 0, 1), out_spec=(0, 3, 1, 2)) feature_group_count=64 batch_group_count=1 precision=(<Precision.HIGHEST: 2>, <Precision.HIGHEST: 2>) preferred_element_type=None]"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/hnnpp.py"" source_line=366
+		XLA Label: custom-call
+		Shape: f32[8,576,128,128]
+		==========================
+
+	Buffer 15:
+		Size: 288.00MiB
+		Operator: op_name=""jit(complete_update)/jit(main)/conv_general_dilated[window_strides=(1, 1) padding=((1, 1), (1, 1)) lhs_dilation=(1, 1) rhs_dilation=(1, 1) dimension_numbers=ConvDimensionNumbers(lhs_spec=(0, 3, 1, 2), rhs_spec=(3, 2, 0, 1), out_spec=(0, 3, 1, 2)) feature_group_count=16 batch_group_count=1 precision=(<Precision.HIGHEST: 2>, <Precision.HIGHEST: 2>) preferred_element_type=None]"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/hnnpp.py"" source_line=366
+		XLA Label: custom-call
+		Shape: f32[8,144,256,256]
+		==========================",[1],1.11,75f10dd9f671f12df7fe4f357f061341f9041bc7,f0604c9ca563f1fd41281ae1f988103de068aba57a46b64feae3d7cb58c54f6d,argexpr3.vsb.cz::gpu:0::Tesla V100-PCIE-32GB,GPU-4e0547c3-d65d-7d8b-9f6a-d40ad61a0f0f,unet:update,"[""/data2/joc0027/ExPoConv/artifacts/e13_unet_scaling.csv.failures.jsonl""]"
+E13,unet_update_b8_r512,resolution,8,512,F,2,200,ok,200,198.88007,12.75775671005249,20.033203125,,,,[],1.11,75f10dd9f671f12df7fe4f357f061341f9041bc7,f0604c9ca563f1fd41281ae1f988103de068aba57a46b64feae3d7cb58c54f6d,argexpr3.vsb.cz::gpu:0::Tesla V100-PCIE-32GB,GPU-4e0547c3-d65d-7d8b-9f6a-d40ad61a0f0f,unet:update:depth=1,"[""/data2/joc0027/ExPoConv/artifacts/e13_unet_scaling.csv""]"
+E13,unet_update_b8_r512,resolution,8,512,R,3,200,oom,0,,,,oom,first_update,"2026-09-29 01:21:05.161581: W external/tsl/tsl/framework/bfc_allocator.cc:482] Allocator (GPU_0_bfc) ran out of memory trying to allocate 22.97GiB (rounded to 24664834816)requested by op 
+2026-09-29 01:21:05.163859: W external/tsl/tsl/framework/bfc_allocator.cc:494] __________________________________________________________________________________________________*_
+E0929 01:21:05.178230  317777 pjrt_stream_executor_client.cc:2804] Execution of replica 0 failed: RESOURCE_EXHAUSTED: Out of memory while trying to allocate 24664834784 bytes.
+BufferAssignment OOM Debugging.
+BufferAssignment stats:
+             parameter allocation:   29.57MiB
+              constant allocation:    8.00MiB
+        maybe_live_out allocation:    5.57MiB
+     preallocated temp allocation:   22.97GiB
+  preallocated temp fragmentation:   16.05MiB (0.07%)
+                 total allocation:   23.01GiB
+              total fragmentation:   10.15MiB (0.04%)
+Peak buffers:
+	Buffer 1:
+		Size: 1.12GiB
+		Operator: op_name=""jit(complete_update)/jit(main)/conv_general_dilated[window_strides=(1, 1) padding=((1, 1), (1, 1)) lhs_dilation=(1, 1) rhs_dilation=(1, 1) dimension_numbers=ConvDimensionNumbers(lhs_spec=(0, 3, 1, 2), rhs_spec=(3, 2, 0, 1), out_spec=(0, 3, 1, 2)) feature_group_count=16 batch_group_count=1 precision=(<Precision.HIGHEST: 2>, <Precision.HIGHEST: 2>) preferred_element_type=None]"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/hnnpp.py"" source_line=366
+		XLA Label: custom-call
+		Shape: f32[8,144,512,512]
+		==========================
+
+	Buffer 2:
+		Size: 1.12GiB
+		Operator: op_name=""jit(complete_update)/jit(main)/reduce_sum[axes=(3,)]"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/hnnpp.py"" source_line=178
+		XLA Label: fusion
+		Shape: f32[8,144,512,512]
+		==========================
+
+	Buffer 3:
+		Size: 1.12GiB
+		Operator: op_name=""jit(complete_update)/jit(main)/jvp(jit(_where))/select_n"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/geometry.py"" source_line=64
+		XLA Label: fusion
+		Shape: f32[8,512,512,144]
+		==========================
+
+	Buffer 4:
+		Size: 576.00MiB
+		Operator: op_name=""jit(complete_update)/jit(main)/transpose(jvp(...i,io->...o))/dot_general[dimension_numbers=(((3,), (1,)), ((), ())) precision=(<Precision.HIGHEST: 2>, <Precision.HIGHEST: 2>) preferred_element_type=float32]"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/hnnpp.py"" source_line=180
+		XLA Label: custom-call
+		Shape: f32[2097152,72]
+		==========================
+
+	Buffer 5:
+		Size: 576.00MiB
+		Operator: op_name=""jit(complete_update)/jit(main)/conv_general_dilated[window_strides=(1, 1) padding=((1, 1), (1, 1)) lhs_dilation=(1, 1) rhs_dilation=(1, 1) dimension_numbers=ConvDimensionNumbers(lhs_spec=(0, 3, 1, 2), rhs_spec=(3, 2, 0, 1), out_spec=(0, 3, 1, 2)) feature_group_count=8 batch_group_count=1 precision=(<Precision.HIGHEST: 2>, <Precision.HIGHEST: 2>) preferred_element_type=None]"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/hnnpp.py"" source_line=366
+		XLA Label: custom-call
+		Shape: f32[8,72,512,512]
+		==========================
+
+	Buffer 6:
+		Size: 576.00MiB
+		Operator: op_name=""jit(complete_update)/jit(main)/conv_general_dilated[window_strides=(1, 1) padding=((1, 1), (1, 1)) lhs_dilation=(1, 1) rhs_dilation=(1, 1) dimension_numbers=ConvDimensionNumbers(lhs_spec=(0, 3, 1, 2), rhs_spec=(3, 2, 0, 1), out_spec=(0, 3, 1, 2)) feature_group_count=32 batch_group_count=1 precision=(<Precision.HIGHEST: 2>, <Precision.HIGHEST: 2>) preferred_element_type=None]"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/hnnpp.py"" source_line=366
+		XLA Label: custom-call
+		Shape: f32[8,288,256,256]
+		==========================
+
+	Buffer 7:
+		Size: 576.00MiB
+		Operator: op_name=""jit(complete_update)/jit(main)/conv_general_dilated[window_strides=(1, 1) padding=((1, 1), (1, 1)) lhs_dilation=(1, 1) rhs_dilation=(1, 1) dimension_numbers=ConvDimensionNumbers(lhs_spec=(0, 3, 1, 2), rhs_spec=(3, 2, 0, 1), out_spec=(0, 3, 1, 2)) feature_group_count=8 batch_group_count=1 precision=(<Precision.HIGHEST: 2>, <Precision.HIGHEST: 2>) preferred_element_type=None]"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/hnnpp.py"" source_line=366
+		XLA Label: custom-call
+		Shape: f32[8,72,512,512]
+		==========================
+
+	Buffer 8:
+		Size: 576.00MiB
+		Operator: op_name=""jit(complete_update)/jit(main)/transpose(jvp(jit(_where)))/select_n"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/geometry.py"" source_line=64 deduplicated_name=""input_transpose_fusion.56""
+		XLA Label: fusion
+		Shape: f32[8,72,512,512]
+		==========================
+
+	Buffer 9:
+		Size: 576.00MiB
+		Operator: op_name=""jit(complete_update)/jit(main)/jvp(jit(_where))/select_n"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/geometry.py"" source_line=64
+		XLA Label: fusion
+		Shape: f32[8,512,512,72]
+		==========================
+
+	Buffer 10:
+		Size: 576.00MiB
+		Operator: op_name=""jit(complete_update)/jit(main)/reduce_sum[axes=(3,)]"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/hnnpp.py"" source_line=178 deduplicated_name=""input_reduce_select_fusion.50""
+		XLA Label: fusion
+		Shape: f32[8,72,512,512]
+		==========================
+
+	Buffer 11:
+		Size: 576.00MiB
+		Operator: op_name=""jit(complete_update)/jit(main)/reduce_sum[axes=(3,)]"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/hnnpp.py"" source_line=178 deduplicated_name=""input_reduce_select_fusion.50""
+		XLA Label: fusion
+		Shape: f32[8,72,512,512]
+		==========================
+
+	Buffer 12:
+		Size: 576.00MiB
+		Operator: op_name=""jit(complete_update)/jit(main)/jvp(jit(_where))/select_n"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/geometry.py"" source_line=64
+		XLA Label: fusion
+		Shape: f32[8,256,256,288]
+		==========================
+
+	Buffer 13:
+		Size: 576.00MiB
+		Operator: op_name=""jit(complete_update)/jit(main)/jvp(jit(_where))/select_n"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/geometry.py"" source_line=64
+		XLA Label: fusion
+		Shape: f32[8,512,512,72]
+		==========================
+
+	Buffer 14:
+		Size: 288.00MiB
+		Operator: op_name=""jit(complete_update)/jit(main)/conv_general_dilated[window_strides=(1, 1) padding=((1, 1), (1, 1)) lhs_dilation=(1, 1) rhs_dilation=(1, 1) dimension_numbers=ConvDimensionNumbers(lhs_spec=(0, 3, 1, 2), rhs_spec=(3, 2, 0, 1), out_spec=(0, 3, 1, 2)) feature_group_count=64 batch_group_count=1 precision=(<Precision.HIGHEST: 2>, <Precision.HIGHEST: 2>) preferred_element_type=None]"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/hnnpp.py"" source_line=366
+		XLA Label: custom-call
+		Shape: f32[8,576,128,128]
+		==========================
+
+	Buffer 15:
+		Size: 288.00MiB
+		Operator: op_name=""jit(complete_update)/jit(main)/conv_general_dilated[window_strides=(1, 1) padding=((1, 1), (1, 1)) lhs_dilation=(1, 1) rhs_dilation=(1, 1) dimension_numbers=ConvDimensionNumbers(lhs_spec=(0, 3, 1, 2), rhs_spec=(3, 2, 0, 1), out_spec=(0, 3, 1, 2)) feature_group_count=16 batch_group_count=1 precision=(<Precision.HIGHEST: 2>, <Precision.HIGHEST: 2>) preferred_element_type=None]"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/hnnpp.py"" source_line=366
+		XLA Label: custom-call
+		Shape: f32[8,144,256,256]
+		==========================
+
+
+Traceback (most recent call last):
+  File ""<frozen runpy>"", line 198, in _run_module_as_main
+  File ""<frozen runpy>"", line 88, in _run_code
+  File ""/data2/joc0027/ExPoConv/src/poincare_exec/cli.py"", line 342, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File ""/data2/joc0027/ExPoConv/src/poincare_exec/cli.py"", line 230, in main
+    benchmark_worker(
+  File ""/data2/joc0027/ExPoConv/src/poincare_exec/experiments/benchmark.py"", line 558, in benchmark_worker
+    first_output = compiled(initial_state, inputs, curvature)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/data2/joc0027/poincare-execution-experiments/.venv/lib/python3.11/site-packages/jax/_src/stages.py"", line 575, in __call__
+    return self._call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/data2/joc0027/poincare-execution-experiments/.venv/lib/python3.11/site-packages/jax/_src/interpreters/pxla.py"", line 2909, in aot_cache_miss
+    outs, out_flat, args_flat = stages.Compiled.call(params, *args, **kwargs)
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/data2/joc0027/poincare-execution-experiments/.venv/lib/python3.11/site-packages/jax/_src/stages.py"", line 544, in call
+    out_flat = params.executable.call(*args_flat)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/data2/joc0027/poincare-execution-experiments/.venv/lib/python3.11/site-packages/jax/_src/interpreters/pxla.py"", line 2887, in call
+    return self.unsafe_call(*args)  # pylint: disable=not-callable
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/data2/joc0027/poincare-execution-experiments/.venv/lib/python3.11/site-packages/jax/_src/profiler.py"", line 336, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File ""/data2/joc0027/poincare-execution-experiments/.venv/lib/python3.11/site-packages/jax/_src/interpreters/pxla.py"", line 1209, in __call__
+    results = self.xla_executable.execute_sharded(input_bufs)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+jaxlib.xla_extension.XlaRuntimeError: RESOURCE_EXHAUSTED: Out of memory while trying to allocate 24664834784 bytes.
+BufferAssignment OOM Debugging.
+BufferAssignment stats:
+             parameter allocation:   29.57MiB
+              constant allocation:    8.00MiB
+        maybe_live_out allocation:    5.57MiB
+     preallocated temp allocation:   22.97GiB
+  preallocated temp fragmentation:   16.05MiB (0.07%)
+                 total allocation:   23.01GiB
+              total fragmentation:   10.15MiB (0.04%)
+Peak buffers:
+	Buffer 1:
+		Size: 1.12GiB
+		Operator: op_name=""jit(complete_update)/jit(main)/conv_general_dilated[window_strides=(1, 1) padding=((1, 1), (1, 1)) lhs_dilation=(1, 1) rhs_dilation=(1, 1) dimension_numbers=ConvDimensionNumbers(lhs_spec=(0, 3, 1, 2), rhs_spec=(3, 2, 0, 1), out_spec=(0, 3, 1, 2)) feature_group_count=16 batch_group_count=1 precision=(<Precision.HIGHEST: 2>, <Precision.HIGHEST: 2>) preferred_element_type=None]"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/hnnpp.py"" source_line=366
+		XLA Label: custom-call
+		Shape: f32[8,144,512,512]
+		==========================
+
+	Buffer 2:
+		Size: 1.12GiB
+		Operator: op_name=""jit(complete_update)/jit(main)/reduce_sum[axes=(3,)]"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/hnnpp.py"" source_line=178
+		XLA Label: fusion
+		Shape: f32[8,144,512,512]
+		==========================
+
+	Buffer 3:
+		Size: 1.12GiB
+		Operator: op_name=""jit(complete_update)/jit(main)/jvp(jit(_where))/select_n"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/geometry.py"" source_line=64
+		XLA Label: fusion
+		Shape: f32[8,512,512,144]
+		==========================
+
+	Buffer 4:
+		Size: 576.00MiB
+		Operator: op_name=""jit(complete_update)/jit(main)/transpose(jvp(...i,io->...o))/dot_general[dimension_numbers=(((3,), (1,)), ((), ())) precision=(<Precision.HIGHEST: 2>, <Precision.HIGHEST: 2>) preferred_element_type=float32]"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/hnnpp.py"" source_line=180
+		XLA Label: custom-call
+		Shape: f32[2097152,72]
+		==========================
+
+	Buffer 5:
+		Size: 576.00MiB
+		Operator: op_name=""jit(complete_update)/jit(main)/conv_general_dilated[window_strides=(1, 1) padding=((1, 1), (1, 1)) lhs_dilation=(1, 1) rhs_dilation=(1, 1) dimension_numbers=ConvDimensionNumbers(lhs_spec=(0, 3, 1, 2), rhs_spec=(3, 2, 0, 1), out_spec=(0, 3, 1, 2)) feature_group_count=8 batch_group_count=1 precision=(<Precision.HIGHEST: 2>, <Precision.HIGHEST: 2>) preferred_element_type=None]"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/hnnpp.py"" source_line=366
+		XLA Label: custom-call
+		Shape: f32[8,72,512,512]
+		==========================
+
+	Buffer 6:
+		Size: 576.00MiB
+		Operator: op_name=""jit(complete_update)/jit(main)/conv_general_dilated[window_strides=(1, 1) padding=((1, 1), (1, 1)) lhs_dilation=(1, 1) rhs_dilation=(1, 1) dimension_numbers=ConvDimensionNumbers(lhs_spec=(0, 3, 1, 2), rhs_spec=(3, 2, 0, 1), out_spec=(0, 3, 1, 2)) feature_group_count=32 batch_group_count=1 precision=(<Precision.HIGHEST: 2>, <Precision.HIGHEST: 2>) preferred_element_type=None]"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/hnnpp.py"" source_line=366
+		XLA Label: custom-call
+		Shape: f32[8,288,256,256]
+		==========================
+
+	Buffer 7:
+		Size: 576.00MiB
+		Operator: op_name=""jit(complete_update)/jit(main)/conv_general_dilated[window_strides=(1, 1) padding=((1, 1), (1, 1)) lhs_dilation=(1, 1) rhs_dilation=(1, 1) dimension_numbers=ConvDimensionNumbers(lhs_spec=(0, 3, 1, 2), rhs_spec=(3, 2, 0, 1), out_spec=(0, 3, 1, 2)) feature_group_count=8 batch_group_count=1 precision=(<Precision.HIGHEST: 2>, <Precision.HIGHEST: 2>) preferred_element_type=None]"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/hnnpp.py"" source_line=366
+		XLA Label: custom-call
+		Shape: f32[8,72,512,512]
+		==========================
+
+	Buffer 8:
+		Size: 576.00MiB
+		Operator: op_name=""jit(complete_update)/jit(main)/transpose(jvp(jit(_where)))/select_n"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/geometry.py"" source_line=64 deduplicated_name=""input_transpose_fusion.56""
+		XLA Label: fusion
+		Shape: f32[8,72,512,512]
+		==========================
+
+	Buffer 9:
+		Size: 576.00MiB
+		Operator: op_name=""jit(complete_update)/jit(main)/jvp(jit(_where))/select_n"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/geometry.py"" source_line=64
+		XLA Label: fusion
+		Shape: f32[8,512,512,72]
+		==========================
+
+	Buffer 10:
+		Size: 576.00MiB
+		Operator: op_name=""jit(complete_update)/jit(main)/reduce_sum[axes=(3,)]"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/hnnpp.py"" source_line=178 deduplicated_name=""input_reduce_select_fusion.50""
+		XLA Label: fusion
+		Shape: f32[8,72,512,512]
+		==========================
+
+	Buffer 11:
+		Size: 576.00MiB
+		Operator: op_name=""jit(complete_update)/jit(main)/reduce_sum[axes=(3,)]"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/hnnpp.py"" source_line=178 deduplicated_name=""input_reduce_select_fusion.50""
+		XLA Label: fusion
+		Shape: f32[8,72,512,512]
+		==========================
+
+	Buffer 12:
+		Size: 576.00MiB
+		Operator: op_name=""jit(complete_update)/jit(main)/jvp(jit(_where))/select_n"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/geometry.py"" source_line=64
+		XLA Label: fusion
+		Shape: f32[8,256,256,288]
+		==========================
+
+	Buffer 13:
+		Size: 576.00MiB
+		Operator: op_name=""jit(complete_update)/jit(main)/jvp(jit(_where))/select_n"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/geometry.py"" source_line=64
+		XLA Label: fusion
+		Shape: f32[8,512,512,72]
+		==========================
+
+	Buffer 14:
+		Size: 288.00MiB
+		Operator: op_name=""jit(complete_update)/jit(main)/conv_general_dilated[window_strides=(1, 1) padding=((1, 1), (1, 1)) lhs_dilation=(1, 1) rhs_dilation=(1, 1) dimension_numbers=ConvDimensionNumbers(lhs_spec=(0, 3, 1, 2), rhs_spec=(3, 2, 0, 1), out_spec=(0, 3, 1, 2)) feature_group_count=64 batch_group_count=1 precision=(<Precision.HIGHEST: 2>, <Precision.HIGHEST: 2>) preferred_element_type=None]"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/hnnpp.py"" source_line=366
+		XLA Label: custom-call
+		Shape: f32[8,576,128,128]
+		==========================
+
+	Buffer 15:
+		Size: 288.00MiB
+		Operator: op_name=""jit(complete_update)/jit(main)/conv_general_dilated[window_strides=(1, 1) padding=((1, 1), (1, 1)) lhs_dilation=(1, 1) rhs_dilation=(1, 1) dimension_numbers=ConvDimensionNumbers(lhs_spec=(0, 3, 1, 2), rhs_spec=(3, 2, 0, 1), out_spec=(0, 3, 1, 2)) feature_group_count=16 batch_group_count=1 precision=(<Precision.HIGHEST: 2>, <Precision.HIGHEST: 2>) preferred_element_type=None]"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/hnnpp.py"" source_line=366
+		XLA Label: custom-call
+		Shape: f32[8,144,256,256]
+		==========================",[1],1.11,75f10dd9f671f12df7fe4f357f061341f9041bc7,f0604c9ca563f1fd41281ae1f988103de068aba57a46b64feae3d7cb58c54f6d,argexpr3.vsb.cz::gpu:0::Tesla V100-PCIE-32GB,GPU-4e0547c3-d65d-7d8b-9f6a-d40ad61a0f0f,unet:update,"[""/data2/joc0027/ExPoConv/artifacts/e13_unet_scaling.csv.failures.jsonl""]"
+E13,unet_update_b8_r512,resolution,8,512,F,3,200,ok,200,197.300659,12.75775671005249,20.033203125,,,,[],1.11,75f10dd9f671f12df7fe4f357f061341f9041bc7,f0604c9ca563f1fd41281ae1f988103de068aba57a46b64feae3d7cb58c54f6d,argexpr3.vsb.cz::gpu:0::Tesla V100-PCIE-32GB,GPU-4e0547c3-d65d-7d8b-9f6a-d40ad61a0f0f,unet:update:depth=1,"[""/data2/joc0027/ExPoConv/artifacts/e13_unet_scaling.csv""]"
+E13,unet_update_b8_r512,resolution,8,512,R,4,200,oom,0,,,,oom,first_update,"2026-09-29 01:30:15.804592: W external/tsl/tsl/framework/bfc_allocator.cc:482] Allocator (GPU_0_bfc) ran out of memory trying to allocate 22.97GiB (rounded to 24664834816)requested by op 
+2026-09-29 01:30:15.806389: W external/tsl/tsl/framework/bfc_allocator.cc:494] __________________________________________________________________________________________________*_
+E0929 01:30:15.821564  325101 pjrt_stream_executor_client.cc:2804] Execution of replica 0 failed: RESOURCE_EXHAUSTED: Out of memory while trying to allocate 24664834784 bytes.
+BufferAssignment OOM Debugging.
+BufferAssignment stats:
+             parameter allocation:   29.57MiB
+              constant allocation:    8.00MiB
+        maybe_live_out allocation:    5.57MiB
+     preallocated temp allocation:   22.97GiB
+  preallocated temp fragmentation:   16.05MiB (0.07%)
+                 total allocation:   23.01GiB
+              total fragmentation:   10.15MiB (0.04%)
+Peak buffers:
+	Buffer 1:
+		Size: 1.12GiB
+		Operator: op_name=""jit(complete_update)/jit(main)/conv_general_dilated[window_strides=(1, 1) padding=((1, 1), (1, 1)) lhs_dilation=(1, 1) rhs_dilation=(1, 1) dimension_numbers=ConvDimensionNumbers(lhs_spec=(0, 3, 1, 2), rhs_spec=(3, 2, 0, 1), out_spec=(0, 3, 1, 2)) feature_group_count=16 batch_group_count=1 precision=(<Precision.HIGHEST: 2>, <Precision.HIGHEST: 2>) preferred_element_type=None]"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/hnnpp.py"" source_line=366
+		XLA Label: custom-call
+		Shape: f32[8,144,512,512]
+		==========================
+
+	Buffer 2:
+		Size: 1.12GiB
+		Operator: op_name=""jit(complete_update)/jit(main)/reduce_sum[axes=(3,)]"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/hnnpp.py"" source_line=178
+		XLA Label: fusion
+		Shape: f32[8,144,512,512]
+		==========================
+
+	Buffer 3:
+		Size: 1.12GiB
+		Operator: op_name=""jit(complete_update)/jit(main)/jvp(jit(_where))/select_n"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/geometry.py"" source_line=64
+		XLA Label: fusion
+		Shape: f32[8,512,512,144]
+		==========================
+
+	Buffer 4:
+		Size: 576.00MiB
+		Operator: op_name=""jit(complete_update)/jit(main)/transpose(jvp(...i,io->...o))/dot_general[dimension_numbers=(((3,), (1,)), ((), ())) precision=(<Precision.HIGHEST: 2>, <Precision.HIGHEST: 2>) preferred_element_type=float32]"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/hnnpp.py"" source_line=180
+		XLA Label: custom-call
+		Shape: f32[2097152,72]
+		==========================
+
+	Buffer 5:
+		Size: 576.00MiB
+		Operator: op_name=""jit(complete_update)/jit(main)/conv_general_dilated[window_strides=(1, 1) padding=((1, 1), (1, 1)) lhs_dilation=(1, 1) rhs_dilation=(1, 1) dimension_numbers=ConvDimensionNumbers(lhs_spec=(0, 3, 1, 2), rhs_spec=(3, 2, 0, 1), out_spec=(0, 3, 1, 2)) feature_group_count=8 batch_group_count=1 precision=(<Precision.HIGHEST: 2>, <Precision.HIGHEST: 2>) preferred_element_type=None]"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/hnnpp.py"" source_line=366
+		XLA Label: custom-call
+		Shape: f32[8,72,512,512]
+		==========================
+
+	Buffer 6:
+		Size: 576.00MiB
+		Operator: op_name=""jit(complete_update)/jit(main)/conv_general_dilated[window_strides=(1, 1) padding=((1, 1), (1, 1)) lhs_dilation=(1, 1) rhs_dilation=(1, 1) dimension_numbers=ConvDimensionNumbers(lhs_spec=(0, 3, 1, 2), rhs_spec=(3, 2, 0, 1), out_spec=(0, 3, 1, 2)) feature_group_count=32 batch_group_count=1 precision=(<Precision.HIGHEST: 2>, <Precision.HIGHEST: 2>) preferred_element_type=None]"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/hnnpp.py"" source_line=366
+		XLA Label: custom-call
+		Shape: f32[8,288,256,256]
+		==========================
+
+	Buffer 7:
+		Size: 576.00MiB
+		Operator: op_name=""jit(complete_update)/jit(main)/conv_general_dilated[window_strides=(1, 1) padding=((1, 1), (1, 1)) lhs_dilation=(1, 1) rhs_dilation=(1, 1) dimension_numbers=ConvDimensionNumbers(lhs_spec=(0, 3, 1, 2), rhs_spec=(3, 2, 0, 1), out_spec=(0, 3, 1, 2)) feature_group_count=8 batch_group_count=1 precision=(<Precision.HIGHEST: 2>, <Precision.HIGHEST: 2>) preferred_element_type=None]"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/hnnpp.py"" source_line=366
+		XLA Label: custom-call
+		Shape: f32[8,72,512,512]
+		==========================
+
+	Buffer 8:
+		Size: 576.00MiB
+		Operator: op_name=""jit(complete_update)/jit(main)/transpose(jvp(jit(_where)))/select_n"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/geometry.py"" source_line=64 deduplicated_name=""input_transpose_fusion.56""
+		XLA Label: fusion
+		Shape: f32[8,72,512,512]
+		==========================
+
+	Buffer 9:
+		Size: 576.00MiB
+		Operator: op_name=""jit(complete_update)/jit(main)/jvp(jit(_where))/select_n"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/geometry.py"" source_line=64
+		XLA Label: fusion
+		Shape: f32[8,512,512,72]
+		==========================
+
+	Buffer 10:
+		Size: 576.00MiB
+		Operator: op_name=""jit(complete_update)/jit(main)/reduce_sum[axes=(3,)]"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/hnnpp.py"" source_line=178 deduplicated_name=""input_reduce_select_fusion.50""
+		XLA Label: fusion
+		Shape: f32[8,72,512,512]
+		==========================
+
+	Buffer 11:
+		Size: 576.00MiB
+		Operator: op_name=""jit(complete_update)/jit(main)/reduce_sum[axes=(3,)]"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/hnnpp.py"" source_line=178 deduplicated_name=""input_reduce_select_fusion.50""
+		XLA Label: fusion
+		Shape: f32[8,72,512,512]
+		==========================
+
+	Buffer 12:
+		Size: 576.00MiB
+		Operator: op_name=""jit(complete_update)/jit(main)/jvp(jit(_where))/select_n"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/geometry.py"" source_line=64
+		XLA Label: fusion
+		Shape: f32[8,256,256,288]
+		==========================
+
+	Buffer 13:
+		Size: 576.00MiB
+		Operator: op_name=""jit(complete_update)/jit(main)/jvp(jit(_where))/select_n"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/geometry.py"" source_line=64
+		XLA Label: fusion
+		Shape: f32[8,512,512,72]
+		==========================
+
+	Buffer 14:
+		Size: 288.00MiB
+		Operator: op_name=""jit(complete_update)/jit(main)/conv_general_dilated[window_strides=(1, 1) padding=((1, 1), (1, 1)) lhs_dilation=(1, 1) rhs_dilation=(1, 1) dimension_numbers=ConvDimensionNumbers(lhs_spec=(0, 3, 1, 2), rhs_spec=(3, 2, 0, 1), out_spec=(0, 3, 1, 2)) feature_group_count=64 batch_group_count=1 precision=(<Precision.HIGHEST: 2>, <Precision.HIGHEST: 2>) preferred_element_type=None]"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/hnnpp.py"" source_line=366
+		XLA Label: custom-call
+		Shape: f32[8,576,128,128]
+		==========================
+
+	Buffer 15:
+		Size: 288.00MiB
+		Operator: op_name=""jit(complete_update)/jit(main)/conv_general_dilated[window_strides=(1, 1) padding=((1, 1), (1, 1)) lhs_dilation=(1, 1) rhs_dilation=(1, 1) dimension_numbers=ConvDimensionNumbers(lhs_spec=(0, 3, 1, 2), rhs_spec=(3, 2, 0, 1), out_spec=(0, 3, 1, 2)) feature_group_count=16 batch_group_count=1 precision=(<Precision.HIGHEST: 2>, <Precision.HIGHEST: 2>) preferred_element_type=None]"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/hnnpp.py"" source_line=366
+		XLA Label: custom-call
+		Shape: f32[8,144,256,256]
+		==========================
+
+
+Traceback (most recent call last):
+  File ""<frozen runpy>"", line 198, in _run_module_as_main
+  File ""<frozen runpy>"", line 88, in _run_code
+  File ""/data2/joc0027/ExPoConv/src/poincare_exec/cli.py"", line 342, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File ""/data2/joc0027/ExPoConv/src/poincare_exec/cli.py"", line 230, in main
+    benchmark_worker(
+  File ""/data2/joc0027/ExPoConv/src/poincare_exec/experiments/benchmark.py"", line 558, in benchmark_worker
+    first_output = compiled(initial_state, inputs, curvature)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/data2/joc0027/poincare-execution-experiments/.venv/lib/python3.11/site-packages/jax/_src/stages.py"", line 575, in __call__
+    return self._call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/data2/joc0027/poincare-execution-experiments/.venv/lib/python3.11/site-packages/jax/_src/interpreters/pxla.py"", line 2909, in aot_cache_miss
+    outs, out_flat, args_flat = stages.Compiled.call(params, *args, **kwargs)
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/data2/joc0027/poincare-execution-experiments/.venv/lib/python3.11/site-packages/jax/_src/stages.py"", line 544, in call
+    out_flat = params.executable.call(*args_flat)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/data2/joc0027/poincare-execution-experiments/.venv/lib/python3.11/site-packages/jax/_src/interpreters/pxla.py"", line 2887, in call
+    return self.unsafe_call(*args)  # pylint: disable=not-callable
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File ""/data2/joc0027/poincare-execution-experiments/.venv/lib/python3.11/site-packages/jax/_src/profiler.py"", line 336, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File ""/data2/joc0027/poincare-execution-experiments/.venv/lib/python3.11/site-packages/jax/_src/interpreters/pxla.py"", line 1209, in __call__
+    results = self.xla_executable.execute_sharded(input_bufs)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+jaxlib.xla_extension.XlaRuntimeError: RESOURCE_EXHAUSTED: Out of memory while trying to allocate 24664834784 bytes.
+BufferAssignment OOM Debugging.
+BufferAssignment stats:
+             parameter allocation:   29.57MiB
+              constant allocation:    8.00MiB
+        maybe_live_out allocation:    5.57MiB
+     preallocated temp allocation:   22.97GiB
+  preallocated temp fragmentation:   16.05MiB (0.07%)
+                 total allocation:   23.01GiB
+              total fragmentation:   10.15MiB (0.04%)
+Peak buffers:
+	Buffer 1:
+		Size: 1.12GiB
+		Operator: op_name=""jit(complete_update)/jit(main)/conv_general_dilated[window_strides=(1, 1) padding=((1, 1), (1, 1)) lhs_dilation=(1, 1) rhs_dilation=(1, 1) dimension_numbers=ConvDimensionNumbers(lhs_spec=(0, 3, 1, 2), rhs_spec=(3, 2, 0, 1), out_spec=(0, 3, 1, 2)) feature_group_count=16 batch_group_count=1 precision=(<Precision.HIGHEST: 2>, <Precision.HIGHEST: 2>) preferred_element_type=None]"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/hnnpp.py"" source_line=366
+		XLA Label: custom-call
+		Shape: f32[8,144,512,512]
+		==========================
+
+	Buffer 2:
+		Size: 1.12GiB
+		Operator: op_name=""jit(complete_update)/jit(main)/reduce_sum[axes=(3,)]"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/hnnpp.py"" source_line=178
+		XLA Label: fusion
+		Shape: f32[8,144,512,512]
+		==========================
+
+	Buffer 3:
+		Size: 1.12GiB
+		Operator: op_name=""jit(complete_update)/jit(main)/jvp(jit(_where))/select_n"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/geometry.py"" source_line=64
+		XLA Label: fusion
+		Shape: f32[8,512,512,144]
+		==========================
+
+	Buffer 4:
+		Size: 576.00MiB
+		Operator: op_name=""jit(complete_update)/jit(main)/transpose(jvp(...i,io->...o))/dot_general[dimension_numbers=(((3,), (1,)), ((), ())) precision=(<Precision.HIGHEST: 2>, <Precision.HIGHEST: 2>) preferred_element_type=float32]"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/hnnpp.py"" source_line=180
+		XLA Label: custom-call
+		Shape: f32[2097152,72]
+		==========================
+
+	Buffer 5:
+		Size: 576.00MiB
+		Operator: op_name=""jit(complete_update)/jit(main)/conv_general_dilated[window_strides=(1, 1) padding=((1, 1), (1, 1)) lhs_dilation=(1, 1) rhs_dilation=(1, 1) dimension_numbers=ConvDimensionNumbers(lhs_spec=(0, 3, 1, 2), rhs_spec=(3, 2, 0, 1), out_spec=(0, 3, 1, 2)) feature_group_count=8 batch_group_count=1 precision=(<Precision.HIGHEST: 2>, <Precision.HIGHEST: 2>) preferred_element_type=None]"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/hnnpp.py"" source_line=366
+		XLA Label: custom-call
+		Shape: f32[8,72,512,512]
+		==========================
+
+	Buffer 6:
+		Size: 576.00MiB
+		Operator: op_name=""jit(complete_update)/jit(main)/conv_general_dilated[window_strides=(1, 1) padding=((1, 1), (1, 1)) lhs_dilation=(1, 1) rhs_dilation=(1, 1) dimension_numbers=ConvDimensionNumbers(lhs_spec=(0, 3, 1, 2), rhs_spec=(3, 2, 0, 1), out_spec=(0, 3, 1, 2)) feature_group_count=32 batch_group_count=1 precision=(<Precision.HIGHEST: 2>, <Precision.HIGHEST: 2>) preferred_element_type=None]"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/hnnpp.py"" source_line=366
+		XLA Label: custom-call
+		Shape: f32[8,288,256,256]
+		==========================
+
+	Buffer 7:
+		Size: 576.00MiB
+		Operator: op_name=""jit(complete_update)/jit(main)/conv_general_dilated[window_strides=(1, 1) padding=((1, 1), (1, 1)) lhs_dilation=(1, 1) rhs_dilation=(1, 1) dimension_numbers=ConvDimensionNumbers(lhs_spec=(0, 3, 1, 2), rhs_spec=(3, 2, 0, 1), out_spec=(0, 3, 1, 2)) feature_group_count=8 batch_group_count=1 precision=(<Precision.HIGHEST: 2>, <Precision.HIGHEST: 2>) preferred_element_type=None]"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/hnnpp.py"" source_line=366
+		XLA Label: custom-call
+		Shape: f32[8,72,512,512]
+		==========================
+
+	Buffer 8:
+		Size: 576.00MiB
+		Operator: op_name=""jit(complete_update)/jit(main)/transpose(jvp(jit(_where)))/select_n"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/geometry.py"" source_line=64 deduplicated_name=""input_transpose_fusion.56""
+		XLA Label: fusion
+		Shape: f32[8,72,512,512]
+		==========================
+
+	Buffer 9:
+		Size: 576.00MiB
+		Operator: op_name=""jit(complete_update)/jit(main)/jvp(jit(_where))/select_n"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/geometry.py"" source_line=64
+		XLA Label: fusion
+		Shape: f32[8,512,512,72]
+		==========================
+
+	Buffer 10:
+		Size: 576.00MiB
+		Operator: op_name=""jit(complete_update)/jit(main)/reduce_sum[axes=(3,)]"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/hnnpp.py"" source_line=178 deduplicated_name=""input_reduce_select_fusion.50""
+		XLA Label: fusion
+		Shape: f32[8,72,512,512]
+		==========================
+
+	Buffer 11:
+		Size: 576.00MiB
+		Operator: op_name=""jit(complete_update)/jit(main)/reduce_sum[axes=(3,)]"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/hnnpp.py"" source_line=178 deduplicated_name=""input_reduce_select_fusion.50""
+		XLA Label: fusion
+		Shape: f32[8,72,512,512]
+		==========================
+
+	Buffer 12:
+		Size: 576.00MiB
+		Operator: op_name=""jit(complete_update)/jit(main)/jvp(jit(_where))/select_n"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/geometry.py"" source_line=64
+		XLA Label: fusion
+		Shape: f32[8,256,256,288]
+		==========================
+
+	Buffer 13:
+		Size: 576.00MiB
+		Operator: op_name=""jit(complete_update)/jit(main)/jvp(jit(_where))/select_n"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/geometry.py"" source_line=64
+		XLA Label: fusion
+		Shape: f32[8,512,512,72]
+		==========================
+
+	Buffer 14:
+		Size: 288.00MiB
+		Operator: op_name=""jit(complete_update)/jit(main)/conv_general_dilated[window_strides=(1, 1) padding=((1, 1), (1, 1)) lhs_dilation=(1, 1) rhs_dilation=(1, 1) dimension_numbers=ConvDimensionNumbers(lhs_spec=(0, 3, 1, 2), rhs_spec=(3, 2, 0, 1), out_spec=(0, 3, 1, 2)) feature_group_count=64 batch_group_count=1 precision=(<Precision.HIGHEST: 2>, <Precision.HIGHEST: 2>) preferred_element_type=None]"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/hnnpp.py"" source_line=366
+		XLA Label: custom-call
+		Shape: f32[8,576,128,128]
+		==========================
+
+	Buffer 15:
+		Size: 288.00MiB
+		Operator: op_name=""jit(complete_update)/jit(main)/conv_general_dilated[window_strides=(1, 1) padding=((1, 1), (1, 1)) lhs_dilation=(1, 1) rhs_dilation=(1, 1) dimension_numbers=ConvDimensionNumbers(lhs_spec=(0, 3, 1, 2), rhs_spec=(3, 2, 0, 1), out_spec=(0, 3, 1, 2)) feature_group_count=16 batch_group_count=1 precision=(<Precision.HIGHEST: 2>, <Precision.HIGHEST: 2>) preferred_element_type=None]"" source_file=""/data2/joc0027/ExPoConv/src/poincare_exec/core/hnnpp.py"" source_line=366
+		XLA Label: custom-call
+		Shape: f32[8,144,256,256]
+		==========================",[1],1.11,75f10dd9f671f12df7fe4f357f061341f9041bc7,f0604c9ca563f1fd41281ae1f988103de068aba57a46b64feae3d7cb58c54f6d,argexpr3.vsb.cz::gpu:0::Tesla V100-PCIE-32GB,GPU-4e0547c3-d65d-7d8b-9f6a-d40ad61a0f0f,unet:update,"[""/data2/joc0027/ExPoConv/artifacts/e13_unet_scaling.csv.failures.jsonl""]"
+E13,unet_update_b8_r512,resolution,8,512,F,4,200,ok,200,196.8049805,12.75775671005249,20.033203125,,,,[],1.11,75f10dd9f671f12df7fe4f357f061341f9041bc7,f0604c9ca563f1fd41281ae1f988103de068aba57a46b64feae3d7cb58c54f6d,argexpr3.vsb.cz::gpu:0::Tesla V100-PCIE-32GB,GPU-4e0547c3-d65d-7d8b-9f6a-d40ad61a0f0f,unet:update:depth=1,"[""/data2/joc0027/ExPoConv/artifacts/e13_unet_scaling.csv""]"
+E13,unet_update_b16_r256,batch,16,256,R,0,200,ok,200,217.0511275,12.245070219039917,20.080078125,,,,[],1.11,75f10dd9f671f12df7fe4f357f061341f9041bc7,1ee760e7537f8dbd1efcd7a6812e3f6e852ec526e8b72d27e0f4020e4f782fbd,argexpr3.vsb.cz::gpu:0::Tesla V100-PCIE-32GB,GPU-4e0547c3-d65d-7d8b-9f6a-d40ad61a0f0f,unet:update:depth=1,"[""/data2/joc0027/ExPoConv/artifacts/e13_unet_scaling.csv""]"
+E13,unet_update_b16_r256,batch,16,256,F,0,200,ok,200,102.4249805,5.480059862136841,10.017578125,,,,[],1.11,75f10dd9f671f12df7fe4f357f061341f9041bc7,1ee760e7537f8dbd1efcd7a6812e3f6e852ec526e8b72d27e0f4020e4f782fbd,argexpr3.vsb.cz::gpu:0::Tesla V100-PCIE-32GB,GPU-4e0547c3-d65d-7d8b-9f6a-d40ad61a0f0f,unet:update:depth=1,"[""/data2/joc0027/ExPoConv/artifacts/e13_unet_scaling.csv""]"
+E13,unet_update_b16_r256,batch,16,256,R,1,200,ok,200,218.119495,12.245070219039917,20.080078125,,,,[],1.11,75f10dd9f671f12df7fe4f357f061341f9041bc7,1ee760e7537f8dbd1efcd7a6812e3f6e852ec526e8b72d27e0f4020e4f782fbd,argexpr3.vsb.cz::gpu:0::Tesla V100-PCIE-32GB,GPU-4e0547c3-d65d-7d8b-9f6a-d40ad61a0f0f,unet:update:depth=1,"[""/data2/joc0027/ExPoConv/artifacts/e13_unet_scaling.csv""]"
+E13,unet_update_b16_r256,batch,16,256,F,1,200,ok,200,103.8774565,5.480059862136841,10.017578125,,,,[],1.11,75f10dd9f671f12df7fe4f357f061341f9041bc7,1ee760e7537f8dbd1efcd7a6812e3f6e852ec526e8b72d27e0f4020e4f782fbd,argexpr3.vsb.cz::gpu:0::Tesla V100-PCIE-32GB,GPU-4e0547c3-d65d-7d8b-9f6a-d40ad61a0f0f,unet:update:depth=1,"[""/data2/joc0027/ExPoConv/artifacts/e13_unet_scaling.csv""]"
+E13,unet_update_b16_r256,batch,16,256,R,2,200,ok,200,218.082484,12.245070219039917,20.080078125,,,,[],1.11,75f10dd9f671f12df7fe4f357f061341f9041bc7,1ee760e7537f8dbd1efcd7a6812e3f6e852ec526e8b72d27e0f4020e4f782fbd,argexpr3.vsb.cz::gpu:0::Tesla V100-PCIE-32GB,GPU-4e0547c3-d65d-7d8b-9f6a-d40ad61a0f0f,unet:update:depth=1,"[""/data2/joc0027/ExPoConv/artifacts/e13_unet_scaling.csv""]"
+E13,unet_update_b16_r256,batch,16,256,F,2,200,ok,200,102.5951015,5.480059862136841,10.017578125,,,,[],1.11,75f10dd9f671f12df7fe4f357f061341f9041bc7,1ee760e7537f8dbd1efcd7a6812e3f6e852ec526e8b72d27e0f4020e4f782fbd,argexpr3.vsb.cz::gpu:0::Tesla V100-PCIE-32GB,GPU-4e0547c3-d65d-7d8b-9f6a-d40ad61a0f0f,unet:update:depth=1,"[""/data2/joc0027/ExPoConv/artifacts/e13_unet_scaling.csv""]"
+E13,unet_update_b16_r256,batch,16,256,R,3,200,ok,200,217.20815449999998,12.245070219039917,20.080078125,,,,[],1.11,75f10dd9f671f12df7fe4f357f061341f9041bc7,1ee760e7537f8dbd1efcd7a6812e3f6e852ec526e8b72d27e0f4020e4f782fbd,argexpr3.vsb.cz::gpu:0::Tesla V100-PCIE-32GB,GPU-4e0547c3-d65d-7d8b-9f6a-d40ad61a0f0f,unet:update:depth=1,"[""/data2/joc0027/ExPoConv/artifacts/e13_unet_scaling.csv""]"
+E13,unet_update_b16_r256,batch,16,256,F,3,200,ok,200,105.192999,5.480059862136841,10.017578125,,,,[],1.11,75f10dd9f671f12df7fe4f357f061341f9041bc7,1ee760e7537f8dbd1efcd7a6812e3f6e852ec526e8b72d27e0f4020e4f782fbd,argexpr3.vsb.cz::gpu:0::Tesla V100-PCIE-32GB,GPU-4e0547c3-d65d-7d8b-9f6a-d40ad61a0f0f,unet:update:depth=1,"[""/data2/joc0027/ExPoConv/artifacts/e13_unet_scaling.csv""]"
+E13,unet_update_b16_r256,batch,16,256,R,4,200,ok,200,217.32142349999998,12.245070219039917,20.080078125,,,,[],1.11,75f10dd9f671f12df7fe4f357f061341f9041bc7,1ee760e7537f8dbd1efcd7a6812e3f6e852ec526e8b72d27e0f4020e4f782fbd,argexpr3.vsb.cz::gpu:0::Tesla V100-PCIE-32GB,GPU-4e0547c3-d65d-7d8b-9f6a-d40ad61a0f0f,unet:update:depth=1,"[""/data2/joc0027/ExPoConv/artifacts/e13_unet_scaling.csv""]"
+E13,unet_update_b16_r256,batch,16,256,F,4,200,ok,200,103.29905099999999,5.480059862136841,10.017578125,,,,[],1.11,75f10dd9f671f12df7fe4f357f061341f9041bc7,1ee760e7537f8dbd1efcd7a6812e3f6e852ec526e8b72d27e0f4020e4f782fbd,argexpr3.vsb.cz::gpu:0::Tesla V100-PCIE-32GB,GPU-4e0547c3-d65d-7d8b-9f6a-d40ad61a0f0f,unet:update:depth=1,"[""/data2/joc0027/ExPoConv/artifacts/e13_unet_scaling.csv""]"

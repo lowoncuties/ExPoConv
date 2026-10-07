@@ -1,0 +1,98 @@
+{
+  "all_planned_groups_accounted_for": true,
+  "analysis_id": "e13_unet_scaling_rf",
+  "analysis_manifest": {
+    "path": "/data2/joc0027/ExPoConv/configs/analysis/e13_unet_scaling.yaml",
+    "sha256": "27bb15e7a8f8f19c2c919e327c8f4acf7565075259efd8d777abc926feaea6e5"
+  },
+  "derivation": "CPU-only validation and aggregation; no benchmark was launched.",
+  "experiment_id": "E13",
+  "memory_scope": "Process-lifetime peak live JAX allocation through the final synchronized output, including initialization, compilation, and warmup; this is not isolated activation memory.",
+  "outcome_counts": {
+    "ok": 65,
+    "oom": 5
+  },
+  "outputs": {
+    "figure_pdf": {
+      "path": "/data2/joc0027/ExPoConv/artifacts/analysis/e13_unet_scaling/unet_scaling.pdf",
+      "sha256": "1e696b7e3ae0ad1ca608145ea077e31e3b8f6dff2d05adc173f446bf80031ea4"
+    },
+    "figure_png": {
+      "path": "/data2/joc0027/ExPoConv/artifacts/analysis/e13_unet_scaling/unet_scaling.png",
+      "sha256": "cf6965dac3bbf25b85c28aaa024e9bf40f81ced5104fc0fec1d070e1ab0ca317"
+    },
+    "paired_ratios": {
+      "path": "/data2/joc0027/ExPoConv/artifacts/analysis/e13_unet_scaling/paired_ratio_summary.csv",
+      "sha256": "9068ed6805bec296d5436284987c18ad51b8ab54ad1035fc17d8e66c2f4d9b44"
+    },
+    "session_outcomes": {
+      "path": "/data2/joc0027/ExPoConv/artifacts/analysis/e13_unet_scaling/session_outcomes.csv",
+      "sha256": "d14502207099c2c0433916a35e82e150dfe14b9b186fefd20c9ef6dc3b5a7cfb"
+    },
+    "workload_summary": {
+      "path": "/data2/joc0027/ExPoConv/artifacts/analysis/e13_unet_scaling/workload_summary.csv",
+      "sha256": "d3d2ec1b1fa778f9f3838bda5bbeacce1c3d5b05cfc98e5b006558ad4ec6782b"
+    }
+  },
+  "paired_rows": 7,
+  "provenance_contract": {
+    "benchmark_config_path": "configs/benchmarks/e13_unet_scaling.yaml",
+    "benchmark_config_sha256": "aba1f0bdf28206f0e2363fad67de641c29a35aeb3f14056c8bd5278c9a3bcd29",
+    "expected_config_hashes": {
+      "unet_update_b16_r256": "1ee760e7537f8dbd1efcd7a6812e3f6e852ec526e8b72d27e0f4020e4f782fbd",
+      "unet_update_b1_r256": "05ec05903f13077d20f0672b865a21631198daefff423622298f59071860af63",
+      "unet_update_b2_r256": "d296e59e0f3187edf3e2eb50f97dbab1659d984a90b239507cc8632fa3549f58",
+      "unet_update_b4_r256": "d85bdc4114c023499bedfbdbe6cc3791cc2d2a15ad80aff1340098833ecfe660",
+      "unet_update_b8_r128": "f86206ed7ebc50c92cd2db900b22ad1ea5fb08a3019131b5dcdb5c908931bdfb",
+      "unet_update_b8_r256": "aea17d6bf3a5c279cd8509c85e8645a98a12a04e37d032e8f1e2ef1e19718b70",
+      "unet_update_b8_r512": "f0604c9ca563f1fd41281ae1f988103de068aba57a46b64feae3d7cb58c54f6d"
+    },
+    "protocol_path": "protocol.yaml",
+    "protocol_sha256": "5dbd77ce1d6fa7e9a33114093a730208048bcf295012b66c0df00f6e3e8711fe",
+    "protocol_version": "1.11"
+  },
+  "raw_sources": [
+    {
+      "byte_size": 24852259,
+      "path": "/data2/joc0027/ExPoConv/artifacts/e13_unet_scaling.csv",
+      "rows": 13195,
+      "sha256": "39097ccdc5c0567c8fa8c6b48dfd280275030bc2ee1cd353c33648031b759fb0"
+    },
+    {
+      "byte_size": 92602,
+      "path": "/data2/joc0027/ExPoConv/artifacts/e13_unet_scaling.csv.failures.jsonl",
+      "rows": 5,
+      "sha256": "c7610591e9e10b44bf5800271df53b40c9feff8741be3146a043e42afeed14e6"
+    }
+  ],
+  "schema_version": "1.0",
+  "session_rows": 70,
+  "statistical_method": "For each successful fresh-process path/session, take the median of 200 synchronized complete-update calls. For sessions in which both R and F succeed, form the paired R/F ratio and report its geometric mean with a two-sided 95% Student-t interval on log ratios. Adjacent calls are technical repetitions; sessions are the inferential units.",
+  "validated_identity": {
+    "code_commit": "75f10dd9f671f12df7fe4f357f061341f9041bc7",
+    "config_hashes": {
+      "unet_update_b16_r256": "1ee760e7537f8dbd1efcd7a6812e3f6e852ec526e8b72d27e0f4020e4f782fbd",
+      "unet_update_b1_r256": "05ec05903f13077d20f0672b865a21631198daefff423622298f59071860af63",
+      "unet_update_b2_r256": "d296e59e0f3187edf3e2eb50f97dbab1659d984a90b239507cc8632fa3549f58",
+      "unet_update_b4_r256": "d85bdc4114c023499bedfbdbe6cc3791cc2d2a15ad80aff1340098833ecfe660",
+      "unet_update_b8_r128": "f86206ed7ebc50c92cd2db900b22ad1ea5fb08a3019131b5dcdb5c908931bdfb",
+      "unet_update_b8_r256": "aea17d6bf3a5c279cd8509c85e8645a98a12a04e37d032e8f1e2ef1e19718b70",
+      "unet_update_b8_r512": "f0604c9ca563f1fd41281ae1f988103de068aba57a46b64feae3d7cb58c54f6d"
+    },
+    "device_id_encodings": [
+      "argexpr3.vsb.cz::gpu:0::Tesla V100-PCIE-32GB"
+    ],
+    "normalized_precision_policy": {
+      "matmul_precision": "highest",
+      "reduced_precision_reduction": false,
+      "storage_dtype": "float32",
+      "tf32": false
+    },
+    "physical_gpu_uuid": "GPU-4e0547c3-d65d-7d8b-9f6a-d40ad61a0f0f",
+    "precision_policy_encodings": [
+      "{\"matmul_precision\":\"highest\",\"reduced_precision_reduction\":false,\"storage_dtype\":\"float32\",\"tf32\":false}"
+    ],
+    "protocol_version": "1.11"
+  },
+  "workload_rows": 14
+}

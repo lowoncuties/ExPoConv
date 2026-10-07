@@ -1,8 +1,11 @@
 # E13 R/F U-Net scaling analysis
 
-This is a CPU-only analysis path for a future, bounded scaling campaign. It
-does not launch benchmarks and it is not evidence that the campaign has been
-run.
+This is the CPU-only analysis path used for the completed, bounded E13 scaling
+campaign. The exporter does not launch benchmarks. The accepted raw sources
+account for all 70 planned fresh-process path/session groups: all 35 F groups
+and 30 of 35 R groups completed, while all five R groups at batch 8 and
+512 x 512 ended in recorded first-update OOMs. The corresponding five F groups
+completed.
 
 ## Registered analysis grid
 
@@ -75,3 +78,9 @@ The figure draws a point only when all five sessions for that path/workload
 completed. OOM and other incomplete outcomes remain visible as markers at the
 top of the affected panel. This prevents a capacity failure from disappearing
 from the visual summary.
+
+The accepted compact outputs are copied byte-for-byte to
+`results/e13_scaling/`. The 24-MiB per-call timing table and JSONL failure
+sidecar remain in the untracked artifact archive; their paths, sizes, row
+counts, and SHA-256 hashes are retained in
+`results/e13_scaling/summary.json`.
