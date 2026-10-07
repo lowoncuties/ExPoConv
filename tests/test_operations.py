@@ -5,7 +5,6 @@ import jax.numpy as jnp
 
 from poincare_exec.core.hnnpp import init_dense
 from poincare_exec.core.operations import (
-    _fold_expanded_tangent,
     init_midpoint_batch_norm,
     midpoint_batch_norm,
     project_tangent,
@@ -23,7 +22,9 @@ def test_midpoint_batch_norm_has_finite_values_and_gradients() -> None:
     curvature = jnp.asarray(0.7, dtype=jnp.float64)
 
     def loss(selected_params, selected_input, selected_curvature):
-        output = midpoint_batch_norm(selected_params, selected_input, selected_curvature)
+        output = midpoint_batch_norm(
+            selected_params, selected_input, selected_curvature
+        )
         return jnp.sum(jnp.square(output))
 
     value, gradients = jax.value_and_grad(loss, argnums=(0, 1, 2))(
@@ -68,41 +69,3 @@ def test_transpose_convolution_variants_agree() -> None:
     assert outputs["R"].shape == (2, 6, 6, 4)
     assert jnp.allclose(outputs["R"], outputs["F"], atol=2e-10, rtol=2e-10)
     assert jnp.allclose(outputs["R"], outputs["T"], atol=2e-10, rtol=2e-10)
-
-
-def test_disjoint_transpose_fold_matches_scatter_values_and_gradients() -> None:
-    expanded = jax.random.normal(
-        jax.random.PRNGKey(19), (2, 3, 4, 2 * 2 * 5), dtype=jnp.float32
-    )
-    cotangent = jax.random.normal(jax.random.PRNGKey(23), (2, 6, 8, 5), dtype=jnp.float32)
-
-    def scatter_reference(value):
-        blocks = jnp.reshape(value, (2, 3, 4, 2, 2, 5))
-        output = jnp.zeros((2, 6, 8, 5), dtype=value.dtype)
-        for row in range(2):
-            for column in range(2):
-                output = output.at[:, row::2, column::2, :].add(
-                    blocks[:, :, :, row, column, :]
-                )
-        return output
-
-    def disjoint_fold(value):
-        return _fold_expanded_tangent(
-            value,
-            kernel_shape=(2, 2),
-            output_channels=5,
-            stride=(2, 2),
-            padding=(0, 0),
-        )
-
-    expected = scatter_reference(expanded)
-    actual = disjoint_fold(expanded)
-    assert jnp.array_equal(actual, expected)
-
-    expected_gradient = jax.grad(
-        lambda value: jnp.sum(scatter_reference(value) * cotangent)
-    )(expanded)
-    actual_gradient = jax.grad(lambda value: jnp.sum(disjoint_fold(value) * cotangent))(
-        expanded
-    )
-    assert jnp.array_equal(actual_gradient, expected_gradient)

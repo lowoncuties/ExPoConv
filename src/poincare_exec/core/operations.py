@@ -55,7 +55,9 @@ def poincare_midpoint(point: Array, curvature: Array, *, axis: int = 0) -> Array
     count = point.shape[axis]
     denominator = jnp.sum(gamma_sq, axis=axis, keepdims=True) - 0.5 * count
     fraction = numerator / positive_denominator(denominator)
-    fraction_radius_sq = curvature * jnp.sum(jnp.square(fraction), axis=-1, keepdims=True)
+    fraction_radius_sq = curvature * jnp.sum(
+        jnp.square(fraction), axis=-1, keepdims=True
+    )
     gamma = 1.0 / jnp.sqrt(positive_denominator(1.0 - fraction_radius_sq))
     return gamma * fraction / (1.0 + gamma)
 
@@ -180,15 +182,6 @@ def _fold_expanded_tangent(
             output_channels,
         ),
     )
-    if stride == kernel_shape and padding == (0, 0):
-        # The source U-Net uses kernel=stride=2 without padding, so the four
-        # blocks are disjoint. Interleaving them by reshape/transpose is the
-        # exact fold and avoids a CUDA/XLA scatter-fusion failure at 256^2.
-        interleaved = jnp.transpose(expanded, (0, 1, 3, 2, 4, 5))
-        return jnp.reshape(
-            interleaved,
-            (batch, full_height, full_width, output_channels),
-        )
     output = jnp.zeros(
         (batch, full_height, full_width, output_channels), dtype=expanded.dtype
     )
@@ -211,10 +204,13 @@ def _fold_expanded_tangent(
     return output
 
 
-def _nonnegative_pair(value: int | Sequence[int], *, name: str) -> tuple[int, int]:
+def _nonnegative_pair(
+    value: int | Sequence[int], *, name: str
+) -> tuple[int, int]:
     values = (value, value) if isinstance(value, int) else tuple(value)
     if len(values) != 2 or any(
-        isinstance(item, bool) or not isinstance(item, int) or item < 0 for item in values
+        isinstance(item, bool) or not isinstance(item, int) or item < 0
+        for item in values
     ):
         raise ValueError(f"{name} must contain two nonnegative Python integers")
     return values
@@ -241,7 +237,9 @@ def transpose_conv2d(
         raise ValueError("transpose parameters do not match kernel/output channels")
     expanded = dense(params, tangent, curvature, variant=variant)
     stacked_dimension = expected
-    fold_scale = 1.0 / beta_ratio(stacked_dimension, output_channels, dtype=tangent.dtype)
+    fold_scale = 1.0 / beta_ratio(
+        stacked_dimension, output_channels, dtype=tangent.dtype
+    )
     folded = _fold_expanded_tangent(
         fold_scale * expanded,
         kernel_shape=kernel,

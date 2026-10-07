@@ -1,4 +1,4 @@
-protocol_version: "1.13"
+protocol_version: "1.14"
 protocol_date: "2026-10-07"
 target_journal: "Neural Networks"
 working_title: "Exact and Efficient Execution of Poincare Neural Networks"
@@ -86,6 +86,11 @@ protocol_amendments:
     affected_experiments: [E12, E20, E21]
     reason: "After the retained pre-update E20/JAX 0.5.3 compile failure, lower the U-Net's kernel-equals-stride, zero-padding transpose fold as an exact reshape and transpose instead of four disjoint scatter-adds. The general overlapping fold is unchanged. Targeted forward, cotangent-gradient, and complete-update checks are required before restarting the frozen campaigns; no failed seed is replaced."
     case_manifest_changed: false
+  - version: "1.14"
+    date: "2026-10-07"
+    affected_experiments: [E20, E21]
+    reason: "The protocol-1.13 disjoint-fold lowering passed bitwise value/gradient checks but did not resolve the retained JAX 0.5.3 GPU compiler failure and is reverted before accepted training. Freeze E20/E21 to the unchanged scientific implementation and the original JAX/JAXLIB 0.4.25 CUDA-11.8 user-space stack on one RTX A6000. Exact batch-2/256 backward and complete-update diagnostics compiled and completed finitely before restart. E12 remains a separate unrun CUDA-12 portability experiment."
+    case_manifest_changed: false
 
 variants:
   numerical: [R, F, T]
@@ -112,12 +117,14 @@ training_extensions:
     task: isic16_poincare_unet
     dataset: isic16
     variants: [R, F]
+    runtime_profile: "JAX/JAXLIB 0.4.25 with pinned CUDA-11.8 user-space libraries on RTX A6000"
     seeds: [1898335833, 205785622, 1338995025, 1192596770, 864171589, 1052495617, 1147609747, 1619140427, 458014223, 646228129, 821637680, 1059645469, 1209522243, 1985788232, 565813932]
   E21:
     role: "prospective independent-platform replication"
     task: cifar100_poincare_resnet20
     dataset: cifar100
     variants: [R, F]
+    runtime_profile: "JAX/JAXLIB 0.4.25 with pinned CUDA-11.8 user-space libraries on RTX A6000"
     seeds: [1898335833, 205785622, 1338995025, 1192596770, 864171589, 1052495617, 1147609747, 1619140427, 458014223, 646228129, 821637680, 1059645469, 1209522243, 1985788232, 565813932]
   analysis_policy:
     seed_rule: "SHA-256 first-31-bit values of ExPoConv-E09E10-RF-extension-v1:{i}, rejecting zero, prior seeds, and duplicates"
@@ -278,6 +285,7 @@ tasks:
 hardware:
   primary_gpu: "Tesla V100-PCIE-32GB"
   primary_runtime: "JAX/JAXLIB 0.4.25, CUDA 11.8, cuDNN 8.6"
+  secondary_training_runtime: "JAX/JAXLIB 0.4.25 with the pinned CUDA 11.8 and cuDNN 8.6 user-space libraries on RTX A6000"
   secondary_runtime: "JAX/JAXLIB 0.5.3 CUDA 12 plugin; joint hardware/runtime portability"
   secondary_gpus:
     - host: "aibox1a6000"
