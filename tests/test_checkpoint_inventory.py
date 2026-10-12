@@ -6,6 +6,7 @@ import io
 import json
 import math
 import pickle
+import shutil
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -451,6 +452,155 @@ def test_checkpoint_milestones_and_optimizer_steps_are_validated(
         )
 
 
+@pytest.mark.parametrize(
+    ("field", "value", "expected"),
+    [
+        ("seed", 201.0, "identity field seed"),
+        ("update", 10.5, "milestone"),
+        ("epoch", True, "milestone"),
+        ("optimizer_step", math.inf, "optimizer step"),
+        ("best_update", 20.5, "best-checkpoint metadata"),
+    ],
+)
+def test_checkpoint_integer_fields_require_exact_scalars(
+    campaign: Campaign,
+    field: str,
+    value: Any,
+    expected: str,
+) -> None:
+    role = "validation_best" if field == "best_update" else "10_percent"
+    path = campaign.roots["E20"] / "F" / "seed_201" / "checkpoints" / f"{role}.pkl"
+
+    def mutate(payload: dict[str, Any]) -> None:
+        if field == "optimizer_step":
+            payload["optimizer_state"]["step"] = value
+        else:
+            payload[field] = value
+
+    _rewrite(path, mutate)
+
+    with pytest.raises(inventory.CheckpointInventoryError, match=expected):
+        inventory.export_checkpoint_inventory(
+            campaign.manifest,
+            campaign.roots,
+            campaign.analysis_output,
+            campaign.existing_inventory,
+            campaign.repository / "output.csv",
+            repository_root=campaign.repository,
+        )
+
+
+def test_terminal_checkpoints_share_validation_best_metadata(campaign: Campaign) -> None:
+    path = campaign.roots["E20"] / "F" / "seed_201" / "checkpoints" / "validation_best.pkl"
+
+    def mutate(payload: dict[str, Any]) -> None:
+        payload["update"] = 30
+        payload["epoch"] = 3
+        payload["optimizer_state"]["step"] = 30
+        payload["best_update"] = 30
+        payload["best_metric"] = 0.6
+
+    _rewrite(path, mutate)
+
+    with pytest.raises(
+        inventory.CheckpointInventoryError,
+        match="best-checkpoint metadata disagrees with validation_best",
+    ):
+        inventory.export_checkpoint_inventory(
+            campaign.manifest,
+            campaign.roots,
+            campaign.analysis_output,
+            campaign.existing_inventory,
+            campaign.repository / "output.csv",
+            repository_root=campaign.repository,
+        )
+
+
+def test_checkpoint_directory_symlink_cannot_escape_cohort_root(
+    campaign: Campaign, tmp_path: Path
+) -> None:
+    run_dir = campaign.roots["E20"] / "F" / "seed_201"
+    outside = tmp_path / "outside" / "checkpoints"
+    outside.parent.mkdir()
+    shutil.move(run_dir / "checkpoints", outside)
+    (run_dir / "checkpoints").symlink_to(outside, target_is_directory=True)
+
+    with pytest.raises(inventory.CheckpointInventoryError, match="non-symlink"):
+        inventory.export_checkpoint_inventory(
+            campaign.manifest,
+            campaign.roots,
+            campaign.analysis_output,
+            campaign.existing_inventory,
+            campaign.repository / "output.csv",
+            repository_root=campaign.repository,
+        )
+
+
+def test_checkpoint_hash_and_validation_use_the_same_byte_snapshot(
+    campaign: Campaign,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    target = campaign.roots["E20"] / "F" / "seed_201" / "checkpoints" / "10_percent.pkl"
+    original_bytes = target.read_bytes()
+    replacement = pickle.loads(original_bytes)
+    replacement["params"]["weight"] = 999.0
+    replacement_bytes = pickle.dumps(replacement, protocol=5)
+    original_loads = pickle.loads
+    swapped = False
+
+    def swap_after_snapshot(payload: bytes) -> Any:
+        nonlocal swapped
+        value = original_loads(payload)
+        if not swapped and payload == original_bytes:
+            target.write_bytes(replacement_bytes)
+            swapped = True
+        return value
+
+    monkeypatch.setattr(inventory.pickle, "loads", swap_after_snapshot)
+    output = tmp_path / "inventory.csv"
+    rows = inventory.export_checkpoint_inventory(
+        campaign.manifest,
+        campaign.roots,
+        campaign.analysis_output,
+        campaign.existing_inventory,
+        output,
+        repository_root=campaign.repository,
+    )
+
+    row = next(
+        row
+        for row in rows
+        if row["experiment_id"] == "E20"
+        and row["variant"] == "F"
+        and row["seed"] == 201
+        and row["role"] == "10_percent"
+    )
+    assert swapped
+    assert target.read_bytes() == replacement_bytes
+    assert row["sha256"] == hashlib.sha256(original_bytes).hexdigest()
+    assert row["sha256"] != hashlib.sha256(replacement_bytes).hexdigest()
+
+
+def test_gate_audit_symlink_cannot_escape_analysis_root(
+    campaign: Campaign, tmp_path: Path
+) -> None:
+    gate = campaign.analysis_output / "e20_e21_gate_audit.json"
+    outside = tmp_path / "outside_gate.json"
+    gate.replace(outside)
+    gate.symlink_to(outside)
+
+    with pytest.raises(inventory.CheckpointInventoryError, match="non-symlink"):
+        inventory.export_checkpoint_inventory(
+            campaign.manifest,
+            campaign.roots,
+            campaign.analysis_output,
+            campaign.existing_inventory,
+            campaign.repository / "output.csv",
+            repository_root=campaign.repository,
+        )
+
+
 def test_historical_checkpoint_hashes_must_match_frozen_projection(
     campaign: Campaign,
 ) -> None:
@@ -474,7 +624,7 @@ def test_output_replacement_is_atomic(
     output = tmp_path / "inventory.csv"
     output.write_bytes(b"previous complete inventory\n")
 
-    def fail_replace(source: Path, destination: Path) -> None:
+    def fail_replace(source: Path, destination: Path, **_: Any) -> None:
         raise OSError(f"simulated replace failure: {source} -> {destination}")
 
     monkeypatch.setattr(inventory.os, "replace", fail_replace)
@@ -490,3 +640,44 @@ def test_output_replacement_is_atomic(
 
     assert output.read_bytes() == b"previous complete inventory\n"
     assert not list(tmp_path.glob(".inventory.csv.*.tmp"))
+
+
+def test_output_symlink_is_refused_without_replacing_target(
+    campaign: Campaign, tmp_path: Path
+) -> None:
+    target = tmp_path / "target.csv"
+    target.write_bytes(b"keep me\n")
+    output = tmp_path / "inventory.csv"
+    output.symlink_to(target)
+
+    with pytest.raises(inventory.CheckpointInventoryError, match="non-symlink"):
+        inventory.export_checkpoint_inventory(
+            campaign.manifest,
+            campaign.roots,
+            campaign.analysis_output,
+            campaign.existing_inventory,
+            output,
+            repository_root=campaign.repository,
+        )
+
+    assert output.is_symlink()
+    assert target.read_bytes() == b"keep me\n"
+
+
+def test_output_parent_symlink_is_refused(campaign: Campaign, tmp_path: Path) -> None:
+    target = tmp_path / "outside"
+    target.mkdir()
+    linked_parent = tmp_path / "linked"
+    linked_parent.symlink_to(target, target_is_directory=True)
+
+    with pytest.raises(inventory.CheckpointInventoryError, match="output parent"):
+        inventory.export_checkpoint_inventory(
+            campaign.manifest,
+            campaign.roots,
+            campaign.analysis_output,
+            campaign.existing_inventory,
+            linked_parent / "inventory.csv",
+            repository_root=campaign.repository,
+        )
+
+    assert not (target / "inventory.csv").exists()

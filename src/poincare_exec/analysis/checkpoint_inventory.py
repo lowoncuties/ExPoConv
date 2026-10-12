@@ -14,8 +14,11 @@ import io
 import json
 import math
 import os
-import tempfile
-from collections.abc import Mapping, Sequence
+import pickle
+import secrets
+import stat
+from collections.abc import Iterator, Mapping, Sequence
+from contextlib import contextmanager
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -28,7 +31,6 @@ from poincare_exec.config.loader import (
     load_yaml,
     validate_hashed_document,
 )
-from poincare_exec.training.checkpoints import load_checkpoint
 
 INVENTORY_FIELDS = (
     "experiment_id",
@@ -99,6 +101,160 @@ def _require_sequence(value: Any, *, name: str) -> Sequence[Any]:
 
 def _valid_digest(value: str) -> bool:
     return len(value) == 64 and all(character in "0123456789abcdef" for character in value)
+
+
+def _exact_integer_scalar(value: Any, *, name: str) -> int:
+    """Return one integer scalar without accepting coercible values."""
+
+    try:
+        array = np.asarray(value)
+    except Exception as error:
+        raise CheckpointInventoryError(f"{name} must be an integer scalar") from error
+    if array.ndim != 0 or array.dtype.kind not in {"i", "u"}:
+        raise CheckpointInventoryError(f"{name} must be an integer scalar")
+    return int(array.item())
+
+
+def _directory_flags() -> int:
+    return os.O_RDONLY | os.O_DIRECTORY | os.O_CLOEXEC | os.O_NOFOLLOW
+
+
+def _file_flags() -> int:
+    return os.O_RDONLY | os.O_CLOEXEC | os.O_NOFOLLOW
+
+
+def _contained_parts(path: Path, root: Path, *, context: str) -> tuple[str, ...]:
+    if not path.is_absolute() or not root.is_absolute():
+        raise CheckpointInventoryError(f"{context}: containment paths must be absolute")
+    try:
+        resolved = path.resolve(strict=True)
+    except OSError as error:
+        raise CheckpointInventoryError(
+            f"{context}: contained path is unavailable"
+        ) from error
+    if resolved != path or not resolved.is_relative_to(root):
+        raise CheckpointInventoryError(
+            f"{context}: path must resolve within its root through non-symlink components"
+        )
+    try:
+        relative = path.relative_to(root)
+    except ValueError as error:
+        raise CheckpointInventoryError(
+            f"{context}: path is outside its registered root"
+        ) from error
+    if ".." in relative.parts:
+        raise CheckpointInventoryError(f"{context}: path is outside its registered root")
+    return relative.parts
+
+
+@contextmanager
+def _open_contained_directory(path: Path, root: Path, *, context: str) -> Iterator[int]:
+    """Open a directory beneath ``root`` without following any symlink component."""
+
+    parts = _contained_parts(path, root, context=context)
+    descriptors: list[int] = []
+    links: list[tuple[int, str, tuple[int, int, int, int, int, int]]] = []
+    try:
+        root_before = root.lstat()
+        if stat.S_ISLNK(root_before.st_mode) or not stat.S_ISDIR(root_before.st_mode):
+            raise CheckpointInventoryError(
+                f"{context}: registered root must be a non-symlink directory"
+            )
+        descriptor = os.open(root, _directory_flags())
+        descriptors.append(descriptor)
+        if _stat_signature(root_before) != _stat_signature(os.fstat(descriptor)):
+            raise CheckpointInventoryError(
+                f"{context}: registered root changed while opening"
+            )
+
+        for component in parts:
+            before = os.stat(component, dir_fd=descriptor, follow_symlinks=False)
+            if stat.S_ISLNK(before.st_mode) or not stat.S_ISDIR(before.st_mode):
+                raise CheckpointInventoryError(
+                    f"{context}: directory ancestors must be non-symlink directories"
+                )
+            child = os.open(component, _directory_flags(), dir_fd=descriptor)
+            if _stat_signature(before) != _stat_signature(os.fstat(child)):
+                os.close(child)
+                raise CheckpointInventoryError(
+                    f"{context}: directory ancestor changed while opening"
+                )
+            links.append((descriptor, component, _stat_signature(before)))
+            descriptors.append(child)
+            descriptor = child
+
+        yield descriptor
+
+        for parent, component, expected in links:
+            after = os.stat(component, dir_fd=parent, follow_symlinks=False)
+            if _stat_signature(after) != expected:
+                raise CheckpointInventoryError(
+                    f"{context}: directory ancestor changed while being inspected"
+                )
+        if _stat_signature(root.lstat()) != _stat_signature(root_before):
+            raise CheckpointInventoryError(
+                f"{context}: registered root changed while being inspected"
+            )
+    except OSError as error:
+        raise CheckpointInventoryError(
+            f"{context}: contained path is unavailable or unsafe"
+        ) from error
+    finally:
+        for descriptor in reversed(descriptors):
+            os.close(descriptor)
+
+
+def _read_stable_regular_file(
+    path: Path, root: Path, *, context: str
+) -> tuple[bytes, os.stat_result]:
+    """Read one contained regular file once, without following symlinks."""
+
+    parts = _contained_parts(path, root, context=context)
+    if not parts:
+        raise CheckpointInventoryError(f"{context}: expected a file below its root")
+    parent = root.joinpath(*parts[:-1])
+    filename = parts[-1]
+    try:
+        with _open_contained_directory(parent, root, context=context) as parent_descriptor:
+            before = os.stat(filename, dir_fd=parent_descriptor, follow_symlinks=False)
+            if stat.S_ISLNK(before.st_mode) or not stat.S_ISREG(before.st_mode):
+                raise CheckpointInventoryError(
+                    f"{context}: file must be a non-symlink regular file"
+                )
+            descriptor = os.open(filename, _file_flags(), dir_fd=parent_descriptor)
+            try:
+                opened_before = os.fstat(descriptor)
+                if _stat_signature(before) != _stat_signature(opened_before):
+                    raise CheckpointInventoryError(f"{context}: file changed while opening")
+                with os.fdopen(os.dup(descriptor), "rb") as stream:
+                    payload = stream.read()
+                opened_after = os.fstat(descriptor)
+                if _stat_signature(opened_before) != _stat_signature(opened_after):
+                    raise CheckpointInventoryError(
+                        f"{context}: file changed while being read"
+                    )
+                after = os.stat(filename, dir_fd=parent_descriptor, follow_symlinks=False)
+                if _stat_signature(opened_after) != _stat_signature(after):
+                    raise CheckpointInventoryError(
+                        f"{context}: file path changed while being read"
+                    )
+            finally:
+                os.close(descriptor)
+    except OSError as error:
+        raise CheckpointInventoryError(
+            f"{context}: file is unavailable or unsafe"
+        ) from error
+    if len(payload) != opened_before.st_size:
+        raise CheckpointInventoryError(f"{context}: file size changed while being read")
+    return payload, opened_before
+
+
+def _list_contained_directory(path: Path, root: Path, *, context: str) -> tuple[str, ...]:
+    try:
+        with _open_contained_directory(path, root, context=context) as descriptor:
+            return tuple(os.listdir(descriptor))
+    except OSError as error:
+        raise CheckpointInventoryError(f"{context}: directory cannot be listed") from error
 
 
 def _load_manifest(manifest_path: str | Path, repository_root: Path) -> dict[str, Any]:
@@ -318,10 +474,15 @@ def _validate_gate_audit(
     analysis_root = Path(analysis_output_dir).expanduser().resolve()
     gate_path = analysis_root / gate_name
     try:
-        audit = _require_mapping(
-            json.loads(gate_path.read_text(encoding="utf-8")), name=str(gate_path)
+        gate_payload, _ = _read_stable_regular_file(
+            gate_path,
+            analysis_root,
+            context=f"accepted analysis gate audit {gate_path}",
         )
-    except (OSError, json.JSONDecodeError) as error:
+        audit = _require_mapping(
+            json.loads(gate_payload.decode("utf-8")), name=str(gate_path)
+        )
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError) as error:
         raise CheckpointInventoryError(
             f"accepted analysis gate audit is unavailable: {gate_path}"
         ) from error
@@ -414,14 +575,6 @@ def _resolve_roots(
     return resolved
 
 
-def _sha256_file(path: Path) -> str:
-    digest = hashlib.sha256()
-    with path.open("rb") as stream:
-        for block in iter(lambda: stream.read(1024 * 1024), b""):
-            digest.update(block)
-    return digest.hexdigest()
-
-
 def _stat_signature(value: os.stat_result) -> tuple[int, int, int, int, int, int]:
     return (
         value.st_dev,
@@ -433,17 +586,21 @@ def _stat_signature(value: os.stat_result) -> tuple[int, int, int, int, int, int
     )
 
 
-def _checkpoint_files(run_dir: Path) -> dict[str, Path]:
+def _checkpoint_files(run_dir: Path, cohort_root: Path) -> dict[str, Path]:
     checkpoint_dir = run_dir / "checkpoints"
-    if not checkpoint_dir.is_dir():
-        raise CheckpointInventoryError(f"missing checkpoint directory: {checkpoint_dir}")
     expected_checkpoint_names = {
         relative.name
         for relative in ROLE_PATHS.values()
         if relative.parent.name == "checkpoints"
     }
     actual_checkpoint_names = {
-        path.name for path in checkpoint_dir.iterdir() if path.suffix == ".pkl"
+        name
+        for name in _list_contained_directory(
+            checkpoint_dir,
+            cohort_root,
+            context=f"checkpoint directory {checkpoint_dir}",
+        )
+        if Path(name).suffix == ".pkl"
     }
     missing = sorted(expected_checkpoint_names - actual_checkpoint_names)
     extra = sorted(actual_checkpoint_names - expected_checkpoint_names)
@@ -452,7 +609,15 @@ def _checkpoint_files(run_dir: Path) -> dict[str, Path]:
             f"{run_dir}: checkpoint roles disagree with registration; "
             f"missing={missing}, extra={extra}"
         )
-    root_pickle_names = {path.name for path in run_dir.iterdir() if path.suffix == ".pkl"}
+    root_pickle_names = {
+        name
+        for name in _list_contained_directory(
+            run_dir,
+            cohort_root,
+            context=f"run directory {run_dir}",
+        )
+        if Path(name).suffix == ".pkl"
+    }
     if root_pickle_names != {"resume.pkl"}:
         missing_root = sorted({"resume.pkl"} - root_pickle_names)
         extra_root = sorted(root_pickle_names - {"resume.pkl"})
@@ -468,10 +633,12 @@ def _optimizer_step(payload: Mapping[str, Any], *, context: str) -> int:
     step = state.get("step") if isinstance(state, Mapping) else getattr(state, "step", None)
     if step is None:
         raise CheckpointInventoryError(f"{context}: optimizer state has no step")
-    array = np.asarray(step)
-    if array.size != 1:
-        raise CheckpointInventoryError(f"{context}: optimizer step is not scalar")
-    return int(array.reshape(()))
+    try:
+        return _exact_integer_scalar(step, name=f"{context}: optimizer step")
+    except CheckpointInventoryError as error:
+        raise CheckpointInventoryError(
+            f"{context}: optimizer step is not an integer scalar"
+        ) from error
 
 
 def _expected_milestone(
@@ -490,7 +657,10 @@ def _expected_milestone(
         return cohort.expected_updates, cohort.expected_epochs
     if role != "validation_best":
         raise CheckpointInventoryError(f"unsupported checkpoint role: {role}")
-    update = int(payload.get("update", -1))
+    update = _exact_integer_scalar(
+        payload.get("update"),
+        name=f"{cohort.experiment_id} validation_best update",
+    )
     if not 1 <= update <= cohort.expected_updates or update % updates_per_epoch:
         raise CheckpointInventoryError(
             f"{cohort.experiment_id} validation_best is not at an epoch boundary"
@@ -506,7 +676,7 @@ def _validate_payload(
     seed: int,
     role: str,
     context: str,
-) -> None:
+) -> tuple[float, int]:
     expected_commit = cohort.accepted_commits[(variant, seed)]
     for field, expected in (
         ("format", "poincare-exec-checkpoint-v1"),
@@ -515,20 +685,35 @@ def _validate_payload(
         ("code_commit", expected_commit),
         ("task", cohort.task),
         ("variant", variant),
-        ("seed", seed),
     ):
         if payload.get(field) != expected:
             raise CheckpointInventoryError(
                 f"{context}: checkpoint identity field {field} disagrees with registration"
             )
+    try:
+        payload_seed = _exact_integer_scalar(
+            payload.get("seed"), name=f"{context}: checkpoint seed"
+        )
+    except CheckpointInventoryError as error:
+        raise CheckpointInventoryError(
+            f"{context}: checkpoint identity field seed disagrees with registration"
+        ) from error
+    if payload_seed != seed:
+        raise CheckpointInventoryError(
+            f"{context}: checkpoint identity field seed disagrees with registration"
+        )
     if payload.get("code_dirty") is not False:
         raise CheckpointInventoryError(f"{context}: checkpoint code_dirty must be false")
 
     expected_update, expected_epoch = _expected_milestone(cohort, role, payload)
     try:
-        update = int(payload.get("update", -1))
-        epoch = int(payload.get("epoch", -1))
-    except (TypeError, ValueError, OverflowError) as error:
+        update = _exact_integer_scalar(
+            payload.get("update"), name=f"{context}: checkpoint update"
+        )
+        epoch = _exact_integer_scalar(
+            payload.get("epoch"), name=f"{context}: checkpoint epoch"
+        )
+    except CheckpointInventoryError as error:
         raise CheckpointInventoryError(
             f"{context}: invalid checkpoint milestone"
         ) from error
@@ -543,9 +728,11 @@ def _validate_payload(
         )
 
     try:
-        best_update = int(payload.get("best_update", -2))
+        best_update = _exact_integer_scalar(
+            payload.get("best_update"), name=f"{context}: best update"
+        )
         best_metric = float(payload.get("best_metric", math.nan))
-    except (TypeError, ValueError, OverflowError) as error:
+    except (CheckpointInventoryError, TypeError, ValueError, OverflowError) as error:
         raise CheckpointInventoryError(
             f"{context}: invalid best-checkpoint metadata"
         ) from error
@@ -564,31 +751,32 @@ def _validate_payload(
         )
     if not valid_best or (math.isfinite(best_metric) and not 0.0 <= best_metric <= 1.0):
         raise CheckpointInventoryError(f"{context}: invalid best-checkpoint metadata")
+    return best_metric, best_update
 
 
 def _read_checkpoint_row(
     path: Path,
+    cohort_root: Path,
     cohort: CohortRegistration,
     *,
     variant: str,
     seed: int,
     role: str,
-) -> dict[str, Any]:
+) -> tuple[dict[str, Any], tuple[float, int]]:
     context = str(path)
-    if path.is_symlink() or not path.is_file():
-        raise CheckpointInventoryError(f"{context}: checkpoint must be a regular file")
-    before = path.stat()
-    digest = _sha256_file(path)
+    checkpoint_bytes, checkpoint_stat = _read_stable_regular_file(
+        path,
+        cohort_root,
+        context=context,
+    )
+    digest = hashlib.sha256(checkpoint_bytes).hexdigest()
     try:
-        payload = load_checkpoint(path)
+        payload = pickle.loads(checkpoint_bytes)
     except Exception as error:
         raise CheckpointInventoryError(f"{context}: checkpoint cannot be loaded") from error
-    after = path.stat()
-    if _stat_signature(before) != _stat_signature(after):
-        raise CheckpointInventoryError(
-            f"{context}: checkpoint changed while being inventoried"
-        )
-    _validate_payload(
+    if not isinstance(payload, Mapping):
+        raise CheckpointInventoryError(f"{context}: checkpoint payload must be a mapping")
+    best_metadata = _validate_payload(
         payload,
         cohort,
         variant=variant,
@@ -604,19 +792,33 @@ def _read_checkpoint_row(
         / f"seed_{seed}"
         / ROLE_PATHS[role]
     )
-    return {
-        "experiment_id": cohort.experiment_id,
-        "task": cohort.task,
-        "variant": variant,
-        "seed": seed,
-        "role": role,
-        "path": canonical_path.as_posix(),
-        "bytes": before.st_size,
-        "sha256": digest,
-        "code_commit": cohort.accepted_commits[(variant, seed)],
-        "config_hash": cohort.config_hash,
-        "protocol_version": cohort.protocol_version,
-    }
+    return (
+        {
+            "experiment_id": cohort.experiment_id,
+            "task": cohort.task,
+            "variant": variant,
+            "seed": seed,
+            "role": role,
+            "path": canonical_path.as_posix(),
+            "bytes": checkpoint_stat.st_size,
+            "sha256": digest,
+            "code_commit": cohort.accepted_commits[(variant, seed)],
+            "config_hash": cohort.config_hash,
+            "protocol_version": cohort.protocol_version,
+        },
+        best_metadata,
+    )
+
+
+def _validate_run_best_metadata(
+    values: Mapping[str, tuple[float, int]], *, context: str
+) -> None:
+    selected = values["validation_best"]
+    for role in ("final", "resume"):
+        if values[role] != selected:
+            raise CheckpointInventoryError(
+                f"{context}: {role} best-checkpoint metadata disagrees with validation_best"
+            )
 
 
 def _csv_bytes(rows: Sequence[Mapping[str, Any]]) -> bytes:
@@ -679,22 +881,97 @@ def _validate_historical_projection(
         )
 
 
-def _atomic_write(path: str | Path, payload: bytes) -> Path:
-    destination = Path(path).expanduser().resolve()
-    destination.parent.mkdir(parents=True, exist_ok=True)
-    descriptor, temporary_name = tempfile.mkstemp(
-        prefix=f".{destination.name}.", suffix=".tmp", dir=destination.parent
-    )
-    temporary = Path(temporary_name)
+@contextmanager
+def _open_output_parent(path: Path) -> Iterator[int]:
+    """Open or create an output directory without following symlinks."""
+
+    if not path.is_absolute():
+        raise CheckpointInventoryError("output parent must be absolute")
+    descriptor = os.open(path.anchor, _directory_flags())
     try:
-        with os.fdopen(descriptor, "wb") as stream:
-            stream.write(payload)
-            stream.flush()
-            os.fsync(stream.fileno())
-        os.replace(temporary, destination)
-    except BaseException:
-        temporary.unlink(missing_ok=True)
-        raise
+        for component in path.parts[1:]:
+            try:
+                child = os.open(component, _directory_flags(), dir_fd=descriptor)
+            except FileNotFoundError:
+                try:
+                    os.mkdir(component, dir_fd=descriptor)
+                except FileExistsError:
+                    pass
+                child = os.open(component, _directory_flags(), dir_fd=descriptor)
+            os.close(descriptor)
+            descriptor = child
+    except OSError as error:
+        os.close(descriptor)
+        raise CheckpointInventoryError(
+            f"output parent is unavailable or contains a symlink: {path}"
+        ) from error
+    try:
+        yield descriptor
+    finally:
+        os.close(descriptor)
+
+
+def _temporary_output(parent_descriptor: int, destination_name: str) -> tuple[int, str]:
+    for _ in range(100):
+        name = f".{destination_name}.{secrets.token_hex(8)}.tmp"
+        try:
+            descriptor = os.open(
+                name,
+                os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_CLOEXEC | os.O_NOFOLLOW,
+                0o600,
+                dir_fd=parent_descriptor,
+            )
+        except FileExistsError:
+            continue
+        return descriptor, name
+    raise FileExistsError("unable to allocate a unique inventory temporary file")
+
+
+def _atomic_write(path: str | Path, payload: bytes) -> Path:
+    requested = Path(path).expanduser()
+    destination = Path(os.path.abspath(os.fspath(requested)))
+    if not destination.name:
+        raise CheckpointInventoryError("output path must name a file")
+
+    with _open_output_parent(destination.parent) as parent_descriptor:
+        try:
+            existing = os.stat(
+                destination.name,
+                dir_fd=parent_descriptor,
+                follow_symlinks=False,
+            )
+        except FileNotFoundError:
+            existing = None
+        if existing is not None and (
+            stat.S_ISLNK(existing.st_mode) or not stat.S_ISREG(existing.st_mode)
+        ):
+            raise CheckpointInventoryError(
+                f"output path must be absent or a non-symlink regular file: {destination}"
+            )
+
+        descriptor, temporary_name = _temporary_output(parent_descriptor, destination.name)
+        descriptor_is_open = True
+        try:
+            with os.fdopen(descriptor, "wb") as stream:
+                descriptor_is_open = False
+                stream.write(payload)
+                stream.flush()
+                os.fsync(stream.fileno())
+            os.replace(
+                temporary_name,
+                destination.name,
+                src_dir_fd=parent_descriptor,
+                dst_dir_fd=parent_descriptor,
+            )
+            os.fsync(parent_descriptor)
+        except BaseException:
+            if descriptor_is_open:
+                os.close(descriptor)
+            try:
+                os.unlink(temporary_name, dir_fd=parent_descriptor)
+            except FileNotFoundError:
+                pass
+            raise
     return destination
 
 
@@ -724,17 +1001,20 @@ def export_checkpoint_inventory(
         for variant in sorted(cohort.variants):
             for seed in cohort.seeds:
                 run_dir = roots[experiment_id] / variant / f"seed_{seed}"
-                files = _checkpoint_files(run_dir)
+                files = _checkpoint_files(run_dir, roots[experiment_id])
+                best_metadata: dict[str, tuple[float, int]] = {}
                 for role in ROLE_PATHS:
-                    rows.append(
-                        _read_checkpoint_row(
-                            files[role],
-                            cohort,
-                            variant=variant,
-                            seed=seed,
-                            role=role,
-                        )
+                    row, role_best = _read_checkpoint_row(
+                        files[role],
+                        roots[experiment_id],
+                        cohort,
+                        variant=variant,
+                        seed=seed,
+                        role=role,
                     )
+                    rows.append(row)
+                    best_metadata[role] = role_best
+                _validate_run_best_metadata(best_metadata, context=str(run_dir))
     if len(rows) != 540:
         raise CheckpointInventoryError(
             f"checkpoint inventory has {len(rows)} rows, expected 540"
