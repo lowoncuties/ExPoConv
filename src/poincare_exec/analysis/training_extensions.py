@@ -172,7 +172,12 @@ def _validate_analysis_checkout(
         repository_root / contract,
         *(source_root / relative for relative in EXPORTER_SOURCE_FILES),
     ]
-    for field in ("base_manifest_document", "base_contract_document"):
+    for field in (
+        "base_manifest_document",
+        "base_contract_document",
+        "prior_amendment_manifest_document",
+        "prior_amendment_contract_document",
+    ):
         if manifest.get(field) is not None:
             relative = Path(
                 str(_require_mapping(manifest[field], name=field).get("path", ""))
@@ -3002,6 +3007,8 @@ def _load_checked_manifest(
             "base_analysis_id",
             "base_manifest_document",
             "base_contract_document",
+            "prior_amendment_manifest_document",
+            "prior_amendment_contract_document",
             "contract_document",
             "post_worker_snapshot_policy",
             "post_worker_snapshot_evidence",
@@ -3020,6 +3027,16 @@ def _load_checked_manifest(
             name="base_contract_document",
             repository_root=repository,
         )
+        for field in (
+            "prior_amendment_manifest_document",
+            "prior_amendment_contract_document",
+        ):
+            if registration.get(field) is not None:
+                _validate_document(
+                    registration[field],
+                    name=field,
+                    repository_root=repository,
+                )
         _validate_document(
             registration["contract_document"],
             name="contract_document",
@@ -3043,6 +3060,7 @@ def _load_checked_manifest(
             "analysis_id",
             "amendment_id",
             "analysis_status",
+            "frozen",
             "base_analysis_id",
             "contract_document",
             "base_manifest_document",
@@ -3052,6 +3070,12 @@ def _load_checked_manifest(
             "immutability",
         ):
             manifest[field] = copy.deepcopy(registration[field])
+        for field in (
+            "prior_amendment_manifest_document",
+            "prior_amendment_contract_document",
+        ):
+            if field in registration:
+                manifest[field] = copy.deepcopy(registration[field])
     checkout = _validate_analysis_checkout(manifest_file, manifest, repository)
     return manifest, manifest_file, repository, checkout
 

@@ -53,7 +53,8 @@ Their official-test endpoints remain jointly blinded until all 60 runs pass
 the frozen health and provenance gate in
 [`docs/e20_e21_analysis_contract.md`](docs/e20_e21_analysis_contract.md) and
 its pre-unblinding
-[`v2 amendment`](docs/e20_e21_analysis_contract_amendment_v2.md).
+[`v3 amendment`](docs/e20_e21_analysis_contract_amendment_v3.md), which
+preserves and supersedes the v2 infrastructure registration.
 E20/E21 are reported as separate A6000 cohorts and are never silently pooled
 with E09/E10.
 
@@ -232,11 +233,11 @@ For the E20/E21 exporter, set `E09_ROOT`, `E10_ROOT`, `E20_ROOT`, and
 `E21_ROOT` to the corresponding cohort directories (each containing the
 variant/seed directories). Set `ACCEPTED_RUNTIME_ROOT` to the registered
 protocol-1.14 evidence root and `REJECTED_ATTEMPT_ROOT` to the registered
-pre-update failure evidence root. Set `POST_WORKER_EVIDENCE_ROOT` to the
-registered v3 guardian evidence archive. Run it only from a clean committed
-checkout and give it a new, nonexistent output directory; it validates the
-joint gate before opening any endpoint-bearing summary and otherwise fails
-closed.
+pre-update failure evidence root. Set `E20_POST_WORKER_ROOT` and
+`E21_POST_WORKER_ROOT` to the two immutable infrastructure evidence archives.
+Run it only from a clean committed checkout and give it a new, nonexistent
+output directory; it validates the joint gate before opening any
+endpoint-bearing summary and otherwise fails closed.
 
 ```bash
 ./.venv/bin/python scripts/export_e02_repair_tables.py --help
@@ -251,12 +252,14 @@ closed.
 # Run only after all 60 E20/E21 runs pass the joint endpoint gate.
 # Each cohort root contains R/seed_<seed>/ and F/seed_<seed>/ directories.
 ./.venv/bin/python scripts/export_e20_e21_training.py \
-    --manifest configs/analysis/e20_e21_training_replication_v2.yaml \
+    --manifest configs/analysis/e20_e21_training_replication_v3.yaml \
     --cohort-root E09="$E09_ROOT" --cohort-root E10="$E10_ROOT" \
     --cohort-root E20="$E20_ROOT" --cohort-root E21="$E21_ROOT" \
     --runtime-evidence e20_e21_fef30ec_environment_before="$ACCEPTED_RUNTIME_ROOT" \
     --supplemental-attempt-evidence e20_p112_jax053_preupdate_compile_failure="$REJECTED_ATTEMPT_ROOT" \
-    --post-worker-evidence e20_r1338995025_post_worker_ollama="$POST_WORKER_EVIDENCE_ROOT" \
+    --post-worker-evidence e20_r1338995025_post_worker_ollama="$E20_POST_WORKER_ROOT" \
+    --post-worker-evidence e21_r1619140427_post_worker_ollama="$E21_POST_WORKER_ROOT" \
+    --post-worker-evidence e21_f646228129_post_worker_ollama="$E21_POST_WORKER_ROOT" \
     --output-dir artifacts/analysis/e20_e21_training_replication
 ./.venv/bin/python -m poincare_exec.analysis.build_all \
     --artifact-dir artifacts --table-dir out/tables --figure-dir out/figures

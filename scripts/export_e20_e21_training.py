@@ -24,7 +24,7 @@ def main() -> None:
         default=REPOSITORY_ROOT
         / "configs"
         / "analysis"
-        / "e20_e21_training_replication_v2.yaml",
+        / "e20_e21_training_replication_v3.yaml",
     )
     parser.add_argument(
         "--cohort-root",

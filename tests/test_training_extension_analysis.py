@@ -1268,15 +1268,36 @@ def test_empty_post_worker_process_list_allows_lagging_utilization(
     assert outputs[OUTPUTS["run_audit"]]
 
 
-def test_v2_amendment_overlay_preserves_the_frozen_base(
+@pytest.mark.parametrize(
+    ("filename", "amendment_id", "frozen", "evidence_count"),
+    [
+        (
+            "e20_e21_training_replication_v2.yaml",
+            "e20_e21_training_replication_v2",
+            "2026-10-07",
+            1,
+        ),
+        (
+            "e20_e21_training_replication_v3.yaml",
+            "e20_e21_training_replication_v3",
+            "2026-10-12",
+            3,
+        ),
+    ],
+)
+def test_amendment_overlay_preserves_the_frozen_base(
     monkeypatch: pytest.MonkeyPatch,
+    filename: str,
+    amendment_id: str,
+    frozen: str,
+    evidence_count: int,
 ) -> None:
     repository = extension_analysis.SOURCE_REPOSITORY_ROOT
     manifest_path = (
         repository
         / "configs"
         / "analysis"
-        / "e20_e21_training_replication_v2.yaml"
+        / filename
     )
     monkeypatch.setattr(
         extension_analysis,
@@ -1291,10 +1312,42 @@ def test_v2_amendment_overlay_preserves_the_frozen_base(
     assert selected_path == manifest_path
     assert selected_repository == repository
     assert manifest["analysis_id"] == "e20_e21_training_replication_v1"
-    assert manifest["amendment_id"] == "e20_e21_training_replication_v2"
+    assert manifest["amendment_id"] == amendment_id
+    assert manifest["frozen"] == frozen
     assert manifest["base_analysis_id"] == "e20_e21_training_replication_v1"
     assert manifest["cohorts"]["E20"]["run_config_hash"].startswith("b226335a")
-    assert len(manifest["post_worker_snapshot_evidence"]) == 1
+    assert len(manifest["post_worker_snapshot_evidence"]) == evidence_count
+    if amendment_id.endswith("_v3"):
+        assert manifest["prior_amendment_manifest_document"]["path"].endswith(
+            "e20_e21_training_replication_v2.yaml"
+        )
+        assert manifest["prior_amendment_contract_document"]["path"].endswith(
+            "e20_e21_analysis_contract_amendment_v2.md"
+        )
+        registrations = manifest["post_worker_snapshot_evidence"]
+        assert {
+            (
+                item["evidence_id"],
+                item["identity"]["experiment_id"],
+                item["identity"]["variant"],
+                item["identity"]["seed"],
+            )
+            for item in registrations
+        } == {
+            ("e20_r1338995025_post_worker_ollama", "E20", "R", 1338995025),
+            ("e21_r1619140427_post_worker_ollama", "E21", "R", 1619140427),
+            ("e21_f646228129_post_worker_ollama", "E21", "F", 646228129),
+        }
+        e21 = [
+            item for item in registrations if item["identity"]["experiment_id"] == "E21"
+        ]
+        assert len({item["archived_remote_root"] for item in e21}) == 1
+        assert {
+            item["expected_attempt"]["timestamp_utc"] for item in e21
+        } == {
+            "2026-10-08T08:03:43.159Z",
+            "2026-10-08T09:23:01.021Z",
+        }
 
     base = yaml.safe_load(
         (repository / "configs/analysis/e20_e21_training_replication.yaml").read_text(
@@ -2135,6 +2188,62 @@ def test_analysis_checkout_requires_all_sources_tracked_at_head(
     monkeypatch.setattr(extension_analysis, "_git_command", fake_git)
     with pytest.raises(ExtensionAnalysisError, match="missing tracked source"):
         extension_analysis._validate_analysis_checkout(manifest_path, manifest, root)
+
+
+def test_analysis_checkout_tracks_prior_amendment_documents(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    root = tmp_path / "checkout"
+    root.mkdir()
+    manifest_path = root / "manifest.yaml"
+    protocol_path = root / "protocol.yaml"
+    contract_path = root / "contract.md"
+    prior_manifest_path = root / "prior-manifest.yaml"
+    prior_contract_path = root / "prior-contract.md"
+    required_paths = (
+        manifest_path,
+        protocol_path,
+        contract_path,
+        prior_manifest_path,
+        prior_contract_path,
+    )
+    for path in required_paths:
+        path.write_text("tracked\n", encoding="utf-8")
+    for relative in extension_analysis.EXPORTER_SOURCE_FILES:
+        path = root / relative
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text("tracked\n", encoding="utf-8")
+    manifest = {
+        "protocol_document": {"path": protocol_path.name},
+        "contract_document": {"path": contract_path.name},
+        "prior_amendment_manifest_document": {"path": prior_manifest_path.name},
+        "prior_amendment_contract_document": {"path": prior_contract_path.name},
+    }
+    monkeypatch.setattr(extension_analysis, "SOURCE_REPOSITORY_ROOT", root)
+    tracked_at_head: list[str] = []
+
+    def fake_git(repository: Path, *arguments: str) -> str:
+        assert repository == root
+        if arguments == ("rev-parse", "--show-toplevel"):
+            return str(root)
+        if arguments == ("status", "--porcelain", "--untracked-files=all"):
+            return ""
+        if arguments[:2] == ("cat-file", "-e"):
+            tracked_at_head.append(arguments[-1].removeprefix("HEAD:"))
+            return ""
+        if arguments == ("rev-parse", "HEAD"):
+            return "f" * 40
+        raise AssertionError(arguments)
+
+    monkeypatch.setattr(extension_analysis, "_git_command", fake_git)
+    checkout = extension_analysis._validate_analysis_checkout(
+        manifest_path, manifest, root
+    )
+
+    for path in (prior_manifest_path, prior_contract_path):
+        relative = path.relative_to(root).as_posix()
+        assert relative in checkout["tracked_sources"]
+        assert relative in tracked_at_head
 
 
 @pytest.mark.parametrize(
