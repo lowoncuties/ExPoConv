@@ -7,6 +7,7 @@ import hashlib
 import json
 import os
 import pickle
+import subprocess
 from pathlib import Path
 from typing import Any
 
@@ -1392,6 +1393,167 @@ def test_amendment_overlay_preserves_the_frozen_base(
         assert amended_stream == base_stream
 
 
+def test_v3_post_worker_registrations_are_frozen_exactly() -> None:
+    repository = extension_analysis.SOURCE_REPOSITORY_ROOT
+    config_root = repository / "configs" / "analysis"
+    v2 = yaml.safe_load(
+        (config_root / "e20_e21_training_replication_v2.yaml").read_text(encoding="utf-8")
+    )
+    v3 = yaml.safe_load(
+        (config_root / "e20_e21_training_replication_v3.yaml").read_text(encoding="utf-8")
+    )
+
+    assert v3["prior_amendment_manifest_document"] == {
+        "path": "configs/analysis/e20_e21_training_replication_v2.yaml",
+        "sha256": "d59268fff666396aa98658baaec832cc584f7d1c632d93bf19c8f5760b40bdd1",
+    }
+    assert v3["prior_amendment_contract_document"] == {
+        "path": "docs/e20_e21_analysis_contract_amendment_v2.md",
+        "sha256": "41e58033d37b7d36a42e8b80842c3f17ff2164363c13d7ed54c2204c74aab4b2",
+    }
+
+    registrations = v3["post_worker_snapshot_evidence"]
+    assert len(registrations) == 3
+    assert registrations[0] == v2["post_worker_snapshot_evidence"][0]
+    assert [registration["evidence_id"] for registration in registrations] == [
+        "e20_r1338995025_post_worker_ollama",
+        "e21_r1619140427_post_worker_ollama",
+        "e21_f646228129_post_worker_ollama",
+    ]
+
+    required_file_roles = (
+        "campaign_attempts_snapshot",
+        "wrapper_telemetry",
+        "wrapper_status",
+        "wrapper_stderr",
+        "wrapper_command",
+        "wrapper_gpu_phase",
+    )
+    expected = {
+        "e20_r1338995025_post_worker_ollama": {
+            "identity": {
+                "experiment_id": "E20",
+                "variant": "R",
+                "seed": 1338995025,
+            },
+            "required_file_sha256": (
+                "451870218f5f51ea08b0ed943fc916ad3e4628dae71c621d3110c56c863d0407",
+                "eaf68f96c7f6694df2169679d6e3176cd828e3bea814686d49dffd357833ef57",
+                "b93f9999a52ec4d6780b3a7e3402747a77e3f487302755713d6fd3fa94396e20",
+                "a9b28004706bcbea27745a3b56dc16f343d3b33c691903034167af9f99ed0581",
+                "2f373179fd6cf85d1bb026c8cd27bb4c782fa55bf98acb9e24aebfb38bb26d16",
+                "a28785d95c190046afd6c467fd9bf7ed948f9aeabf9e6df4647128b51f8a347e",
+            ),
+            "expected_attempt": {
+                "canonical_row_sha256": (
+                    "cbccbf06b32f2c7c27f4f688e8b8e6c83c906669019e858f4ef44180c73297fd"
+                ),
+                "after_snapshot_sha256": (
+                    "9dbe90f443748f8bac1f75625cab92e320b2a17abc58c810a25ee382f2ebbf87"
+                ),
+                "timestamp_utc": "2026-10-07T20:13:52.671Z",
+            },
+            "summary_stat": {
+                "relative_path": "R/seed_1338995025/summary.json",
+                "size": 2137,
+                "mtime_ns": 1791404030720105567,
+            },
+            "registration_sha256": (
+                "d7fa597961b6abb05b7ef9da755e22e950aa94cea5b481edd50f51b7bdc8f783"
+            ),
+        },
+        "e21_r1619140427_post_worker_ollama": {
+            "identity": {
+                "experiment_id": "E21",
+                "variant": "R",
+                "seed": 1619140427,
+            },
+            "required_file_sha256": (
+                "a838fb504ea1da83ba7dbafa7fcc6269f34fe55341e26f3a06b175d1ab7f28ac",
+                "4e16fa8d3ff71933266194657e8d63706c0af9f36fc2765229e336df5565eb59",
+                "2dc447a78b76d5a96eab75b26f640c26c1a30c8fa3f2ec1edbdcc27dda6760b3",
+                "a9b28004706bcbea27745a3b56dc16f343d3b33c691903034167af9f99ed0581",
+                "fb6d1a2e5e717fab616762fe72bb2217e05f253ac14abe1653da47dda983a651",
+                "a28785d95c190046afd6c467fd9bf7ed948f9aeabf9e6df4647128b51f8a347e",
+            ),
+            "expected_attempt": {
+                "canonical_row_sha256": (
+                    "c70ab0cd682004a523604f5d26c342b18b12c7bc76dce99952f45a2cb0c960b1"
+                ),
+                "after_snapshot_sha256": (
+                    "ede5468a1e5759f8be582d53a7f8b833b8cf3e89a2f00de6e568d55f0864bddf"
+                ),
+                "timestamp_utc": "2026-10-08T08:03:43.159Z",
+            },
+            "summary_stat": {
+                "relative_path": "R/seed_1619140427/summary.json",
+                "size": 1899,
+                "mtime_ns": 1791446621508066694,
+            },
+            "registration_sha256": (
+                "029b3a04744aafe2e8bd195b9b7eb5285d3a80af5f534b3cadb21447d1b5c46e"
+            ),
+        },
+        "e21_f646228129_post_worker_ollama": {
+            "identity": {
+                "experiment_id": "E21",
+                "variant": "F",
+                "seed": 646228129,
+            },
+            "required_file_sha256": (
+                "a838fb504ea1da83ba7dbafa7fcc6269f34fe55341e26f3a06b175d1ab7f28ac",
+                "4e16fa8d3ff71933266194657e8d63706c0af9f36fc2765229e336df5565eb59",
+                "2dc447a78b76d5a96eab75b26f640c26c1a30c8fa3f2ec1edbdcc27dda6760b3",
+                "a9b28004706bcbea27745a3b56dc16f343d3b33c691903034167af9f99ed0581",
+                "fb6d1a2e5e717fab616762fe72bb2217e05f253ac14abe1653da47dda983a651",
+                "a28785d95c190046afd6c467fd9bf7ed948f9aeabf9e6df4647128b51f8a347e",
+            ),
+            "expected_attempt": {
+                "canonical_row_sha256": (
+                    "618973ec4606ed8e1f9a633bb10ae321da0626a4cec07c5654d695648036edd5"
+                ),
+                "after_snapshot_sha256": (
+                    "52f7877a17426218dd23a023d68cb90776a07e7765fe94951ca70e8e0b9113d6"
+                ),
+                "timestamp_utc": "2026-10-08T09:23:01.021Z",
+            },
+            "summary_stat": {
+                "relative_path": "F/seed_646228129/summary.json",
+                "size": 1895,
+                "mtime_ns": 1791451379428610798,
+            },
+            "registration_sha256": (
+                "6824fe9db4521b7d72b8ceed4ba9a8ddd17cc1fd9f33f18a582db7c08e6aa7e0"
+            ),
+        },
+    }
+    for registration in registrations:
+        frozen = expected[registration["evidence_id"]]
+        assert set(registration) == {
+            "evidence_id",
+            "input_kind",
+            "archived_remote_root",
+            "identity",
+            "required_files",
+            "required_text_lines",
+            "expected_attempt",
+            "summary_stat",
+            "timing_evidence",
+            "classification",
+        }
+        assert registration["identity"] == frozen["identity"]
+        assert tuple(registration["required_files"]) == required_file_roles
+        assert (
+            tuple(
+                metadata["sha256"] for metadata in registration["required_files"].values()
+            )
+            == frozen["required_file_sha256"]
+        )
+        assert registration["expected_attempt"] == frozen["expected_attempt"]
+        assert registration["summary_stat"] == frozen["summary_stat"]
+        assert _canonical_line_digest(registration) == frozen["registration_sha256"]
+
+
 def test_gate_does_not_deserialize_any_summary_before_health_is_complete(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
@@ -2244,6 +2406,59 @@ def test_analysis_checkout_tracks_prior_amendment_documents(
         relative = path.relative_to(root).as_posix()
         assert relative in checkout["tracked_sources"]
         assert relative in tracked_at_head
+
+
+def test_analysis_checkout_rejects_required_source_absent_from_head(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    root = tmp_path / "checkout"
+    root.mkdir()
+    manifest_path = root / "manifest.yaml"
+    protocol_path = root / "protocol.yaml"
+    contract_path = root / "contract.md"
+    prior_contract_path = root / "prior-contract.md"
+    (root / ".gitignore").write_text("prior-contract.md\n", encoding="utf-8")
+    for path in (manifest_path, protocol_path, contract_path, prior_contract_path):
+        path.write_text("analysis source\n", encoding="utf-8")
+    for relative in extension_analysis.EXPORTER_SOURCE_FILES:
+        path = root / relative
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text("exporter source\n", encoding="utf-8")
+
+    def git(*arguments: str) -> None:
+        subprocess.run(
+            ["git", *arguments],
+            cwd=root,
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+
+    git("init", "--quiet")
+    git("config", "user.name", "Test Reproducer")
+    git("config", "user.email", "test@example.invalid")
+    git("add", ".")
+    git("commit", "--quiet", "-m", "tracked analysis sources")
+    assert not subprocess.run(
+        ["git", "status", "--porcelain", "--untracked-files=all"],
+        cwd=root,
+        check=True,
+        capture_output=True,
+        text=True,
+    ).stdout
+
+    manifest = {
+        "protocol_document": {"path": protocol_path.name},
+        "contract_document": {"path": contract_path.name},
+        "prior_amendment_contract_document": {"path": prior_contract_path.name},
+    }
+    monkeypatch.setattr(extension_analysis, "SOURCE_REPOSITORY_ROOT", root)
+
+    with pytest.raises(
+        ExtensionAnalysisError,
+        match=r"git cat-file -e HEAD:prior-contract\.md failed",
+    ):
+        extension_analysis._validate_analysis_checkout(manifest_path, manifest, root)
 
 
 @pytest.mark.parametrize(
