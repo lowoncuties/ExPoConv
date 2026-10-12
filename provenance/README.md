@@ -13,13 +13,20 @@ trees. E13 revision `75f10dd9` is already reachable in ExPoConv's own history.
 The bundle is not required to run the release snapshot or the bounded E19
 reproduction.
 
-The scoped audit found no HyperJAX-named paths or imports and no byte-identical
-Git objects shared with the audited local HyperJAX history. It is not a
-source-origin or non-exposure attestation and is not enforced by the verifier.
+The confidential evidence archive includes the checksummed
+`SCOPED_HYPERJAX_OVERLAP_AUDIT.md` record. It freezes the bundle ref and tip,
+the comparator's sorted-ref snapshot and distinct tip IDs, the exact commands,
+the result counts, and the audit's limitations. The scoped audit found no
+HyperJAX-named paths or direct Python imports and no identical complete Git
+objects shared with the audited committed HyperJAX history. It is not a
+source-origin or non-exposure attestation and is not enforced by the bundle
+verifier. The record deliberately excludes the comparator's repository path
+and remote URL.
+
 The historical commits do contain textual HyperJAX references, author identity,
-host metadata, and absolute private-workspace paths. Keep the bundle in a
-confidential editor/reviewer deposit unless the author explicitly approves
-those metadata for public release.
+host metadata, and absolute private-workspace paths. Keep the bundle and audit
+record in a confidential editor/reviewer deposit unless the author explicitly
+approves those metadata for public release.
 
 After obtaining the bundle and placing it beside the manifest, verify it with:
 

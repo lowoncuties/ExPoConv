@@ -65,6 +65,56 @@ def _fixture(tmp_path: Path) -> tuple[Path, Path, dict[str, object]]:
     return manifest_path, bundle, manifest
 
 
+def _add_unrelated_commit_to_bundle(
+    tmp_path: Path,
+    manifest_path: Path,
+    bundle: Path,
+    manifest: dict[str, object],
+) -> str:
+    repository = tmp_path / "source"
+    accepted_commits = manifest["accepted_commits"]
+    assert isinstance(accepted_commits, list)
+    branch_point = accepted_commits[0]["commit"]
+    assert isinstance(branch_point, str)
+
+    _run(
+        ["git", "checkout", "--quiet", "-b", "unrelated", branch_point],
+        cwd=repository,
+    )
+    (repository / "unrelated.txt").write_text(
+        "not accepted history\n", encoding="utf-8"
+    )
+    _run(["git", "add", "unrelated.txt"], cwd=repository)
+    _run(["git", "commit", "--quiet", "-m", "unrelated revision"], cwd=repository)
+    unrelated_commit = _run(["git", "rev-parse", "HEAD"], cwd=repository)
+    _run(
+        ["git", "checkout", "--quiet", "accepted-provenance"], cwd=repository
+    )
+
+    bundle_tip = manifest["bundle_tip"]
+    assert isinstance(bundle_tip, str)
+    packed_objects = subprocess.run(
+        ["git", "pack-objects", "--stdout", "--revs"],
+        cwd=repository,
+        check=True,
+        input=f"{bundle_tip}\n{unrelated_commit}\n".encode(),
+        capture_output=True,
+    ).stdout
+    bundle.write_bytes(
+        b"# v2 git bundle\n"
+        + f"{bundle_tip} refs/heads/accepted-provenance\n\n".encode()
+        + packed_objects
+    )
+
+    accepted_commits.append(
+        {"family": "unrelated-fixture", "commit": unrelated_commit}
+    )
+    manifest["size_bytes"] = bundle.stat().st_size
+    manifest["sha256"] = hashlib.sha256(bundle.read_bytes()).hexdigest()
+    manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+    return unrelated_commit
+
+
 def test_verifies_declared_bundle_and_every_commit(tmp_path: Path) -> None:
     manifest_path, bundle, manifest = _fixture(tmp_path)
 
@@ -82,6 +132,38 @@ def test_rejects_bundle_with_wrong_digest(tmp_path: Path) -> None:
 
     with pytest.raises(ValueError, match="SHA-256 mismatch"):
         verify_bundle(manifest_path, bundle)
+
+
+def test_rejects_declared_commit_outside_bundle_tip_history(tmp_path: Path) -> None:
+    manifest_path, bundle, manifest = _fixture(tmp_path)
+    unrelated_commit = _add_unrelated_commit_to_bundle(
+        tmp_path, manifest_path, bundle, manifest
+    )
+
+    probe = tmp_path / "probe"
+    _run(
+        [
+            "git",
+            "clone",
+            "--quiet",
+            "--branch",
+            "accepted-provenance",
+            str(bundle),
+            str(probe),
+        ],
+        cwd=tmp_path,
+    )
+    _run(["git", "cat-file", "-e", f"{unrelated_commit}^{{commit}}"], cwd=probe)
+
+    with pytest.raises(subprocess.CalledProcessError) as error:
+        verify_bundle(manifest_path, bundle)
+
+    assert error.value.returncode == 1
+    assert error.value.cmd[-3:] == [
+        "--is-ancestor",
+        unrelated_commit,
+        manifest["bundle_tip"],
+    ]
 
 
 def test_tracked_manifest_covers_every_results_readme_revision() -> None:

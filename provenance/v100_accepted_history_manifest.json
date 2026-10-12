@@ -11,7 +11,14 @@
   "scope": {
     "contains_standalone_experiment_history": true,
     "includes_uncommitted_source_state": false,
-    "hyperjax_source_audit": "No HyperJAX-named paths or imports and no byte-identical Git objects shared with the audited local HyperJAX history were found; this is not a source-origin or non-exposure attestation and is not enforced by the verifier.",
+    "hyperjax_source_audit": "No HyperJAX-named paths or direct Python imports and no identical complete Git objects shared with the audited committed HyperJAX history were found; this is not a source-origin or non-exposure attestation and is not enforced by the verifier.",
+    "hyperjax_source_audit_record": {
+      "artifact_name": "SCOPED_HYPERJAX_OVERLAP_AUDIT.md",
+      "sha256": "97db36bb4773cf30f8032874aa7a31754704fa07f7e964b6bf364bee2b46565d",
+      "availability": "Confidential evidence deposit only",
+      "enforced_by_bundle_verifier": false,
+      "contents": "Frozen bundle ref and tip, comparator ref-snapshot digest and distinct tip IDs, exact commands, result counts, and explicit scope limits"
+    },
     "contains_historical_identity_and_private_path_metadata": true,
     "recommended_visibility": "Confidential editor/reviewer deposit unless the author approves metadata disclosure",
     "notes": "The bundle ends at the last accepted legacy V100 evaluator revision and excludes later release-preparation commits and unrelated remote refs. E13 is retained in ExPoConv's current Git history."
