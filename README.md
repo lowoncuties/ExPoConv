@@ -24,9 +24,14 @@ normalization, curvature, data order, and optimizer:
 
 | Path | Execution | Role |
 |---|---|---|
-| **R** | materializes the beta-scaled patch, maps it to the ball, evaluates the score, reconstructs and projects the output point | reference |
-| **F** | directional products by native convolution, patch energy by a box sum of squared inputs, same clipped score and output round trip | primary method |
+| **R** | materializes and ball-maps the beta-scaled patch for spatial layers; ball-maps the input to dense layers; evaluates the clipped score and reference output round trip | reference |
+| **F** | directional convolution plus scalar patch energy for spatial layers; analogous matrix products plus input energy for dense layers; same clipped score and output round trip | primary method |
 | **T** | F plus direct evaluation of the projected origin-tangent output | ablation only |
+
+Spatial patch factorization is the primary contribution. The packaged F/T
+model paths also apply the analogous sufficient-statistics score evaluation to
+HNN++ dense layers, including the ResNet classifier and the fully connected
+part of U-Net transpose decoding; `docs/derivation.md` maps both cases to code.
 
 Experiments reported in the manuscript, with the identifiers used in
 `configs/` and `results/`:
@@ -219,13 +224,20 @@ tracked manifests, registered seeds in the selected configuration (split seed
 `1729`),
 preprocessing, loss reductions, optimizer, batching, checkpoint selection,
 metric aggregation, precision policy, synchronization, and timing scope.
-Timing uses five fresh-process paired sessions with 50 warm-up and 200
-synchronized calls; compilation and host transfer are outside the measured
-boundary. Peak memory is the process-lifetime allocator peak, not isolated
-activation memory. Normalization uses current-batch statistics without
-running state, so evaluation always uses manifest order and the declared
-batch size. A nonfinite value, out-of-memory, or divergence is a result and
-is never replaced.
+Steady-state benchmark timing uses five fresh-process paired sessions with 50
+warm-up and 200 synchronized calls; compilation and host transfer are outside
+that measured boundary. An operator or block forward-plus-gradient call
+differentiates the mean squared output with respect to parameters, inputs, and
+curvature and does not include an optimizer update. Training `compute_seconds`
+sums synchronized optimizer updates only. `elapsed_seconds` starts before
+train/development data materialization and includes initialization,
+compilation, training, development evaluation, checkpointing, final
+evaluations, and prediction writing; the outer launcher and GPU guard are
+outside that clock. Peak memory is the process-lifetime allocator peak, not
+isolated activation memory.
+Normalization uses current-batch statistics without running state, so
+evaluation always uses manifest order and the declared batch size. A nonfinite
+value, out-of-memory, or divergence is a result and is never replaced.
 
 For E13, the accelerator has 32 GiB of physical memory, while the accepted
 environment record captures a 25,567,444,992-byte (23.81-GiB) JAX allocator
