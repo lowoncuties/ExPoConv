@@ -27,7 +27,9 @@ working repository.
 
 The independent reproducer must:
 
-- obtain a new clone or independently unpacked release archive;
+- obtain a new clone from the released repository or independently clone a
+  released Git bundle; a plain source archive is insufficient because the
+  evidence capture binds results to Git identity;
 - check out the exact 40-character commit named by the frozen release;
 - make no source, protocol, configuration, or dependency changes;
 - execute every command below in **one persistent Bash shell**, without
@@ -53,7 +55,11 @@ bash --noprofile --norc
 set -euo pipefail
 umask 077
 
-git clone <released-repository-url> ExPoConv-e19
+for command in git python3.11 uv nvidia-smi sha256sum find sort xargs tee; do
+  command -v "$command" >/dev/null
+done
+
+git clone <released-repository-url-or-bundle-path> ExPoConv-e19
 cd ExPoConv-e19
 git checkout --detach <immutable-release-commit>
 e19_commit=$(git rev-parse HEAD)
@@ -64,7 +70,8 @@ test -z "$(git status --porcelain)"
 (cd splits && sha256sum --check SHA256SUMS)
 
 ./scripts/bootstrap_cuda11_v100.sh
-./.venv/bin/pytest -m "not gpu and not slow and not reference"
+CUDA_VISIBLE_DEVICES='' JAX_PLATFORMS=cpu \
+  ./.venv/bin/pytest -m "not gpu and not slow and not reference"
 test -z "$(git status --porcelain)"
 
 e19_root="artifacts/e19/<reproducer-id>-<utc-date>"
@@ -215,6 +222,7 @@ printf '%s\n' "$analysis_status" > "$e19_root/unet_b8_update.analysis.status"
 
 if test "$analysis_status" -eq 0; then
   E19_TABLE="$e19_root/unet_b8_update_analysis/paired_speedup_summary.csv" \
+  E19_LATENCY_TABLE="$e19_root/unet_b8_update_analysis/workload_latency_summary.csv" \
     ./.venv/bin/python - <<'PY'
 import csv
 import os
@@ -231,6 +239,18 @@ selected = [
 assert len(selected) == 1
 row = selected[0]
 assert int(row["paired_sessions"]) == 5
+
+with Path(os.environ["E19_LATENCY_TABLE"]).open(newline="") as stream:
+    latency_rows = list(csv.DictReader(stream))
+latencies = {
+    item["variant"]: item
+    for item in latency_rows
+    if item["workload_id"] == "unet_b8_update"
+}
+assert set(latencies) == {"R", "F", "T"}
+assert {int(item["sessions"]) for item in latencies.values()} == {5}
+print("R median latency (ms):", latencies["R"]["median_latency_ms"])
+print("F median latency (ms):", latencies["F"]["median_latency_ms"])
 print(
     "R/F speedup:",
     row["geometric_mean_speedup"],

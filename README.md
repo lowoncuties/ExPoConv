@@ -294,7 +294,14 @@ Git. Verify the compact evidence with:
 
 The recorded code revisions belong to the development history from which this
 repository was extracted; the source tree here is the release snapshot of that
-code and is not itself one of those revisions.
+code and is not itself one of those revisions. Eleven legacy V100
+result-producing commits are retained in a separate, hashed Git bundle
+described by
+[`provenance/v100_accepted_history_manifest.json`](provenance/v100_accepted_history_manifest.json).
+The E13 revision is already reachable in this repository's own history. The
+legacy bundle is prepared for a separate evidence deposit rather than embedded
+in the public checkout; [`provenance/README.md`](provenance/README.md) gives
+the verification command and disclosure boundary.
 
 The compact evidence retains the original machine-readable provenance,
 including local source paths, the measurement host name, physical-device

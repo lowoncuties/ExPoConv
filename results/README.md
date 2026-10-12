@@ -43,7 +43,10 @@ Verify the bundle with `sha256sum --check SHA256SUMS` in this directory.
 
 Commit identifiers refer to the development history the code was extracted
 from; bounded repairs and later campaigns were frozen at different times, so
-families legitimately differ in revision.
+families legitimately differ in revision. Full commit objects for the eleven
+legacy-development revisions below are preserved in the separate Git bundle
+declared in `../provenance/v100_accepted_history_manifest.json`; E13 revision
+`75f10dd9` is retained in ExPoConv's own Git history.
 
 | Family | Protocol | Code revision | Identity record |
 |---|---|---|---|

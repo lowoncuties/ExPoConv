@@ -1,0 +1,71 @@
+{
+  "schema_version": "1.0",
+  "artifact_name": "v100-accepted-provenance.bundle",
+  "artifact_role": "Exact standalone development history for eleven legacy accepted V100 result revisions",
+  "storage_policy": "Prepared for a confidential evidence deposit; not committed inside the public source tree",
+  "size_bytes": 8840488,
+  "sha256": "c70a517045415bd93b799a8fb55c7578f2801ac0d7bd7040bad66c8f2ed07c64",
+  "bundle_ref": "refs/heads/v100-accepted-provenance",
+  "bundle_tip": "04aca39f7c99b9881995889ca4f50ff42d2c0425",
+  "bundle_created_utc": "2026-10-12T17:05:49.991329016Z",
+  "scope": {
+    "contains_standalone_experiment_history": true,
+    "includes_uncommitted_source_state": false,
+    "hyperjax_source_audit": "No HyperJAX-named paths or imports and no byte-identical Git objects shared with the audited local HyperJAX history were found; this is not a source-origin or non-exposure attestation and is not enforced by the verifier.",
+    "contains_historical_identity_and_private_path_metadata": true,
+    "recommended_visibility": "Confidential editor/reviewer deposit unless the author approves metadata disclosure",
+    "notes": "The bundle ends at the last accepted legacy V100 evaluator revision and excludes later release-preparation commits and unrelated remote refs. E13 is retained in ExPoConv's current Git history."
+  },
+  "release_history_commits": [
+    {
+      "family": "E13 U-Net update scaling",
+      "commit": "75f10dd9f671f12df7fe4f357f061341f9041bc7"
+    }
+  ],
+  "accepted_commits": [
+    {
+      "family": "E02 bounded numerics",
+      "commit": "d3f3eb80e1a35577d60befdf97ef7430e299d779"
+    },
+    {
+      "family": "E02 structured numerics",
+      "commit": "ce009c162672cce28224d7c85782e9acb2ee9505"
+    },
+    {
+      "family": "E03/E05 operator and block timing",
+      "commit": "758d182d3d764ba299a76ecba4fbbe944404c55a"
+    },
+    {
+      "family": "E08 U-Net forward timing",
+      "commit": "c0caba164bdd9b136efb82b64ecc8229ccb370d3"
+    },
+    {
+      "family": "E08 U-Net update timing",
+      "commit": "50c399bc7c1194df1496b44b1143cd5077df4af6"
+    },
+    {
+      "family": "E11 U-Net profile",
+      "commit": "33331485f6910d9a3db0f83129f31e2576856b7c"
+    },
+    {
+      "family": "E09 U-Net seed 11 R/T",
+      "commit": "75426855d0f0e374b9714daee94c18787c83df59"
+    },
+    {
+      "family": "E09 remaining U-Net runs",
+      "commit": "2d29b5257a583b5074d51a7a772660b474f87c47"
+    },
+    {
+      "family": "E10 ResNet-20 training",
+      "commit": "c3a1dd92504e601d8e2cccf17b263e768b05d645"
+    },
+    {
+      "family": "E06 checkpoint replay evaluator",
+      "commit": "e78d3674735c651a4e059aae7f663ff77ecb7e9c"
+    },
+    {
+      "family": "E07-J2 retained-state evaluator",
+      "commit": "04aca39f7c99b9881995889ca4f50ff42d2c0425"
+    }
+  ]
+}
