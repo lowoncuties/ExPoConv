@@ -3,10 +3,20 @@
   "analysis_id": "e13_unet_scaling_rf",
   "analysis_manifest": {
     "path": "/data2/joc0027/ExPoConv/configs/analysis/e13_unet_scaling.yaml",
-    "sha256": "27bb15e7a8f8f19c2c919e327c8f4acf7565075259efd8d777abc926feaea6e5"
+    "sha256": "15867c398254a891310cab012f89e1cdd5d3d58de3f743234c476ddf511d2bf8"
   },
   "derivation": "CPU-only validation and aggregation; no benchmark was launched.",
   "experiment_id": "E13",
+  "memory_reference": {
+    "bytes": 25567444992,
+    "environment_field": "hardware.jax_allocator_bytes_limit",
+    "evidence_path": "results/environment.json",
+    "evidence_sha256": "3a7a509ad6f04d197ede3a75c9c9aec0d6e3778e8ab3bf0d221d9a6602cabd6a",
+    "gib": 23.811538696289062,
+    "kind": "captured_jax_allocator_limit",
+    "physical_device_memory_bytes": 34359738368,
+    "physical_device_memory_gib": 32.0
+  },
   "memory_scope": "Process-lifetime peak live JAX allocation through the final synchronized output, including initialization, compilation, and warmup; this is not isolated activation memory.",
   "outcome_counts": {
     "ok": 65,
@@ -15,11 +25,11 @@
   "outputs": {
     "figure_pdf": {
       "path": "/data2/joc0027/ExPoConv/artifacts/analysis/e13_unet_scaling/unet_scaling.pdf",
-      "sha256": "1e696b7e3ae0ad1ca608145ea077e31e3b8f6dff2d05adc173f446bf80031ea4"
+      "sha256": "c2ca868f09d6658cbf7e0dc35391c2f3a090b585242c7c02bb0e79ed6b4d67d3"
     },
     "figure_png": {
       "path": "/data2/joc0027/ExPoConv/artifacts/analysis/e13_unet_scaling/unet_scaling.png",
-      "sha256": "cf6965dac3bbf25b85c28aaa024e9bf40f81ced5104fc0fec1d070e1ab0ca317"
+      "sha256": "dbd84b34da546e5814809d373e3a1aff75e6f0fa388b9a9245adf44548d0b26b"
     },
     "paired_ratios": {
       "path": "/data2/joc0027/ExPoConv/artifacts/analysis/e13_unet_scaling/paired_ratio_summary.csv",
@@ -47,7 +57,7 @@
       "unet_update_b8_r256": "aea17d6bf3a5c279cd8509c85e8645a98a12a04e37d032e8f1e2ef1e19718b70",
       "unet_update_b8_r512": "f0604c9ca563f1fd41281ae1f988103de068aba57a46b64feae3d7cb58c54f6d"
     },
-    "protocol_path": "protocol.yaml",
+    "protocol_path": "configs/protocols/protocol_1_11.yaml",
     "protocol_sha256": "5dbd77ce1d6fa7e9a33114093a730208048bcf295012b66c0df00f6e3e8711fe",
     "protocol_version": "1.11"
   },

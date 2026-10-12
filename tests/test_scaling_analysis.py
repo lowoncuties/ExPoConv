@@ -187,6 +187,18 @@ def test_export_preserves_oom_and_pairs_only_successful_sessions(tmp_path):
     )
     assert summary["provenance_contract"]["protocol_version"] == "1.11"
     assert summary["validated_identity"]["physical_gpu_uuid"] == GPU_UUID
+    assert summary["memory_reference"] == {
+        "kind": "captured_jax_allocator_limit",
+        "bytes": 25_567_444_992,
+        "gib": 25_567_444_992 / 1024**3,
+        "environment_field": "hardware.jax_allocator_bytes_limit",
+        "evidence_path": "results/environment.json",
+        "evidence_sha256": (
+            "3a7a509ad6f04d197ede3a75c9c9aec0d6e3778e8ab3bf0d221d9a6602cabd6a"
+        ),
+        "physical_device_memory_bytes": 32 * 1024**3,
+        "physical_device_memory_gib": 32.0,
+    }
     assert len(summary["validated_identity"]["device_id_encodings"]) == 2
     assert len(summary["validated_identity"]["precision_policy_encodings"]) == 2
     with (output_dir / "session_outcomes.csv").open(

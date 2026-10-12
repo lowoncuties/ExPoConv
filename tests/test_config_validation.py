@@ -94,8 +94,14 @@ def test_e13_analysis_uses_the_frozen_protocol_snapshot() -> None:
         manifest, field="protocol_document"
     )
     benchmark_path, _ = validate_hashed_document(manifest, field="benchmark_config")
+    allocator_path, allocator_digest = validate_hashed_document(
+        manifest, field="allocator_limit_evidence"
+    )
     protocol = load_yaml(REPOSITORY_ROOT / protocol_path)
     benchmark = load_yaml(REPOSITORY_ROOT / benchmark_path)
+    environment = json.loads(
+        (REPOSITORY_ROOT / allocator_path).read_text(encoding="utf-8")
+    )
     accepted_summary = json.loads(
         (REPOSITORY_ROOT / "results" / "e13_scaling" / "summary.json").read_text(
             encoding="utf-8"
@@ -107,6 +113,12 @@ def test_e13_analysis_uses_the_frozen_protocol_snapshot() -> None:
         "5dbd77ce1d6fa7e9a33114093a730208048bcf295012b66c0df00f6e3e8711fe"
     )
     assert protocol["protocol_version"] == "1.11"
+    assert allocator_path == "results/environment.json"
+    assert allocator_digest == (
+        "3a7a509ad6f04d197ede3a75c9c9aec0d6e3778e8ab3bf0d221d9a6602cabd6a"
+    )
+    assert environment["hardware"]["jax_allocator_bytes_limit"] == 25_567_444_992
+    assert accepted_summary["memory_reference"]["bytes"] == 25_567_444_992
     assert {
         workload["id"]: config_hash(protocol, benchmark, workload)
         for workload in benchmark["workloads"]

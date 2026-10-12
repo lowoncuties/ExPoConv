@@ -8,6 +8,13 @@ candidate_variant: F
 sessions: 5
 timed_calls_per_session: 200
 memory_budget_bytes: 34359738368
+# The frozen benchmark budget above records the device's nominal 32-GiB
+# physical memory. The derived figure uses the captured JAX allocator limit
+# below so that the OOM marker is not presented as exhaustion of all physical
+# device memory.
+allocator_limit_evidence:
+  path: results/environment.json
+  sha256: 3a7a509ad6f04d197ede3a75c9c9aec0d6e3778e8ab3bf0d221d9a6602cabd6a
 require_clean_code: true
 require_physical_gpu_uuid: true
 operation_boundary_prefix: "unet:update"

@@ -167,6 +167,7 @@ def _validate_manifest(manifest: Mapping[str, Any]) -> dict[str, dict[str, Any]]
             "sessions",
             "timed_calls_per_session",
             "memory_budget_bytes",
+            "allocator_limit_evidence",
             "precision_contract",
             "protocol_document",
             "benchmark_config",
@@ -254,6 +255,50 @@ def _validate_manifest(manifest: Mapping[str, Any]) -> dict[str, dict[str, Any]]
     if len(workloads) != 7 or observed_shapes != _E13_SHAPES:
         raise ValueError("workloads must be the seven unique shapes in the E13 R/F grid")
     return workloads
+
+
+def _allocator_limit_reference(manifest: Mapping[str, Any]) -> dict[str, Any]:
+    """Validate and return the captured JAX allocator ceiling used in the plot."""
+
+    relative, sha256 = validate_hashed_document(
+        manifest, field="allocator_limit_evidence"
+    )
+    evidence_path = REPOSITORY_ROOT / relative
+    evidence = json.loads(evidence_path.read_text(encoding="utf-8"))
+    if not isinstance(evidence, Mapping):
+        raise ValueError("allocator limit evidence must be a JSON mapping")
+    hardware = evidence.get("hardware")
+    if not isinstance(hardware, Mapping):
+        raise ValueError("allocator limit evidence is missing hardware metadata")
+    allocator_limit_bytes = _optional_int(hardware.get("jax_allocator_bytes_limit"))
+    if allocator_limit_bytes is None or allocator_limit_bytes <= 0:
+        raise ValueError(
+            "allocator limit evidence must contain a positive "
+            "hardware.jax_allocator_bytes_limit"
+        )
+    physical_memory_mib = _optional_int(hardware.get("accelerator_memory_mib"))
+    if physical_memory_mib is None or physical_memory_mib <= 0:
+        raise ValueError(
+            "allocator limit evidence must contain positive "
+            "hardware.accelerator_memory_mib"
+        )
+    nominal_budget_bytes = int(manifest["memory_budget_bytes"])
+    if physical_memory_mib * 1024**2 != nominal_budget_bytes:
+        raise ValueError(
+            "captured physical memory disagrees with the frozen E13 memory budget"
+        )
+    if allocator_limit_bytes > nominal_budget_bytes:
+        raise ValueError("captured allocator limit exceeds physical device memory")
+    return {
+        "kind": "captured_jax_allocator_limit",
+        "bytes": allocator_limit_bytes,
+        "gib": allocator_limit_bytes / 1024**3,
+        "environment_field": "hardware.jax_allocator_bytes_limit",
+        "evidence_path": relative,
+        "evidence_sha256": sha256,
+        "physical_device_memory_bytes": nominal_budget_bytes,
+        "physical_device_memory_gib": nominal_budget_bytes / 1024**3,
+    }
 
 
 def _provenance_contract(
@@ -966,7 +1011,7 @@ def _plot_panel(
     workloads: Mapping[str, Mapping[str, Any]],
     summaries: Mapping[tuple[str, str], Mapping[str, Any]],
     variants: Sequence[str],
-    memory_budget_gib: float,
+    allocator_limit_gib: float,
 ) -> None:
     selected = [item for item in workloads.values() if panel in item["panels"]]
     field = "batch" if panel == "batch" else "resolution"
@@ -1051,22 +1096,28 @@ def _plot_panel(
         axis.set_ylabel("Process-lifetime peak live allocation (GiB)")
         axis.set_yscale("log")
         axis.axhline(
-            memory_budget_gib,
+            allocator_limit_gib,
             color="#555555",
             linestyle=(0, (3, 3)),
             linewidth=1,
-            label="VRAM budget",
+            label=f"JAX allocator limit ({allocator_limit_gib:.2f} GiB)",
         )
         positive_minimum = min(panel_metric_values) if panel_metric_values else 0.25
         positive_maximum = max(panel_metric_values) if panel_metric_values else 1.0
         axis.set_ylim(
             bottom=max(positive_minimum / 1.5, 0.05),
-            top=max(memory_budget_gib * 1.12, positive_maximum * 1.4),
+            top=max(allocator_limit_gib * 1.12, positive_maximum * 1.4),
         )
-        tick_candidates = (0.25, 0.5, 1, 2, 4, 8, 16, 32)
+        tick_candidates = (0.25, 0.5, 1, 2, 4, 8, 16, allocator_limit_gib)
         lower, upper = axis.get_ylim()
         ticks = [value for value in tick_candidates if lower <= value <= upper]
-        axis.set_yticks(ticks, [f"{value:g}" for value in ticks])
+        tick_labels = [
+            f"{value:.2f}"
+            if math.isclose(value, allocator_limit_gib)
+            else f"{value:g}"
+            for value in ticks
+        ]
+        axis.set_yticks(ticks, tick_labels)
 
 
 def plot_scaling_figure(
@@ -1075,6 +1126,7 @@ def plot_scaling_figure(
     workload_rows: Sequence[Mapping[str, Any]],
     manifest: Mapping[str, Any],
     workloads: Mapping[str, Mapping[str, Any]],
+    allocator_limit_bytes: int,
 ) -> tuple[Path, Path]:
     """Write the latency/memory by batch/resolution four-panel figure."""
 
@@ -1082,7 +1134,7 @@ def plot_scaling_figure(
         (str(row["workload_id"]), str(row["variant"])): row for row in workload_rows
     }
     variants = [str(value) for value in manifest["variants"]]
-    memory_budget_gib = int(manifest["memory_budget_bytes"]) / 1024**3
+    allocator_limit_gib = allocator_limit_bytes / 1024**3
     plt.rcParams.update(
         {
             "font.family": "DejaVu Sans",
@@ -1116,7 +1168,7 @@ def plot_scaling_figure(
             workloads=workloads,
             summaries=summaries,
             variants=variants,
-            memory_budget_gib=memory_budget_gib,
+            allocator_limit_gib=allocator_limit_gib,
         )
         axis.set_title(title, loc="left", fontweight="bold")
     handles = [
@@ -1140,7 +1192,7 @@ def plot_scaling_figure(
                 [],
                 color="#555555",
                 linestyle=(0, (3, 3)),
-                label="VRAM budget",
+                label=f"JAX allocator limit ({allocator_limit_gib:.2f} GiB)",
             ),
         ]
     )
@@ -1184,6 +1236,7 @@ def export_scaling_campaign(
     manifest_file = Path(manifest_path).expanduser().resolve()
     manifest = load_yaml(manifest_file)
     workloads = _validate_manifest(manifest)
+    allocator_reference = _allocator_limit_reference(manifest)
     provenance = _provenance_contract(manifest, workloads)
     records, sources = load_raw_records(raw_paths)
     identity = _validate_records(records, manifest, workloads, provenance)
@@ -1240,6 +1293,7 @@ def export_scaling_campaign(
         workload_rows=workload_rows,
         manifest=manifest,
         workloads=workloads,
+        allocator_limit_bytes=int(allocator_reference["bytes"]),
     )
     outcome_counts: dict[str, int] = defaultdict(int)
     for row in session_rows:
@@ -1262,6 +1316,7 @@ def export_scaling_campaign(
         "paired_rows": len(paired_rows),
         "statistical_method": manifest.get("statistical_method"),
         "memory_scope": manifest.get("memory_scope"),
+        "memory_reference": allocator_reference,
         "outputs": {
             name: {"path": str(path), "sha256": _sha256(path)}
             for name, path in {

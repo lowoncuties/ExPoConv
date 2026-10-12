@@ -227,6 +227,13 @@ running state, so evaluation always uses manifest order and the declared
 batch size. A nonfinite value, out-of-memory, or divergence is a result and
 is never replaced.
 
+For E13, the accelerator has 32 GiB of physical memory, while the accepted
+environment record captures a 25,567,444,992-byte (23.81-GiB) JAX allocator
+limit. The scaling figure uses that captured allocator ceiling rather than a
+nominal 32-GiB line; its R out-of-memory outcome is therefore specific to the
+recorded allocator configuration and does not imply exhaustion of all physical
+device memory.
+
 Rebuilding the compact tables from the raw outputs of a new run:
 
 For the E20/E21 exporter, set `E09_ROOT`, `E10_ROOT`, `E20_ROOT`, and

@@ -7,6 +7,14 @@ and 30 of 35 R groups completed, while all five R groups at batch 8 and
 512 x 512 ended in recorded first-update OOMs. The corresponding five F groups
 completed.
 
+The V100 has 32 GiB of physical memory, but the accepted environment capture
+records a JAX allocator limit of 25,567,444,992 bytes (23.81 GiB). The figure's
+dashed memory reference is this captured allocator limit, not nominal device
+memory. The R failure diagnostic reports a 23.01-GiB compiled allocation under
+that allocator configuration; it does not show that all 32 GiB of physical
+memory were exhausted. The analysis manifest hash-pins the environment record
+from which the plotting reference is read.
+
 ## Registered analysis grid
 
 The grid in `configs/analysis/e13_unet_scaling.yaml` contains seven distinct
@@ -24,8 +32,9 @@ the byte-exact protocol 1.11 snapshot at
 `configs/benchmarks/e13_unet_scaling.yaml` by SHA-256. The exporter recomputes
 every expected per-workload configuration hash from those two pinned documents.
 At the recorded E13 code revision, the same protocol bytes were at top-level
-`protocol.yaml`; `results/e13_scaling/summary.json` retains that historical
-path, while the versioned snapshot permits validation after later amendments.
+`protocol.yaml`. The regenerated CPU-only analysis summary records the
+versioned snapshot path and the same byte hash, permitting validation after
+later amendments without changing the accepted experiment identity.
 
 ## Accepted raw formats and identities
 
@@ -74,7 +83,7 @@ The exporter refuses to overwrite an existing output. It writes:
 - `paired_ratio_summary.csv`: paired R/F latency and peak-allocation ratios
   using only sessions in which both paths succeeded;
 - `unet_scaling.pdf` and `.png`: a four-panel batch/resolution latency/memory
-  figure; and
+  figure whose dashed line is the captured 23.81-GiB JAX allocator limit; and
 - `summary.json`: source hashes, validated identities, output hashes, and
   outcome counts.
 
