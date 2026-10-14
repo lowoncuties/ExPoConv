@@ -1,0 +1,112 @@
+{
+  "accepted_runtime_evidence": [
+    {
+      "cohorts": [
+        "E20",
+        "E21"
+      ],
+      "environment_path": "/storage1/users/joc0027/expoconv/fef30ec/provenance/environment_before.json",
+      "environment_sha256": "ee5fcedac92ee44dec8356df76caeeb477f2697361fab6f4d194bb595b9cc1e2",
+      "evidence_id": "e20_e21_fef30ec_environment_before",
+      "evidence_root": "/storage1/users/joc0027/expoconv/fef30ec",
+      "matched_device": {
+        "bind_with_campaign_attempt_snapshots": true,
+        "driver": "560.35.03",
+        "driver_advertised_cuda": "12.6",
+        "jax_device_id": 0,
+        "jax_device_kind": "NVIDIA RTX A6000",
+        "name": "NVIDIA RTX A6000",
+        "physical_index": 1,
+        "uuid": "GPU-6daddab9-4b59-fdde-bf0b-09ecd8f31723"
+      },
+      "matched_software": {
+        "environment": {
+          "CUDA_VISIBLE_DEVICES": "1",
+          "JAX_ENABLE_X64": "true",
+          "JAX_PLATFORMS": null,
+          "NVIDIA_TF32_OVERRIDE": null,
+          "XLA_FLAGS": null,
+          "XLA_PYTHON_CLIENT_PREALLOCATE": "false"
+        },
+        "git": {
+          "commit": "fef30ecb5063fb8823368997bde10d16654b8b5e",
+          "dirty": false,
+          "status_porcelain": []
+        },
+        "jax": {
+          "backend": "gpu",
+          "jaxlib_version": "0.4.25",
+          "version": "0.4.25",
+          "x64_enabled": true
+        },
+        "packages": {
+          "jax": "0.4.25",
+          "jaxlib": "0.4.25+cuda11.cudnn86",
+          "numpy": "1.26.4",
+          "nvidia-cublas-cu11": "11.11.3.6",
+          "nvidia-cuda-nvcc-cu11": "11.8.89",
+          "nvidia-cuda-runtime-cu11": "11.8.89",
+          "nvidia-cudnn-cu11": "8.6.0.163",
+          "scipy": "1.11.4"
+        },
+        "python": {
+          "executable": "/storage1/users/joc0027/expoconv/envs/jax0425-cuda11/bin/python",
+          "version": "3.11.16 (main, Aug 14 2026, 15:35:36) [Clang 22.1.3 ]"
+        }
+      },
+      "registered_relative_file": "provenance/environment_before.json",
+      "runtime_identity_validated": true
+    }
+  ],
+  "analysis_id": "e20_e21_training_replication_v1",
+  "cohorts": [
+    {
+      "analysis_id": "e20_e21_training_replication_v1",
+      "cohort_role": "prospective_independent_platform_replication",
+      "config_hash": "b226335a56314f0947c81f193621802ffa0c4aea90acc1f2d1117212de59bed8",
+      "dataset": "isic16",
+      "expected_pairs": 15,
+      "expected_runs": 30,
+      "experiment_id": "E20",
+      "grand_pool_performed": false,
+      "official_endpoint_embargo": "opened_after_global_validation",
+      "physical_gpu_host": "aibox2a6000",
+      "physical_gpu_index": 1,
+      "physical_gpu_name": "NVIDIA RTX A6000",
+      "physical_gpu_uuid": "GPU-6daddab9-4b59-fdde-bf0b-09ecd8f31723",
+      "platform_stratum": "NVIDIA RTX A6000 | JAX/JAXLIB 0.4.25 with pinned CUDA 11.8 and cuDNN 8.6 user-space libraries",
+      "protocol_version": "1.14",
+      "runtime": "JAX/JAXLIB 0.4.25 with pinned CUDA 11.8 and cuDNN 8.6 user-space libraries",
+      "status": "complete",
+      "task": "isic16_poincare_unet",
+      "validated_pairs": 15,
+      "validated_runs": 30
+    },
+    {
+      "analysis_id": "e20_e21_training_replication_v1",
+      "cohort_role": "prospective_independent_platform_replication",
+      "config_hash": "6b7973dad0db1b2578f88987c7527a586f5fac68eda1bae3592ff96387d883b6",
+      "dataset": "cifar100",
+      "expected_pairs": 15,
+      "expected_runs": 30,
+      "experiment_id": "E21",
+      "grand_pool_performed": false,
+      "official_endpoint_embargo": "opened_after_global_validation",
+      "physical_gpu_host": "aibox2a6000",
+      "physical_gpu_index": 1,
+      "physical_gpu_name": "NVIDIA RTX A6000",
+      "physical_gpu_uuid": "GPU-6daddab9-4b59-fdde-bf0b-09ecd8f31723",
+      "platform_stratum": "NVIDIA RTX A6000 | JAX/JAXLIB 0.4.25 with pinned CUDA 11.8 and cuDNN 8.6 user-space libraries",
+      "protocol_version": "1.14",
+      "runtime": "JAX/JAXLIB 0.4.25 with pinned CUDA 11.8 and cuDNN 8.6 user-space libraries",
+      "status": "complete",
+      "task": "cifar100_poincare_resnet20",
+      "validated_pairs": 15,
+      "validated_runs": 30
+    }
+  ],
+  "opened_only_after_joint_validation": true,
+  "required_complete_pairs": 30,
+  "required_successful_runs": 60,
+  "status": "open"
+}

@@ -32,8 +32,16 @@ fully specified architecture, not an assertion that every upstream software
 default reproduced its paper. Any later decision that changes this table must
 increment the protocol version before affected confirmatory runs.
 
-## Measured platform
+## Measured platforms
 
-All reported GPU evidence comes from one Tesla V100-PCIE-32GB with driver
+The original E09/E10 training cohorts and all operator, complete-model timing,
+memory, profile, and scaling evidence use one Tesla V100-PCIE-32GB with driver
 520.61.05 under the pinned CUDA 11.8 build; see `results/environment.json`.
-No second accelerator or CUDA version was measured.
+The prospective E20/E21 training replications use one NVIDIA RTX A6000 with
+driver 560.35.03 and the same pinned JAX/JAXLIB 0.4.25 CUDA-11.8 and cuDNN-8.6
+user-space packages; see
+`results/e20_e21_training_replication/e20_e21_gate_audit.json`. The driver on
+that host advertised CUDA 12.6 compatibility, but the measured user-space
+runtime remained CUDA 11.8. E09/E10 and E20/E21 are retained as separate
+cohort/platform strata, no grand pool was performed, and the design does not
+identify a causal accelerator effect or establish CUDA-12 portability.

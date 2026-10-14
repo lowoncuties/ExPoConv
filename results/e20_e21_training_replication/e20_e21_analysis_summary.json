@@ -1,0 +1,55 @@
+{
+  "analysis_id": "e20_e21_training_replication_v1",
+  "analysis_runtime": {
+    "packages": {
+      "matplotlib": "3.8.4",
+      "numpy": "1.26.4",
+      "scipy": "1.11.4"
+    },
+    "python": "3.11.16 (main, Aug 14 2026, 15:35:36) [Clang 22.1.3 ]"
+  },
+  "analysis_status": "frozen_before_official_test_unblinding",
+  "bootstrap_quantile_method": "linear",
+  "endpoint_embargo": "opened_after_global_validation",
+  "exporter_git": {
+    "commit": "072c9ddd23571dc3137d44ec1a9c51e4df7ce198",
+    "dirty": false,
+    "status_porcelain": [],
+    "tracked_sources": [
+      "configs/analysis/e20_e21_training_replication_v3.yaml",
+      "protocol.yaml",
+      "docs/e20_e21_analysis_contract_amendment_v3.md",
+      "scripts/export_e20_e21_training.py",
+      "src/poincare_exec/analysis/training_extension_statistics.py",
+      "src/poincare_exec/analysis/training_extension_types.py",
+      "src/poincare_exec/analysis/training_extensions.py",
+      "configs/analysis/e20_e21_training_replication.yaml",
+      "docs/e20_e21_analysis_contract.md",
+      "configs/analysis/e20_e21_training_replication_v2.yaml",
+      "docs/e20_e21_analysis_contract_amendment_v2.md"
+    ]
+  },
+  "exporter_source_sha256": {
+    "scripts/export_e20_e21_training.py": "e35bc70615b8cfdf5b31136eb2a5b0429934b6102c32f239f0a77c8357acb3d6",
+    "src/poincare_exec/analysis/training_extension_statistics.py": "47f09765cf08c61e7b1c72a0913a74730d65646886e2e733f410e66e839abddd",
+    "src/poincare_exec/analysis/training_extension_types.py": "09cc09ffdd3053a84e005dc043374c6f2a70e6ee7d2c435eaebff11a6d492368",
+    "src/poincare_exec/analysis/training_extensions.py": "34f7d7d2eb1b138d2e08212fec02021ec5235c9a90896d20ddbff69b1da4fc4f"
+  },
+  "grand_pool_performed": false,
+  "manifest_path": "/home/fei/joc0027/ExPoConv-analysis-072c9ddd/configs/analysis/e20_e21_training_replication_v3.yaml",
+  "manifest_sha256": "df32f0ef4c60c9dbcf8d40ab172427bf8569b6d9a7742e571d544fef3ff34f1b",
+  "outputs": {
+    "e09_e10_e20_e21_platform_strata.csv": "6a587c4781817c3bc5a6b3840f92ede0fc64b4eb6b9e073c950bb6a53693995d",
+    "e09_e10_e20_e21_quality_strata.pdf": "bc1898eda8cf0ca69046a133de8cc3d03c936c591f8efc4011526ed0815018a6",
+    "e09_e10_e20_e21_quality_strata.png": "e330b9f7bba6052cc2994c26238c05fb959d5ce57a77751f9f5e77ff44e2eda3",
+    "e20_e21_gate_audit.json": "1ff790426b9b3167e3ff5ecd0cbbeed5c282ec5ea1c3d97219db5f92486db9df",
+    "e20_e21_paired_quality_by_seed.csv": "505a6ebfb86be64856fee5463f2bd1b96fbbe8d7030bb912c7e83160f7b4b1b8",
+    "e20_e21_paired_quality_summary.csv": "2cba4052afba70d1a7a42e6748767293923a2d583b9f7ace5542f5be3c716c4c",
+    "e20_e21_paired_training_efficiency_by_seed.csv": "33e990db9ed008c3695bf77ec6731ee63b58ba5117325a75b41965367d12dba6",
+    "e20_e21_paired_training_efficiency_summary.csv": "e5c482209db0e4dbf406d193f20e77460d7347cd752f54bcaf4f98bff1379da4",
+    "e20_e21_run_audit.csv": "3c3a18cba3f7c0e14b459ff88665e09f39014efd991231d41e664bd16b7b0b19",
+    "e20_e21_training_runs.csv": "cffd79c5f9f2f11546732954f4e29fd7831ecf38933eca5b9576c75e0fb61e3e",
+    "e20_e21_training_variant_summary.csv": "ac77b0ccbf1b3f0c17bdff3ad67789314a476af3f093ce3c9e929499b62ebc26",
+    "e20_paired_iou_summary.csv": "c35377a2739bb7c5610f7ddece9cd991e76c9704db3d32eca0b3c6c956d2ecce"
+  }
+}

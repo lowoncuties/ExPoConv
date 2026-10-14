@@ -45,23 +45,17 @@ Experiments reported in the manuscript, with the identifiers used in
 | E10 | CIFAR-100 Poincaré ResNet-20, five matched seeds, fixed 35,200-update budget |
 | E11 | descriptive device-kernel profile of the U-Net update |
 | E13 | complete-update scaling across U-Net batch size and input resolution, including retained OOM outcomes |
+| E20 | prospective ISIC16 Poincaré U-Net replication, 15 new matched R/F seeds on one RTX A6000 |
+| E21 | prospective CIFAR-100 Poincaré ResNet-20 replication, the same 15 new matched R/F seeds and platform |
 
-Two prospective R/F replications are registered and running, but are not part
-of the compact results in this repository snapshot:
-
-| ID | Registered extension |
-|---|---|
-| E20 | ISIC16 Poincaré U-Net, 15 new matched R/F seeds on one RTX A6000 |
-| E21 | CIFAR-100 Poincaré ResNet-20, the same 15 new matched R/F seeds and platform |
-
-Their official-test endpoints remain jointly blinded until all 60 runs pass
-the frozen health and provenance gate in
+All 60 E20/E21 runs passed the frozen health and provenance gate in
 [`docs/e20_e21_analysis_contract.md`](docs/e20_e21_analysis_contract.md) and
 its pre-unblinding
 [`v3 amendment`](docs/e20_e21_analysis_contract_amendment_v3.md), which
-preserves and supersedes the v2 infrastructure registration.
-E20/E21 are reported as separate A6000 cohorts and are never silently pooled
-with E09/E10.
+preserves and supersedes the v2 infrastructure registration. The official-test
+endpoints were opened only after that joint validation. E20/E21 are reported
+as separate A6000 cohorts and are not pooled with E09/E10; the cohort/platform
+change does not support a causal hardware comparison.
 
 Two completed diagnostics are included as supporting evidence but are not
 reported in the manuscript:
@@ -71,24 +65,27 @@ reported in the manuscript:
 | E06 | replay of the ten final R/T U-Net checkpoints through R/F/T at fixed weights |
 | E07-J2 | gradient, update, and 100-update drift comparison at six seed-11 checkpoints, with repeated-R and one-ULP controls |
 
-All results currently included in `results/` come from the V100 platform in
-Section 3. E20/E21 add an RTX A6000 hardware cohort using the same pinned
-JAX/CUDA-11.8 user-space runtime; they are not CUDA-12 software-stack runs and
-have no accepted result until their joint gate passes. The separate E12
-CUDA-12 timing study, reduced precision, and a dense-only training task remain
-unrun and unreported (Section 8).
+The original E09/E10 training cohorts and the timing, memory, and profile
+experiments use the V100 platform in Section 3. E20/E21 add accepted RTX A6000
+training cohorts using the same pinned JAX/CUDA-11.8 user-space runtime. They
+are not CUDA-12 software-stack runs. The separate E12 CUDA-12 timing study,
+reduced precision, and a dense-only training task remain unrun and unreported
+(Section 8).
 
 The original experiment-plan document is an archival design record rather
 than a live status page. The bounded E02, E03/E05, E06, E07-J2, E08--E11
 evidence listed above is complete. E13 completed its registered R/F scaling
 grid, including five retained reference-path OOM outcomes at batch 8 and
-512 × 512 resolution. E20/E21 are in-progress prospective replications;
-their presence in the protocol is not a result. E12 and E14--E18 are unrun
+512 × 512 resolution. E20/E21 completed their registered 60-run matrix and
+passed the joint gate before endpoint export. E12 and E14--E18 are unrun
 strengthening or conditional extensions, and E19
 independent reproduction remains a release gate rather than a completed
 result. The bounded handoff is documented in
 [`docs/e19_independent_reproduction.md`](docs/e19_independent_reproduction.md),
-with a separate signed-record template for the independent reproducer.
+with a separate signed-record template for the independent reproducer. The
+dated [`release-scope disposition`](docs/release_scope_disposition.md) maps
+every E00--E21 item to completed, bounded, unrun, or open status without
+rewriting the frozen protocol.
 
 ## 2. Repository structure
 
@@ -117,17 +114,20 @@ Python 3.11 and [uv](https://docs.astral.sh/uv/). The environment is pinned
 in `uv.lock`: JAX 0.4.25, NumPy 1.26.4, SciPy 1.11.4, Pillow 11.3.0,
 matplotlib 3.8.4.
 
-Every reported measurement was taken on one NVIDIA Tesla V100-PCIE-32GB
+The original E09/E10 cohorts and all operator, complete-model timing, memory,
+scaling, and profile measurements were taken on one NVIDIA Tesla V100-PCIE-32GB
 (driver 520.61.05) with CUDA 11.8.89 and cuDNN 8.6.0.163 through
 `jaxlib 0.4.25+cuda11.cudnn86`, Python 3.11.16, FP32 storage, the highest
 matrix-multiplication precision, TF32 disabled, and JAX preallocation
-disabled. The machine-readable record is `results/environment.json`. A CUDA
-GPU is needed only to rerun experiments. The CPU environment is enough for
-the tests, table inspection, and figure regeneration. Other hardware is
-untested in the accepted results snapshot. The in-progress E20/E21 campaigns
-run on one NVIDIA RTX A6000 with the same JAX/JAXLIB 0.4.25 CUDA-11.8 and
-cuDNN-8.6 user-space packages. A driver advertising CUDA 12 compatibility
-does not make that environment a CUDA-12 software stack.
+disabled. The machine-readable V100 record is `results/environment.json`.
+E20/E21 were trained on one NVIDIA RTX A6000 (driver 560.35.03) with the same
+JAX/JAXLIB 0.4.25 CUDA-11.8 and cuDNN-8.6 user-space packages; their captured
+runtime is retained in
+`results/e20_e21_training_replication/e20_e21_gate_audit.json`. A driver
+advertising CUDA 12 compatibility does not make that environment a CUDA-12
+software stack. A CUDA GPU is needed only to rerun experiments. The CPU
+environment is enough for the tests, table inspection, and figure
+regeneration.
 
 ## 4. Installation
 
@@ -304,7 +304,8 @@ clone is only a technical preflight and does not close that gate.
 lists the code revision, protocol version, and configuration hash of each
 result family. `results/claims.csv` maps each claim of the manuscript to its
 supporting files. `results/checkpoints/checkpoint_inventory.csv` lists the
-150 training checkpoints (roles, sizes, SHA-256) that are archived outside
+540 checkpoint artifacts from the 90 accepted E09/E10/E20/E21 training runs
+(six roles per run, with paths, sizes, and SHA-256) that are archived outside
 Git. Verify the compact evidence with:
 
 ```bash
@@ -317,10 +318,11 @@ code and is not itself one of those revisions. Eleven legacy V100
 result-producing commits are retained in a separate, hashed Git bundle
 described by
 [`provenance/v100_accepted_history_manifest.json`](provenance/v100_accepted_history_manifest.json).
-The E13 revision is already reachable in this repository's own history. The
-legacy bundle is prepared for a separate evidence deposit rather than embedded
-in the public checkout; [`provenance/README.md`](provenance/README.md) gives
-the verification command and disclosure boundary.
+The E13 revision and the E20/E21 training, exporter, and inventory revisions
+are reachable in this repository's own history. The legacy bundle is prepared
+for a separate evidence deposit rather than embedded in the public checkout;
+[`provenance/README.md`](provenance/README.md) gives the verification command
+and disclosure boundary.
 
 The compact evidence retains the original machine-readable provenance,
 including local source paths, the measurement host name, physical-device
@@ -339,7 +341,15 @@ not silently relabelled. Byte-exact historical protocols needed to replay an
 accepted analysis are retained under `configs/protocols/`; E13 uses the
 protocol 1.11 snapshot there rather than the later-amended top-level file. E12
 CUDA-12 timing, a Fashion-MNIST dense task, and the original local plan
-documents remain planned without a result. The hashed
+documents remain planned without a result. In particular, protocol 1.14
+retains the originally selected E14 dense-training extension (15 R/F/T runs):
+E14 was not executed. After the convolutional campaigns, the manuscript scope
+was narrowed to spatial HNN++ convolution factorization. This is a post-results
+scope disposition, not a completed or prospectively deselected experiment;
+the bounded E05 dense-stack timing remains descriptive and supports no
+dense-training or architecture-general claim. The complete post-results
+status map is retained in
+[`docs/release_scope_disposition.md`](docs/release_scope_disposition.md). The hashed
 E20/E21 configuration descriptions still say "secondary CUDA-12 platform";
 protocol 1.14 and the captured environment record are authoritative that the
 accepted training runtime is the pinned CUDA-11.8 stack on A6000. Likewise,

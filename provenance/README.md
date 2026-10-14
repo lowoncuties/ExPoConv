@@ -13,6 +13,22 @@ trees. E13 revision `75f10dd9` is already reachable in ExPoConv's own history.
 The bundle is not required to run the release snapshot or the bounded E19
 reproduction.
 
+The accepted E20/E21 A6000 training cohorts were produced from the clean
+revision `fef30ecb5063fb8823368997bde10d16654b8b5e` under protocol 1.14.
+Their registered configuration hashes are
+`b226335a56314f0947c81f193621802ffa0c4aea90acc1f2d1117212de59bed8`
+for E20 and
+`6b7973dad0db1b2578f88987c7527a586f5fac68eda1bae3592ff96387d883b6`
+for E21. The joint gate and endpoint tables were exported from clean revision
+`072c9ddd23571dc3137d44ec1a9c51e4df7ce198`; the post-gate checkpoint
+inventory was exported with the hardened implementation at clean revision
+`8a233b94c33297ee566af8ff073e85586a8e953d`. All three commits are reachable
+in this repository's history. The gate audit, exporter source hashes, output
+hashes, and the retained pre-update infrastructure failure are recorded under
+`results/e20_e21_training_replication/`. These training cohorts remain
+separate from the earlier V100 cohorts; the repository contains no pooled or
+causal accelerator comparison.
+
 The confidential evidence archive includes the checksummed
 `SCOPED_HYPERJAX_OVERLAP_AUDIT.md` record. It freezes the bundle ref and tip,
 the comparator's sorted-ref snapshot and distinct tip IDs, the exact commands,
