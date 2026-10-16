@@ -27,6 +27,10 @@
     {
       "family": "E13 U-Net update scaling",
       "commit": "75f10dd9f671f12df7fe4f357f061341f9041bc7"
+    },
+    {
+      "family": "E19 same-machine technical preflight",
+      "commit": "93fb31a11a008ba1a378434071cb418b504092d9"
     }
   ],
   "accepted_commits": [

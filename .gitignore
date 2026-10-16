@@ -1,4 +1,5 @@
 .venv/
+/.venv-cuda12/
 __pycache__/
 *.py[cod]
 .pytest_cache/

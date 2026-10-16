@@ -31,6 +31,9 @@ from typing import Any
 import jax
 import numpy as np
 
+from poincare_exec.analysis.training_extension_figure import (
+    write_quality_strata_figure,
+)
 from poincare_exec.analysis.training_extension_statistics import (
     common_metadata,
     efficiency_rows,
@@ -70,6 +73,7 @@ REQUIRED_OUTPUT_KEYS = frozenset(
 SOURCE_REPOSITORY_ROOT = Path(__file__).resolve().parents[3]
 EXPORTER_SOURCE_FILES = (
     "scripts/export_e20_e21_training.py",
+    "src/poincare_exec/analysis/training_extension_figure.py",
     "src/poincare_exec/analysis/training_extension_statistics.py",
     "src/poincare_exec/analysis/training_extension_types.py",
     "src/poincare_exec/analysis/training_extensions.py",
@@ -3175,71 +3179,10 @@ def _write_strata_figure(
 ) -> tuple[Path, Path]:
     """Render four stratum estimates without a pooled marker or estimate."""
 
-    import matplotlib
-
-    matplotlib.use("Agg")
-    import matplotlib.pyplot as plt
-
-    task_order = ("isic16_poincare_unet", "cifar100_poincare_resnet20")
-    labels = {
-        "isic16_poincare_unet": "ISIC16 Poincare U-Net",
-        "cifar100_poincare_resnet20": "CIFAR-100 Poincare ResNet-20",
-    }
-    figure, axes = plt.subplots(1, 2, figsize=(7.1, 2.7), squeeze=False)
-    for axis, task in zip(axes[0], task_order, strict=True):
-        selected = sorted(
-            (row for row in rows if row["task"] == task),
-            key=lambda row: str(row["experiment_id"]),
-        )
-        if len(selected) != 2:
-            raise ExtensionAnalysisError(f"{task}: expected exactly two platform strata")
-        y_positions = [1, 0]
-        for y_position, row in zip(y_positions, selected, strict=True):
-            estimate = float(row["estimate"])
-            lower = float(row["interval_95_lower"])
-            upper = float(row["interval_95_upper"])
-            axis.errorbar(
-                estimate,
-                y_position,
-                xerr=[[estimate - lower], [upper - estimate]],
-                fmt="D",
-                color="#842C46",
-                capsize=3,
-                linewidth=1.3,
-                markersize=4.5,
-            )
-        axis.axvline(0.0, color="#8C8C8C", linestyle="--", linewidth=0.9)
-        axis.set_yticks(
-            y_positions,
-            [
-                f"{row['experiment_id']} | {row['physical_gpu_name']} | n={row['pairs']}"
-                for row in selected
-            ],
-        )
-        axis.set_title(labels[task])
-        axis.set_xlabel("F minus R (native score scale)")
-        axis.grid(axis="x", alpha=0.2)
-    figure.suptitle("Matched-seed quality differences by registered cohort/platform")
-    figure.tight_layout()
-    pdf = destination.with_suffix(".pdf")
-    png = destination.with_suffix(".png")
-    figure.savefig(
-        pdf,
-        bbox_inches="tight",
-        metadata={
-            "Creator": "poincare-execution-experiments",
-            "CreationDate": None,
-            "ModDate": None,
-        },
-    )
-    figure.savefig(
-        png,
-        dpi=300,
-        bbox_inches="tight",
-        metadata={"Software": "poincare-execution-experiments"},
-    )
-    plt.close(figure)
-    return pdf, png
+    try:
+        return write_quality_strata_figure(rows, destination)
+    except ValueError as error:
+        raise ExtensionAnalysisError(str(error)) from error
 
 
 def export_extension_campaign(

@@ -2267,7 +2267,9 @@ def test_export_is_atomic_and_refuses_stale_destination(
         "matplotlib",
     }
     assert audit_summary["exporter_git"]["commit"]
-    assert len(audit_summary["exporter_source_sha256"]) == 4
+    assert set(audit_summary["exporter_source_sha256"]) == set(
+        extension_analysis.EXPORTER_SOURCE_FILES
+    )
     with pytest.raises(FileExistsError, match="stale"):
         export_extension_campaign(
             manifest_path,

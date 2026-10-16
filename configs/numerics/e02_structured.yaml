@@ -1,0 +1,106 @@
+schema_version: "1.0"
+experiment_id: E02
+description: Frozen structured-topology and directional finite-difference matrix.
+precisions: [float32, float64]
+realizations: 10
+finite_difference_relative_steps: [0.0001, 0.00001, 0.000001]
+curvature: 0.1
+input_scale: 0.05
+normalization_epsilon: 0.000001
+cases:
+  - id: dense
+    kind: dense_stack
+    input_shape: [3, 8]
+    input_features: 8
+    output_features: 5
+    depth: 1
+    activation: none
+  - id: dense_stack_2
+    kind: dense_stack
+    input_shape: [2, 8]
+    input_features: 8
+    output_features: 8
+    depth: 2
+    activation: relu
+  - id: dense_stack_8
+    kind: dense_stack
+    input_shape: [2, 8]
+    input_features: 8
+    output_features: 8
+    depth: 8
+    activation: relu
+  - id: convolution
+    kind: convolution_stack
+    input_shape: [2, 7, 7, 3]
+    input_channels: 3
+    output_channels: 4
+    kernel_size: 3
+    stride: 1
+    padding: SAME
+    depth: 1
+    activation: none
+  - id: convolution_stack_2
+    kind: convolution_stack
+    input_shape: [2, 7, 7, 4]
+    input_channels: 4
+    output_channels: 4
+    kernel_size: 3
+    stride: 1
+    padding: SAME
+    depth: 2
+    activation: relu
+  - id: convolution_stack_8
+    kind: convolution_stack
+    input_shape: [2, 7, 7, 4]
+    input_channels: 4
+    output_channels: 4
+    kernel_size: 3
+    stride: 1
+    padding: SAME
+    depth: 8
+    activation: relu
+  - id: conv_bn_relu
+    kind: conv_bn_relu
+    input_shape: [2, 7, 7, 3]
+    input_channels: 3
+    output_channels: 4
+    kernel_size: 3
+    padding: SAME
+  - id: double_convolution
+    kind: double_convolution
+    input_shape: [2, 7, 7, 3]
+    input_channels: 3
+    output_channels: 4
+  - id: beta_skip
+    kind: beta_skip
+    branch_shapes: [[2, 7, 7, 2], [2, 7, 7, 3]]
+    output_channels: 4
+  - id: downsampling_mobius_residual
+    kind: residual_block
+    input_shape: [2, 8, 8, 4]
+    input_channels: 4
+    output_channels: 8
+    stride: 2
+    residual_order: fr
+  - id: transpose_convolution
+    kind: transpose_convolution
+    input_shape: [2, 4, 4, 4]
+    input_channels: 4
+    output_channels: 2
+    kernel_size: 2
+    stride: 2
+  - id: decoder_block
+    kind: decoder_block
+    decoder_shape: [2, 4, 4, 4]
+    skip_shape: [2, 8, 8, 2]
+    skip_channels: 2
+    classes: 2
+    initial_curvature: 0.1
+  - id: small_unet
+    kind: small_unet
+    input_shape: [2, 16, 16, 3]
+    input_channels: 3
+    classes: 2
+    initial_width: 2
+    depth: 2
+    initial_curvature: 0.1

@@ -1,0 +1,42 @@
+{
+  "analytic_passes": 113,
+  "analytic_rows": 114,
+  "code_commit": "93fb31a11a008ba1a378434071cb418b504092d9",
+  "code_dirty": false,
+  "config_hash": "9e7e0fecbe050b882ed4e404269ab47cb784c8fa561b70aa29fa0eab43eb0115",
+  "device_id": "argexpr3.vsb.cz::gpu:0::Tesla V100-PCIE-32GB",
+  "diagnostic_case_ids": [
+    "N083",
+    "N084"
+  ],
+  "diagnostic_same_precision_passes": 11,
+  "diagnostic_same_precision_rows": 20,
+  "exact_cap_kinks_are_diagnostic": true,
+  "experiment_id": "E02-REPAIR",
+  "high_precision_diagnostic_passes": 56,
+  "high_precision_diagnostic_rows": 60,
+  "n084_curvature_oracle_passes": 0,
+  "n084_curvature_oracle_rows": 6,
+  "n088_corrected_finite": true,
+  "n088_mechanism_confirmed": true,
+  "n088_stage_rows": 4,
+  "precision_policy": "{\"matmul_precision\":\"highest\",\"reduced_precision_reduction\":false,\"storage_dtype\":\"mixed_float32_float64\",\"tf32\":false}",
+  "protocol_version": "1.14",
+  "reference_commit": "{\"hnnpp\":\"28737e22822562ac18d5ea03f8c3e3929e945a83\",\"hyperbolic_unet\":\"bec504e2f4d198ee4c438579b86d72f9d8186d78\",\"poincare_resnet\":\"fbbbbf890571115444b89b114f9ed52d128d5aa3\"}",
+  "required_contract_pass": true,
+  "required_same_precision_case_ids": [
+    "N088"
+  ],
+  "required_same_precision_passes": 40,
+  "required_same_precision_rows": 40,
+  "result_rows": 424,
+  "selected_same_precision_nonfinite": 0,
+  "selected_same_precision_passes": 51,
+  "selected_same_precision_rows": 60,
+  "smooth_analytic_passes": 102,
+  "smooth_analytic_rows": 102,
+  "status": "ok",
+  "threshold_diagnostic_passes": 11,
+  "threshold_diagnostic_rows": 12,
+  "timestamp_utc": "2026-10-15T14:39:05.944Z"
+}

@@ -1,3 +1,4 @@
+import hashlib
 import json
 from pathlib import Path
 
@@ -6,6 +7,26 @@ import pytest
 from poincare_exec.config.loader import config_hash, load_yaml, validate_hashed_document
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
+
+
+@pytest.mark.parametrize(
+    ("relative_path", "expected_sha256"),
+    [
+        (
+            "configs/numerics/e02_structured.yaml",
+            "e1b6b624be66d1a7352b4b74925ccb4876f22714ce94cd1540e658ac83ebf60b",
+        ),
+        (
+            "docs/journal_diagnostic_protocol.md",
+            "5f82bbadb1ed267a2c01506d6caa221c9313d7be3ccb7648c141beaab23833a9",
+        ),
+    ],
+)
+def test_restored_historical_protocol_inputs_are_byte_exact(
+    relative_path: str, expected_sha256: str
+) -> None:
+    content = (REPOSITORY_ROOT / relative_path).read_bytes()
+    assert hashlib.sha256(content).hexdigest() == expected_sha256
 
 
 def test_hashed_document_validation_accepts_matching_repository_file(tmp_path):

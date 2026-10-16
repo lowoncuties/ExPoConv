@@ -1,7 +1,7 @@
 # Post-results release-scope disposition
 
-Status: release documentation written on 14 October 2026, after the accepted
-results and before an immutable public or reviewer release.
+Status: updated on 15 October 2026 after the same-machine E19 technical
+preflight and before an immutable public or reviewer release.
 
 This document reports which experiments from the archival
 `Neural_Networks_Experiment_Plan.md` were actually completed. It is not a
@@ -22,8 +22,9 @@ claim are complete. The broader original experiment plan is not complete.
   breadth proposed in the archival plan.
 - **Unrun**: no accepted result exists. A configuration file alone is not a
   completed experiment.
-- **Open external gate**: completion requires action by an independent person
-  after an immutable release is available.
+- **Optional external validation**: an independent person may add stronger
+  post-release evidence, but no current manuscript or release claim depends on
+  it.
 
 ## Experiment disposition
 
@@ -48,7 +49,7 @@ claim are complete. The broader original experiment plan is not complete.
 | E16 | Unrun | No reduced-precision campaign or claim is included. |
 | E17 | Unrun | No frozen corruption or input-shift checkpoint study or claim is included. |
 | E18 | Unrun | No additional application, restoration, or GAN campaign or claim is included. |
-| E19 | Open external release gate | An independent person must follow `docs/e19_independent_reproduction.md` against an immutable release, sign the record, and archive it externally. Author or agent preflight cannot close this gate. |
+| E19 | Same-machine technical preflight complete; optional independent validation open | The author-authorized Codex run cloned commit `93fb31a11a008ba1a378434071cb418b504092d9`, passed the 424-row bounded numerical gate, retained all 15 timing groups, and reproduced the R/F update advantage at 1.745 [1.557, 1.956]. See `results/e19_preflight/`. It is not labelled independent, and no current publication claim depends on a later external signature. |
 | E20 | Complete prospective addition | Fifteen matched R/F seed pairs completed the registered ISIC16 U-Net budget on one A6000 with the pinned CUDA-11.8 user-space stack. All 30 runs passed the joint gate. See `results/e20_e21_training_replication/`. |
 | E21 | Complete prospective addition | Fifteen matched R/F seed pairs completed the registered CIFAR-100 ResNet-20 budget on the same registered platform. All 30 runs passed the joint gate. See `results/e20_e21_training_replication/`. |
 
@@ -57,6 +58,7 @@ claim are complete. The broader original experiment plan is not complete.
 No additional author-run training is required for the claims currently made in
 the manuscript. E04, broader E05/E06/E08/E11 coverage, E12, and E14--E18 are
 possible strengthening studies, not hidden completed evidence. They must stay
-unclaimed unless separately preregistered, executed, and released. E19 and an
-immutable, citable repository/evidence release remain open reproducibility
-steps.
+unclaimed unless separately preregistered, executed, and released. The E19
+technical preflight is complete; independent repetition is optional. Freezing
+an immutable, citable repository/evidence release remains a release operation,
+not a missing experiment.

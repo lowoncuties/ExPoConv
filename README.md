@@ -45,6 +45,7 @@ Experiments reported in the manuscript, with the identifiers used in
 | E10 | CIFAR-100 Poincaré ResNet-20, five matched seeds, fixed 35,200-update budget |
 | E11 | descriptive device-kernel profile of the U-Net update |
 | E13 | complete-update scaling across U-Net batch size and input resolution, including retained OOM outcomes |
+| E19 | same-machine clean-clone technical preflight of the bounded numerical gate and batch-eight U-Net update timing |
 | E20 | prospective ISIC16 Poincaré U-Net replication, 15 new matched R/F seeds on one RTX A6000 |
 | E21 | prospective CIFAR-100 Poincaré ResNet-20 replication, the same 15 new matched R/F seeds and platform |
 
@@ -57,13 +58,15 @@ endpoints were opened only after that joint validation. E20/E21 are reported
 as separate A6000 cohorts and are not pooled with E09/E10; the cohort/platform
 change does not support a causal hardware comparison.
 
-Two completed diagnostics are included as supporting evidence but are not
-reported in the manuscript:
+Two completed diagnostics are included as supporting evidence. E06 remains
+outside the concise manuscript. E07-J2 is summarized there only by one bounded
+limitations sentence; its full design, tables, controls, and trajectory remain
+repository-only:
 
 | ID | Supporting diagnostic |
 |---|---|
-| E06 | replay of the ten final R/T U-Net checkpoints through R/F/T at fixed weights |
-| E07-J2 | gradient, update, and 100-update drift comparison at six seed-11 checkpoints, with repeated-R and one-ULP controls |
+| E06 | replay of the ten final R/T U-Net checkpoints through R/F/T at fixed weights; omitted from the manuscript |
+| E07-J2 | gradient, update, and 100-update drift comparison at six seed-11 checkpoints, with repeated-R and one-ULP controls; summarized in one limitations sentence |
 
 The original E09/E10 training cohorts and the timing, memory, and profile
 experiments use the V100 platform in Section 3. E20/E21 add accepted RTX A6000
@@ -78,11 +81,12 @@ evidence listed above is complete. E13 completed its registered R/F scaling
 grid, including five retained reference-path OOM outcomes at batch 8 and
 512 × 512 resolution. E20/E21 completed their registered 60-run matrix and
 passed the joint gate before endpoint export. E12 and E14--E18 are unrun
-strengthening or conditional extensions, and E19
-independent reproduction remains a release gate rather than a completed
-result. The bounded handoff is documented in
+strengthening or conditional extensions. An E19 same-machine clean-clone
+technical preflight completed successfully on 15 October 2026; optional
+independent post-release reproduction remains unclaimed. The bounded handoff is documented in
 [`docs/e19_independent_reproduction.md`](docs/e19_independent_reproduction.md),
-with a separate signed-record template for the independent reproducer. The
+and the completed technical record is in
+[`results/e19_preflight/`](results/e19_preflight/). The
 dated [`release-scope disposition`](docs/release_scope_disposition.md) maps
 every E00--E21 item to completed, bounded, unrun, or open status without
 rewriting the frozen protocol.
@@ -136,6 +140,25 @@ regeneration.
 ./.venv/bin/pytest              # CPU tests (geometry, kernels, models, exporters)
 ```
 
+If `python3.11` is not on `PATH`, select an existing Python 3.11 interpreter
+explicitly. `POINCARE_EXEC_ENV_DIR` may likewise place the environment outside
+the checkout without changing the locked dependencies:
+
+```bash
+POINCARE_EXEC_PYTHON=/absolute/path/to/python3.11 \
+POINCARE_EXEC_ENV_DIR=/absolute/path/to/expoconv-venv \
+./scripts/bootstrap.sh
+```
+
+Use a Git clone or a clone made from the release Git bundle for
+provenance-recording experiment reruns. A release source archive or source
+distribution is sufficient for source inspection, CPU tests, checksum
+verification, and deterministic table and figure regeneration. The Python
+wheel is intentionally code-only: it does not bundle the frozen protocols,
+configurations, split manifests, compact results, or scripts, and therefore is
+not a reproduction package. The documented lock-based source bootstrap above
+is the supported standalone workflow.
+
 For the measured GPU platform:
 
 ```bash
@@ -186,6 +209,15 @@ Section 4. New outputs go to `artifacts/` (ignored) and never overwrite
 60 registered R/F runs. They take hours and nothing is launched by
 installation or tests.
 
+Run provenance-recording commands from a real Git worktree. The tracked-file
+reviewer ZIP omits `.git` and is suitable for source and compact-evidence
+inspection, not commit-bound reruns. For a release-snapshot rerun, clone the
+release package's `repository/ExPoConv-git-<release-commit>.bundle` (or the
+released repository) rather than extracting the ZIP; the separate legacy V100
+bundle has a different role, described below. The fail-closed final package
+builder and verifier are documented in
+[`provenance/README.md`](provenance/README.md#building-the-final-release-package).
+
 ```bash
 export CUDA_VISIBLE_DEVICES=0
 W=./scripts/with_cuda_11_8.sh
@@ -213,10 +245,19 @@ $W ./scripts/run_training_campaign.sh configs/training/e10_cifar100_resnet20.yam
 $W ./scripts/run_training_campaign.sh configs/training/e20_isic16_unet_rf_replication.yaml
 $W ./scripts/run_training_campaign.sh configs/training/e21_cifar100_resnet20_rf_replication.yaml
 
-# E06, E07-J2: checkpoint replay and retained-state diagnostic (need the E09/E10 checkpoints)
+# E06: checkpoint replay of fresh E09 checkpoints
 $W ./scripts/run_trained_checkpoint_campaign.sh configs/training/e09_isic16_unet.yaml
-$W ./scripts/run_journal_retained_diagnostics_v2.sh
 ```
+
+The E09/E10 commands above create protocol-1.14 outputs. They cannot feed the
+historical E07-J2 configuration, which accepts only protocol-1.10 seed-11
+sources with the two frozen configuration hashes recorded in
+`configs/checkpoints/e07_journal_diagnostics_v2.yaml`. This rejection is an
+intentional provenance check. An exact E07-J2 rerun requires a clone of the
+legacy V100 Git bundle at evaluator revision `04aca39f`, plus the separately
+archived accepted E09/E10 checkpoints and source summaries; see
+[`provenance/README.md`](provenance/README.md). Fresh outputs require a newly
+declared diagnostic rather than relabelling E07-J2.
 
 `scripts/run_training.sh CONFIG VARIANT SEED` runs a single training worker.
 Settings that must not change between the recorded and a new run: the
@@ -246,7 +287,7 @@ nominal 32-GiB line; its R out-of-memory outcome is therefore specific to the
 recorded allocator configuration and does not imply exhaustion of all physical
 device memory.
 
-Rebuilding the compact tables from the raw outputs of a new run:
+### Re-exporting compact evidence from raw outputs
 
 For the E20/E21 exporter, set `E09_ROOT`, `E10_ROOT`, `E20_ROOT`, and
 `E21_ROOT` to the corresponding cohort directories (each containing the
@@ -283,7 +324,6 @@ endpoint-bearing summary and otherwise fails closed.
 ./.venv/bin/python -m poincare_exec.analysis.build_all \
     --artifact-dir artifacts --table-dir out/tables --figure-dir out/figures
 ./.venv/bin/python scripts/export_retained_diagnostic_tables.py --output-dir out/diagnostics
-./.venv/bin/python scripts/plot_training_efficiency_quality.py   # Figure 2 from results/training
 ```
 
 The exporters validate the raw artifacts against the protocol version,
@@ -292,11 +332,34 @@ new run must declare its own identities. Generated numbers are comparable
 with `results/`; byte identity is not expected after paths, timestamps, or
 code revisions change.
 
-E19 is not an additional author-run benchmark. After an immutable release is
-frozen, a person who did not implement the method must follow the E19 runbook,
-retain unfavorable or failed outcomes, sign the reproduction record, and
-archive it outside this working repository. An author- or agent-operated clean
-clone is only a technical preflight and does not close that gate.
+### Rendering figures from tracked compact evidence
+
+These CPU-only commands render already exported compact evidence and do not
+open or re-export raw run artifacts:
+
+```bash
+# Legacy five-seed runtime/quality rendering; retained for evidence history.
+./.venv/bin/python scripts/plot_training_efficiency_quality.py
+# Original V100 R/F/T final and validation-selected endpoints used in the appendix.
+./.venv/bin/python scripts/plot_training_all_endpoints.py
+# Current manuscript rendering of the four separate E09/E10/E20/E21 strata.
+./.venv/bin/python scripts/plot_e20_e21_quality_strata.py
+```
+
+The first output is no longer identified by a manuscript figure number. The
+second validates the exact 60-row accepted E09/E10 endpoint cohort and renders
+the appendix figure directly from `results/training/training_runs.csv`. The
+third is a presentation-only derivative of the unchanged compact
+`e09_e10_e20_e21_platform_strata.csv`; the raw exporter's archival figure
+remains byte-preserved.
+
+The E19 same-machine technical preflight is complete: an author-authorized
+Codex run cloned the verified commit-bound bundle, retained all outcomes, and
+reproduced the bounded numerical gate and batch-eight R/F update advantage on
+the original V100 platform. Its compact record is in
+`results/e19_preflight/`; raw evidence remains checksummed outside Git. An
+independent person may still follow the E19 runbook after public release, but
+that optional validation is not claimed here and is not a submission gate.
 
 ## 7. Results and provenance
 
@@ -322,7 +385,9 @@ The E13 revision and the E20/E21 training, exporter, and inventory revisions
 are reachable in this repository's own history. The legacy bundle is prepared
 for a separate evidence deposit rather than embedded in the public checkout;
 [`provenance/README.md`](provenance/README.md) gives the verification command
-and disclosure boundary.
+and disclosure boundary. It is distinct from the current-release Git bundle
+that supplies `.git` history when the tracked-file reviewer ZIP is used for
+transport.
 
 The compact evidence retains the original machine-readable provenance,
 including local source paths, the measurement host name, physical-device
@@ -360,10 +425,24 @@ The top-level `confirmatory_status` field is likewise historical protocol
 metadata; `results/README.md` and `results/claims.csv` describe the completed
 evidence currently included in this snapshot.
 
+The top-level protocol also references
+`configs/numerics/e02_structured.yaml`. That file is the byte-exact historical
+protocol-1.3 broad E02 matrix (SHA-256
+`e1b6b624be66d1a7352b4b74925ccb4876f22714ce94cd1540e658ac83ebf60b`,
+introduced at development commit
+`a486aab6fb0fd296fb42273032e4741094e017db`). It is retained to make the
+archival protocol self-contained. The paper-facing numerical claims use the
+bounded repaired configurations under `configs/numerics/e02_repair*.yaml`, not
+this broad historical matrix. Reconstructing the historical E02 result hash
+also requires the matching protocol bytes from its result-producing commit;
+the current protocol must not be substituted and relabelled.
+
 ## 9. Citation
 
-See `CITATION.cff`. The public repository identifier and archived release
-version will be added when the release is frozen.
+See `CITATION.cff`. This source snapshot is version `0.1.0`. A public
+repository URL or archive DOI will be added only after the author approves
+public disclosure; the initial provenance-complete reviewer package is
+confidential.
 
 ## 10. License
 

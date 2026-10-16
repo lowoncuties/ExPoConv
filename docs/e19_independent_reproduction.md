@@ -2,8 +2,10 @@
 
 ## Status, scope, and closure rule
 
-E19 is **open**. This runbook defines a bounded independent check; it does not
-claim that anybody has completed it. E19 covers only:
+The **independent-human E19 claim is open and optional**. The current bounded
+manuscript does not require it as a submission or release gate. This runbook
+defines the stronger external check if it is pursued; it does not claim that
+an independent person has completed it. E19 covers only:
 
 1. the 424-row bounded E02 repair suite in
    `configs/numerics/e02_repair.yaml`; and
@@ -17,7 +19,7 @@ process-lifetime peak-allocation result. The timing raw file contains allocator
 fields, but this runbook neither exports nor accepts a memory estimate.
 
 A clean clone run by the author, Codex, or another agent on the original host is
-only a technical preflight. E19 closes only when another person who did not
+only a technical preflight. The independent E19 claim closes only when another person who did not
 implement the method runs an immutable released commit, signs the completed
 [`e19_reproduction_record_TEMPLATE.md`](e19_reproduction_record_TEMPLATE.md),
 and the signed record plus its evidence are archived outside the author's
@@ -39,6 +41,11 @@ The independent reproducer must:
 - retain raw outputs, console logs, status files, environment capture, and
   hashes.
 
+In the supplied release package, clone
+`repository/ExPoConv-git-<release-commit>.bundle`. The reviewer ZIP contains
+the tracked files but no Git object database, and the legacy V100 provenance
+bundle is a different artifact; neither is the E19 clone source.
+
 For direct comparison with the paper, use one 32-GB NVIDIA Tesla V100 with the
 pinned CUDA 11.8 environment. Another accelerator provides portability
 evidence but does not close the same-platform E19 gate. Declare any unavoidable
@@ -55,7 +62,8 @@ bash --noprofile --norc
 set -euo pipefail
 umask 077
 
-for command in git python3.11 uv nvidia-smi sha256sum find sort xargs tee; do
+python_executable=${POINCARE_EXEC_PYTHON:-python3.11}
+for command in git "$python_executable" uv nvidia-smi sha256sum find sort xargs tee; do
   command -v "$command" >/dev/null
 done
 
@@ -69,7 +77,7 @@ test -z "$(git status --porcelain)"
 (cd results && sha256sum --check SHA256SUMS)
 (cd splits && sha256sum --check SHA256SUMS)
 
-./scripts/bootstrap_cuda11_v100.sh
+POINCARE_EXEC_PYTHON="$python_executable" ./scripts/bootstrap_cuda11_v100.sh
 CUDA_VISIBLE_DEVICES='' JAX_PLATFORMS=cpu \
   ./.venv/bin/pytest -m "not gpu and not slow and not reference"
 test -z "$(git status --porcelain)"
@@ -310,5 +318,7 @@ printf '%s\n' "$e19_commit"
 The reproducer must archive the signed record, `SHA256SUMS`, and retained E19
 directory in an external release location and place that immutable identifier
 in the record. The author may review the package but must not rewrite the
-reproducer's observations. Until an independent human has done this, E19 stays
-open even if a same-machine clean-clone preflight passes.
+reproducer's observations. Until an independent human has done this, the
+optional independent-reproduction claim stays open even if a same-machine
+clean-clone preflight passes; the completed technical preflight is recorded in
+`results/e19_preflight/` and must not be relabelled as independent.

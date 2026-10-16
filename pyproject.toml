@@ -9,7 +9,7 @@ description = "Reproducible experiments for factorized execution of HNN++ Poinca
 readme = "README.md"
 requires-python = ">=3.11,<3.12"
 license = {file = "LICENSE"}
-authors = [{name = "Lukas Jochymek"}]
+authors = [{name = "Lukáš Jochymek"}]
 dependencies = [
   "jax==0.4.25",
   "jaxlib==0.4.25",
