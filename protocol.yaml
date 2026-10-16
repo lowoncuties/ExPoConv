@@ -1,4 +1,4 @@
-protocol_version: "1.15"
+protocol_version: "1.17"
 protocol_date: "2026-10-16"
 target_journal: "Neural Networks"
 working_title: "Exact and Efficient Execution of Poincare Neural Networks"
@@ -95,6 +95,16 @@ protocol_amendments:
     date: "2026-10-16"
     affected_experiments: [E22, E23, E24, E25, E26, E27]
     reason: "Before inspecting revision-extension outcomes, freeze six separately reported reviewer-requested checks. E22 tests allocator sensitivity at fraction 0.95 and adds a batch-16/512 workload expected to exceed physical memory. E23 tests whether batch-one forward allocation changes when GPU convolution autotuning is disabled. E24 adds benchmark-only M, which materializes R's identical beta-scaled tangent patch but evaluates the exact HNN++ score from patch energy and directional products, so R-versus-M isolates elementwise patch geometry and M-versus-F isolates explicit patch materialization from fused convolutions. E25 adds contextual E, which uses parameter-shape-matched Euclidean convolution/dense layers, current-batch Euclidean normalization over the same axes, ordinary skip concatenation/addition, and the same FC-plus-fold decoder topology without curvature. E26 is a fresh post-repair structured replay reporting elementwise relative-error quantiles without replacing the accepted E02 gate. E27 is a separate RTX-A6000 current-JAX/CUDA-12 portability cohort and is not pooled with or substituted for the primary JAX-0.4.25/CUDA-11.8 results. None of these post-hoc extensions changes the registered R/F/T numerical or training matrices."
+    case_manifest_changed: true
+  - version: "1.16"
+    date: "2026-10-16"
+    affected_experiments: [E27]
+    reason: "Before any E24--E27 A6000 outcome was generated, a clean-clone preflight aligned E27's configuration workload identifier with its protocol registration and explicitly fixed its allocator fraction at 0.95 with preallocation disabled. The preflight also required separate version/backend/device gates and environment captures for the pinned and current JAX stacks. Workload shape, variants, sessions, warmups, timed calls, and reporting policy are unchanged."
+    case_manifest_changed: false
+  - version: "1.17"
+    date: "2026-10-16"
+    affected_experiments: [E28]
+    reason: "After inspecting the fresh E26 diagnostic, freeze a post-hoc replay-stability check for its only mixed-criterion exception pattern: the first three deterministic FP32 realizations of both original structured cases, repeated in three independent processes. E28 is descriptive, cannot replace E02 or E26, and is intended only to distinguish a stable replay result from process-to-process numerical sensitivity."
     case_manifest_changed: true
 
 variants:
@@ -202,8 +212,20 @@ revision_benchmarks:
     sessions: 5
     warmup_calls: 50
     timed_calls_per_session: 200
+    allocator_fraction: 0.95
+    preallocate: false
     runtime_profile: "JAX/JAXLIB 0.11.2 CUDA-12 plugin on one idle RTX A6000"
     reporting_policy: "Report separately from all JAX-0.4.25 cohorts; do not pool, substitute, or reinterpret earlier results."
+  E28:
+    role: "post-outcome descriptive replay-stability diagnostic for E26"
+    config: "configs/numerics/e28_elementwise_replay_stability.yaml"
+    variants: [R, F, T]
+    cases: [convolution_stack_8, small_unet]
+    precisions: [float32]
+    realizations: [0, 1, 2]
+    independent_process_replays: 3
+    reference_experiment: E26
+    interpretation: "Report every replay separately; do not select a favorable replay, pool it into E02/E26, or use it as a new acceptance gate."
 
 precision:
   oracle: float64

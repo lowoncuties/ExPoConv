@@ -1,0 +1,39 @@
+{
+  "aggregation_note": "Summary quantile columns are conservative maxima of the named per-tensor elementwise quantile across all included tensor rows; they are not pooled elementwise quantiles. The floor fraction alone is pooled from element counts.",
+  "analysis_status": "prospective_reviewer_requested_diagnostic",
+  "definition": "abs(candidate-reference)/max(abs(reference),denominator_floor)",
+  "denominator_floor": 1e-12,
+  "identity": {
+    "code_commit": "30142ce2c9f60a115fa77cf844cac14166446b27",
+    "code_dirty": false,
+    "config_hash": "92b66e55c0d268f6f5d0a5463f28e1484eb5008d4d5c99ad13ba0450e2d63047",
+    "device_id": "argexpr3.vsb.cz::gpu:0::Tesla V100-PCIE-32GB",
+    "experiment_id": "E26",
+    "protocol_version": "1.15"
+  },
+  "interpretation": "Fresh descriptive replay; pass/failure counts are reported to expose replay behavior but do not replace the accepted E02 gate.",
+  "mixed_criterion": {
+    "float32": {
+      "absolute_tolerance": 2e-05,
+      "relative_tolerance": 2e-05
+    },
+    "float64": {
+      "absolute_tolerance": 1e-10,
+      "relative_tolerance": 1e-10
+    }
+  },
+  "output_rows": {
+    "e26_elementwise_case_summary.csv": 16,
+    "e26_elementwise_scope_summary.csv": 8,
+    "e26_elementwise_tensor_statistics.csv": 2720
+  },
+  "quantile_method": "linear",
+  "schema_version": "1.0",
+  "scientific_behavior_change": false,
+  "source": {
+    "bytes": 5669388,
+    "file": "e26_elementwise_agreement_protocol115.jsonl",
+    "rows": 2720,
+    "sha256": "9042a4e3cca0b341c4ecc95bc001e24efb00724a327dd518c8055eb40e48be21"
+  }
+}

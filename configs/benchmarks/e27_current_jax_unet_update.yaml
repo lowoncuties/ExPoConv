@@ -14,7 +14,7 @@ timing_scope: "Each synchronized call includes loss, reverse-mode gradients, gra
 memory_evidence_policy: "Process-lifetime JAX allocator peak through the final synchronized measured update; includes initialization, compilation, first call, and warmup and is not isolated activation memory."
 failure_policy: "Retain every failed group. Explicit allocator diagnostics are classified as OOM; compiler and runtime failures remain distinct."
 workloads:
-  - id: unet_b8_update_current_jax
+  - id: unet_update_b8_r256
     kind: unet
     mode: update
     shape: {batch: 8, height: 256, width: 256}

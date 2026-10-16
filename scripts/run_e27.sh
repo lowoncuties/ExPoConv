@@ -19,6 +19,7 @@ fi
 # A host LD_LIBRARY_PATH can override those libraries, so keep it out of this
 # separately reported portability cohort.
 unset LD_LIBRARY_PATH
+export XLA_PYTHON_CLIENT_MEM_FRACTION=0.95
 export XLA_PYTHON_CLIENT_PREALLOCATE=false
 export PYTHONPATH="$repository_root/src${PYTHONPATH:+:$PYTHONPATH}"
 
