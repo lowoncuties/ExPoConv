@@ -17,8 +17,10 @@ from collections.abc import Mapping, Sequence
 from pathlib import Path
 from typing import Any
 
+from poincare_exec.artifacts.provenance import git_provenance
 from scripts.export_e26_elementwise_tables import _atomic_csv, _atomic_json, _sha256
 
+REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
 EXPECTED_COMMIT = "30142ce2c9f60a115fa77cf844cac14166446b27"
 EXPECTED_PROTOCOL = "1.15"
 EXPECTED_DEVICE = "argexpr3.vsb.cz::gpu:0::Tesla V100-PCIE-32GB"
@@ -116,6 +118,12 @@ PAIRED_FIELDS = (
     "F_peak_live_reduction_vs_R_percent",
     "pairing_rule",
 )
+OUTPUT_FILES = (
+    "e22_session_outcomes.csv",
+    "e22_workload_variant_summary.csv",
+    "e22_paired_contrasts.csv",
+    "e22_failure_diagnostics.csv",
+)
 
 
 def _parser() -> argparse.ArgumentParser:
@@ -183,14 +191,16 @@ def _canonical_shape(value: Any, *, context: str) -> dict[str, int]:
         raise ValueError(f"{context}: invalid shape JSON") from error
     if not isinstance(decoded, Mapping):
         raise ValueError(f"{context}: shape must be a mapping")
-    try:
-        return {
-            "batch": int(decoded["batch"]),
-            "height": int(decoded["height"]),
-            "width": int(decoded["width"]),
-        }
-    except (KeyError, TypeError, ValueError) as error:
-        raise ValueError(f"{context}: invalid shape") from error
+    output = {}
+    for field in ("batch", "height", "width"):
+        try:
+            field_value = decoded[field]
+        except KeyError as error:
+            raise ValueError(f"{context}: invalid shape") from error
+        if isinstance(field_value, bool) or not isinstance(field_value, int):
+            raise ValueError(f"{context}: shape {field} must be an integer")
+        output[field] = field_value
+    return output
 
 
 def _check_snapshot(value: Any, *, context: str, before: bool) -> None:
@@ -788,6 +798,7 @@ def export(
         if runner_path is not None
         else Path(__file__).resolve().with_name("run_e22.sh")
     )
+    analysis_code = git_provenance(REPOSITORY_ROOT)
     success_raw = _read_csv(success_path)
     failure_raw = _read_jsonl(failure_path)
     if not success_raw and not failure_raw:
@@ -808,11 +819,11 @@ def export(
     contrasts = _paired_contrasts(sessions)
     failure_diagnostics = [row for row in sessions if row["outcome"] != "ok"]
     output_dir.mkdir(parents=True, exist_ok=True)
-    _atomic_csv(output_dir / "e22_session_outcomes.csv", sessions)
-    _atomic_csv(output_dir / "e22_workload_variant_summary.csv", summaries)
-    _atomic_csv_or_header(output_dir / "e22_paired_contrasts.csv", contrasts, PAIRED_FIELDS)
+    _atomic_csv(output_dir / OUTPUT_FILES[0], sessions)
+    _atomic_csv(output_dir / OUTPUT_FILES[1], summaries)
+    _atomic_csv_or_header(output_dir / OUTPUT_FILES[2], contrasts, PAIRED_FIELDS)
     _atomic_csv_or_header(
-        output_dir / "e22_failure_diagnostics.csv",
+        output_dir / OUTPUT_FILES[3],
         failure_diagnostics,
         list(sessions[0]),
     )
@@ -822,6 +833,7 @@ def export(
         "schema_version": "1.0",
         "analysis_status": "post_hoc_allocator_fraction_and_capacity_diagnostic",
         "scientific_behavior_change": False,
+        "analysis_code": analysis_code,
         "identity": {
             "experiment_id": "E22",
             "protocol_version": EXPECTED_PROTOCOL,
@@ -876,10 +888,18 @@ def export(
             "diagnostic tables."
         ),
         "output_rows": {
-            "e22_session_outcomes.csv": len(sessions),
-            "e22_workload_variant_summary.csv": len(summaries),
-            "e22_paired_contrasts.csv": len(contrasts),
-            "e22_failure_diagnostics.csv": len(failure_diagnostics),
+            OUTPUT_FILES[0]: len(sessions),
+            OUTPUT_FILES[1]: len(summaries),
+            OUTPUT_FILES[2]: len(contrasts),
+            OUTPUT_FILES[3]: len(failure_diagnostics),
+        },
+        "output_evidence": {
+            filename: {
+                "file": filename,
+                "bytes": (output_dir / filename).stat().st_size,
+                "sha256": _sha256(output_dir / filename),
+            }
+            for filename in OUTPUT_FILES
         },
     }
     _atomic_json(output_dir / "e22_audit.json", summary)

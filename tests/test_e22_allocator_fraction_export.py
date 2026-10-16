@@ -322,6 +322,17 @@ def test_export_rejects_invalid_success_identity_and_phases(
         export(success, failures, tmp_path / field)
 
 
+def test_export_rejects_fractional_shape_dimensions(tmp_path: Path) -> None:
+    success, failures = _sources(tmp_path)
+    success_rows, _ = _campaign()
+    shape = json.loads(str(success_rows[0]["shape"]))
+    shape["width"] = 512.5
+    success_rows[0]["shape"] = json.dumps(shape, separators=(",", ":"), sort_keys=True)
+    _write_csv(success, success_rows)
+    with pytest.raises(ValueError, match="shape width must be an integer"):
+        export(success, failures, tmp_path / "fractional-shape")
+
+
 def test_export_recomputes_failure_class_and_requires_oom_diagnostics(
     tmp_path: Path,
 ) -> None:
