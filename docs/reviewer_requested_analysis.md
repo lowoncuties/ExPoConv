@@ -93,3 +93,29 @@ The completed E23 and E28 diagnostics have separate fail-closed exporters:
 
 Their tracked JSON summaries record raw hashes, identities, row counts, and the
 scope of each post-hoc interpretation.
+
+## Revision benchmark throughput derivation
+
+`scripts/export_e24_e25_e27_tables.py` validates the complete registered
+E24/E25/E27 outcome matrices before producing its combined session, variant,
+contrast, and audit outputs. Export schema 1.1 adds the validated batch size and
+derives each accepted session's steady-state throughput as
+
+`1000 * batch_size / session_median_latency_ms`
+
+in samples/s. The batch size comes from the registered workload shape and must
+be a positive integer. Failed groups retain that validated batch size but have
+no latency or throughput value. Variant summaries take the median, minimum, and
+maximum over accepted session-level throughputs; they do not invert a rounded
+display value. Paired contrast throughput is candidate/reference, so it is
+numerically the same speed direction as the retained reference/candidate
+latency ratio. Full-precision latency and throughput fields are both preserved.
+
+`scripts/plot_e25_cost_context.py` independently verifies the audit hashes,
+batch sizes, and the throughput identity before rendering the U-Net context
+figure. Its left panel shows absolute samples/s and its right panel shows
+process-lifetime peak live allocation. Small points are the five session values,
+large points are medians, and ranges are session minima and maxima rather than
+confidence intervals. The figure-data CSV retains the latency summaries and
+adds the throughput values used by the plot. No E24/E25, software-stack, or
+hardware strata are pooled.

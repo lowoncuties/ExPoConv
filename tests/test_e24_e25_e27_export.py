@@ -286,6 +286,7 @@ def test_exports_complete_matrices_roles_and_registered_contrasts(tmp_path: Path
 
     summary = exporter.export(artifacts, output)
 
+    assert summary["schema_version"] == "1.1"
     assert summary["output_rows"] == {
         "e24_e25_e27_session_outcomes.csv": 145,
         "e24_e25_e27_variant_summary.csv": 29,
@@ -296,6 +297,51 @@ def test_exports_complete_matrices_roles_and_registered_contrasts(tmp_path: Path
     contrasts = _csv(output / exporter.OUTPUT_FILES["contrasts"])
     assert {row["outcome"] for row in sessions} == {"ok"}
     assert len({row["config_hash"] for row in sessions}) == 10
+    e25_audit = next(
+        cohort for cohort in summary["cohorts"] if cohort["experiment_id"] == "E25"
+    )
+    assert e25_audit["expected_batch_sizes"] == {
+        "unet_b1_forward": 1,
+        "unet_b8_forward": 8,
+        "unet_b8_update": 8,
+        "resnet20_b1_forward": 1,
+        "resnet20_b128_forward": 128,
+        "resnet20_b128_update": 128,
+    }
+    e25_batch8_e = next(
+        row
+        for row in sessions
+        if row["experiment_id"] == "E25"
+        and row["workload_id"] == "unet_b8_forward"
+        and row["session"] == "0"
+        and row["variant"] == "E"
+    )
+    assert int(e25_batch8_e["batch_size"]) == 8
+    assert float(e25_batch8_e["session_median_throughput_samples_per_s"]) == (
+        pytest.approx(8000.0 / float(e25_batch8_e["session_median_latency_ms"]))
+    )
+    e25_batch8_e_summary = next(
+        row
+        for row in variants
+        if row["experiment_id"] == "E25"
+        and row["workload_id"] == "unet_b8_forward"
+        and row["variant"] == "E"
+    )
+    expected_throughputs = [
+        8000.0 / (1.0 + 0.01 * session + 0.00995) for session in range(5)
+    ]
+    assert json.loads(
+        e25_batch8_e_summary["session_throughputs_samples_per_s"]
+    ) == pytest.approx(expected_throughputs)
+    assert float(e25_batch8_e_summary["median_throughput_samples_per_s"]) == pytest.approx(
+        expected_throughputs[2]
+    )
+    assert float(e25_batch8_e_summary["min_throughput_samples_per_s"]) == pytest.approx(
+        expected_throughputs[-1]
+    )
+    assert float(e25_batch8_e_summary["max_throughput_samples_per_s"]) == pytest.approx(
+        expected_throughputs[0]
+    )
     assert {row["variant_role"] for row in variants if row["experiment_id"] == "E24"} == {
         "reference_materialized_ball_geometry",
         "materialized_patch_exact_score_control",
@@ -310,6 +356,19 @@ def test_exports_complete_matrices_roles_and_registered_contrasts(tmp_path: Path
         "reference_poincare_cost_relative_to_euclidean",
         "factorized_poincare_cost_relative_to_euclidean",
     }
+    e25_rf = next(
+        row
+        for row in contrasts
+        if row["experiment_id"] == "E25"
+        and row["workload_id"] == "unet_b8_forward"
+        and row["contrast_role"] == "factorized_vs_reference_poincare"
+    )
+    assert float(e25_rf["geometric_mean_throughput_ratio"]) == pytest.approx(
+        float(e25_rf["geometric_mean_latency_ratio"])
+    )
+    assert json.loads(e25_rf["paired_throughput_ratios"]) == pytest.approx(
+        json.loads(e25_rf["paired_latency_ratios"])
+    )
     e27 = next(row for row in contrasts if row["experiment_id"] == "E27")
     assert e27["runtime_role"] == "current_jax_0_11_2_cuda_12_portability"
     assert e27["jax_version"] == "0.11.2"
@@ -339,6 +398,8 @@ def test_retains_failure_and_excludes_only_affected_pair(tmp_path: Path) -> None
         == failed
     )
     assert failure["outcome"] == "failed"
+    assert int(failure["batch_size"]) == 1
+    assert failure["session_median_throughput_samples_per_s"] == ""
     assert failure["failure_phase"] == "compilation"
     assert failure["failure_stderr"] == "retained failure diagnostic"
     variants = _csv(output / exporter.OUTPUT_FILES["variants"])
@@ -414,6 +475,22 @@ def test_role_specs_cover_exact_frozen_variant_matrices() -> None:
     } == {"E24": 45, "E25": 90, "E27": 10}
 
 
+@pytest.mark.parametrize(
+    "workload",
+    [
+        {},
+        {"shape": []},
+        {"shape": {}},
+        {"shape": {"batch": True}},
+        {"shape": {"batch": 0}},
+        {"shape": {"batch": 1.5}},
+    ],
+)
+def test_throughput_batch_size_validation_fails_closed(workload: dict[str, Any]) -> None:
+    with pytest.raises(ValueError, match="batch size|shape"):
+        exporter._validated_batch_size(workload, context="test")
+
+
 def test_e25_cost_figure_is_exact_deterministic_and_fails_closed(
     tmp_path: Path,
 ) -> None:
@@ -459,12 +536,36 @@ def test_e25_cost_figure_is_exact_deterministic_and_fails_closed(
         [1.00995, 1.01995, 1.02995, 1.03995, 1.04995]
     )
     assert float(e["median_latency_ms"]) == pytest.approx(1.02995)
+    expected_figure_throughputs = [
+        1000.0 / latency for latency in [1.00995, 1.01995, 1.02995, 1.03995, 1.04995]
+    ]
+    assert int(e["batch_size"]) == 1
+    assert json.loads(e["session_throughput_samples_per_s"]) == pytest.approx(
+        expected_figure_throughputs
+    )
+    assert float(e["median_throughput_samples_per_s"]) == pytest.approx(
+        expected_figure_throughputs[2]
+    )
+    assert float(e["min_throughput_samples_per_s"]) == pytest.approx(
+        expected_figure_throughputs[-1]
+    )
+    assert float(e["max_throughput_samples_per_s"]) == pytest.approx(
+        expected_figure_throughputs[0]
+    )
     assert json.loads(e["peak_live_gib_by_session"]) == [4.0] * 5
     assert float(e["median_peak_live_gib"]) == 4.0
     assert {row["physical_gpu_uuid"] for row in figure_rows} == {
         exporter.EXPECTED_DEVICE["uuid"]
     }
     assert {row["runtime_role"] for row in figure_rows} == {"pinned_jax_0_4_25_cuda_11_8"}
+    figure = cost_figure.build_figure(figure_rows)
+    try:
+        assert figure.axes[0].get_title(loc="left") == "a  Steady-state throughput"
+        assert figure.axes[0].get_ylabel() == "Throughput (samples/s)"
+    finally:
+        import matplotlib.pyplot as plt
+
+        plt.close(figure)
     with pytest.raises(FileExistsError, match="refusing to overwrite"):
         cost_figure.render(validated, tmp_path / "figure-a")
 
@@ -478,7 +579,7 @@ def test_e25_cost_figure_is_exact_deterministic_and_fails_closed(
         and row["session"] == "0"
         and row["variant"] == "E"
     )
-    target["jax_version"] = "0.11.2"
+    target["session_median_throughput_samples_per_s"] = "999"
     _write_csv(sessions_path, session_rows)
     with pytest.raises(ValueError, match="audit evidence mismatch"):
         cost_figure.render(validated, tmp_path / "tampered-evidence")
@@ -488,5 +589,5 @@ def test_e25_cost_figure_is_exact_deterministic_and_fails_closed(
     session_evidence["bytes"] = sessions_path.stat().st_size
     session_evidence["sha256"] = hashlib.sha256(sessions_path.read_bytes()).hexdigest()
     audit_path.write_text(json.dumps(audit, sort_keys=True) + "\n", encoding="utf-8")
-    with pytest.raises(ValueError, match="unexpected jax_version"):
+    with pytest.raises(ValueError, match="throughput does not match"):
         cost_figure.render(validated, tmp_path / "tampered-provenance")

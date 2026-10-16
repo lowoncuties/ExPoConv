@@ -24,6 +24,7 @@ from poincare_exec.config.loader import canonical_json, config_hash, load_yaml
 REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
 EXPECTED_COMMIT = "df3f6f556a314f74a6966701b38ac5d135a10a62"
 EXPECTED_PROTOCOL_VERSION = "1.17"
+EXPORT_SCHEMA_VERSION = "1.1"
 EXPECTED_DEVICE = {
     "hostname": "aibox2a6000",
     "physical_index": 1,
@@ -198,6 +199,16 @@ def _integer(value: Any, *, context: str, minimum: int | None = None) -> int:
     if minimum is not None and result < minimum:
         raise ValueError(f"{context}: expected an integer >= {minimum}")
     return result
+
+
+def _validated_batch_size(workload: Mapping[str, Any], *, context: str) -> int:
+    shape = workload.get("shape")
+    if not isinstance(shape, dict):
+        raise ValueError(f"{context}: workload shape must be a mapping")
+    batch_size = shape.get("batch")
+    if isinstance(batch_size, bool) or not isinstance(batch_size, int) or batch_size < 1:
+        raise ValueError(f"{context}: batch size must be a positive integer")
+    return batch_size
 
 
 def _one(values: Iterable[Any], *, context: str) -> Any:
@@ -429,9 +440,13 @@ def _load_registration(protocol_path: Path) -> tuple[dict[str, Any], dict[str, A
             raise ValueError(f"{experiment_id}: frozen registration mismatch: {failed}")
         workloads = {}
         for workload in config["workloads"]:
+            batch_size = _validated_batch_size(
+                workload, context=f"{experiment_id}/{workload['id']}"
+            )
             workloads[workload["id"]] = {
                 "spec": workload,
                 "config_hash": config_hash(protocol, config, workload),
+                "batch_size": batch_size,
             }
         registrations[experiment_id] = {
             "config": config,
@@ -530,7 +545,9 @@ def _validate_success_group(
     workload_id, session, variant = key
     context = f"{experiment_id}/{workload_id}/session-{session}/{variant}"
     config = registration["config"]
-    workload = registration["workloads"][workload_id]["spec"]
+    workload_registration = registration["workloads"][workload_id]
+    workload = workload_registration["spec"]
+    batch_size = int(workload_registration["batch_size"])
     timed = int(config["timed_calls_per_session"])
     if len(rows) != timed + 3:
         raise ValueError(f"{context}: row count is {len(rows)}, expected {timed + 3}")
@@ -656,6 +673,12 @@ def _validate_success_group(
     if result_status == "nonfinite" and not (output_nonfinite or state_nonfinite):
         raise ValueError(f"{context}: nonfinite group has no retained nonfinite count")
 
+    session_median_latency_ms = statistics.median(latency_values)
+    session_median_throughput_samples_per_s = _finite(
+        1000.0 * batch_size / session_median_latency_ms,
+        context=f"{context} derived throughput",
+        positive=True,
+    )
     return {
         "experiment_id": experiment_id,
         "runtime_role": cohort["runtime_role"],
@@ -665,12 +688,16 @@ def _validate_success_group(
         "workload_kind": workload["kind"],
         "mode": workload["mode"],
         "shape": canonical_json(workload["shape"]),
+        "batch_size": batch_size,
         "session": session,
         "variant": variant,
         "variant_role": cohort["variant_roles"][variant],
         "outcome": result_status,
         "steady_state_observations": timed,
-        "session_median_latency_ms": statistics.median(latency_values),
+        "session_median_latency_ms": session_median_latency_ms,
+        "session_median_throughput_samples_per_s": (
+            session_median_throughput_samples_per_s
+        ),
         "compilation_ms": compilation_ms,
         "first_compiled_call_ms": first_call_ms,
         "peak_live_gib": peak_live / 1024**3,
@@ -718,7 +745,9 @@ def _validate_failure(
     returncode = _integer(row.get("returncode"), context=f"{context} returncode")
     _snapshot(row.get("gpu_snapshot_before"), context=context, before=True)
     _snapshot(row.get("gpu_snapshot_after"), context=context, before=False)
-    workload = registration["workloads"][workload_id]["spec"]
+    workload_registration = registration["workloads"][workload_id]
+    workload = workload_registration["spec"]
+    batch_size = int(workload_registration["batch_size"])
     if row.get("shape") != workload["shape"]:
         raise ValueError(f"{context}: shape mismatch")
     if row.get("operation_boundary") != f"{workload['kind']}:{workload['mode']}":
@@ -732,12 +761,14 @@ def _validate_failure(
         "workload_kind": workload["kind"],
         "mode": workload["mode"],
         "shape": canonical_json(workload["shape"]),
+        "batch_size": batch_size,
         "session": session,
         "variant": variant,
         "variant_role": cohort["variant_roles"][variant],
         "outcome": "failed",
         "steady_state_observations": 0,
         "session_median_latency_ms": None,
+        "session_median_throughput_samples_per_s": None,
         "compilation_ms": None,
         "first_compiled_call_ms": None,
         "peak_live_gib": None,
@@ -859,6 +890,10 @@ def _validate_cohort(
             workload_id: value["config_hash"]
             for workload_id, value in registration["workloads"].items()
         },
+        "expected_batch_sizes": {
+            workload_id: value["batch_size"]
+            for workload_id, value in registration["workloads"].items()
+        },
     }
 
 
@@ -872,6 +907,9 @@ def _variant_summaries(outcomes: Sequence[Mapping[str, Any]]) -> list[dict[str, 
         exemplar = selected[0]
         accepted = [row for row in selected if row["outcome"] == "ok"]
         latencies = [float(row["session_median_latency_ms"]) for row in accepted]
+        throughputs = [
+            float(row["session_median_throughput_samples_per_s"]) for row in accepted
+        ]
         live = [float(row["peak_live_gib"]) for row in accepted]
         pool = [float(row["peak_pool_gib"]) for row in accepted]
         reservation = [float(row["process_reservation_mib"]) for row in accepted]
@@ -885,6 +923,7 @@ def _variant_summaries(outcomes: Sequence[Mapping[str, Any]]) -> list[dict[str, 
                 "workload_kind": exemplar["workload_kind"],
                 "mode": exemplar["mode"],
                 "shape": exemplar["shape"],
+                "batch_size": exemplar["batch_size"],
                 "variant": key[2],
                 "variant_role": exemplar["variant_role"],
                 "planned_sessions": len(selected),
@@ -902,6 +941,19 @@ def _variant_summaries(outcomes: Sequence[Mapping[str, Any]]) -> list[dict[str, 
                 "q1_session_latency_ms": _quantile(latencies, 0.25),
                 "q3_session_latency_ms": _quantile(latencies, 0.75),
                 "session_medians_ms": json.dumps(latencies, separators=(",", ":")),
+                "throughput_estimand": (
+                    "median of accepted per-session throughputs; each session is "
+                    "1000 times validated batch size divided by its synchronized "
+                    "steady-state median latency in milliseconds"
+                ),
+                "median_throughput_samples_per_s": (
+                    statistics.median(throughputs) if throughputs else None
+                ),
+                "min_throughput_samples_per_s": (min(throughputs) if throughputs else None),
+                "max_throughput_samples_per_s": (max(throughputs) if throughputs else None),
+                "session_throughputs_samples_per_s": json.dumps(
+                    throughputs, separators=(",", ":")
+                ),
                 "median_peak_live_gib": statistics.median(live) if live else None,
                 "min_peak_live_gib": min(live) if live else None,
                 "max_peak_live_gib": max(live) if live else None,
@@ -967,6 +1019,11 @@ def _contrasts(outcomes: Sequence[Mapping[str, Any]]) -> list[dict[str, Any]]:
                     / float(candidate_row["session_median_latency_ms"])
                     for _, reference_row, candidate_row in paired
                 ]
+                throughput_ratios = [
+                    float(candidate_row["session_median_throughput_samples_per_s"])
+                    / float(reference_row["session_median_throughput_samples_per_s"])
+                    for _, reference_row, candidate_row in paired
+                ]
                 live_ratios = [
                     float(reference_row["peak_live_gib"])
                     / float(candidate_row["peak_live_gib"])
@@ -978,9 +1035,11 @@ def _contrasts(outcomes: Sequence[Mapping[str, Any]]) -> list[dict[str, Any]]:
                     for _, reference_row, candidate_row in paired
                 ]
                 latency_ratio = _geometric_mean(latency_ratios)
+                throughput_ratio = _geometric_mean(throughput_ratios)
                 live_ratio = _geometric_mean(live_ratios)
                 pool_ratio = _geometric_mean(pool_ratios)
                 lower, upper = _log_t_interval(latency_ratios)
+                throughput_lower, throughput_upper = _log_t_interval(throughput_ratios)
                 exemplar = indexed[(experiment_id, workload_id, sessions[0], reference)]
                 output.append(
                     {
@@ -992,6 +1051,7 @@ def _contrasts(outcomes: Sequence[Mapping[str, Any]]) -> list[dict[str, Any]]:
                         "workload_kind": exemplar["workload_kind"],
                         "mode": exemplar["mode"],
                         "shape": exemplar["shape"],
+                        "batch_size": exemplar["batch_size"],
                         "contrast_role": role,
                         "reference_variant": reference,
                         "reference_variant_role": cohort["variant_roles"][reference],
@@ -1015,6 +1075,17 @@ def _contrasts(outcomes: Sequence[Mapping[str, Any]]) -> list[dict[str, Any]]:
                         ),
                         "paired_latency_ratios": json.dumps(
                             latency_ratios, separators=(",", ":")
+                        ),
+                        "throughput_ratio_estimand": (
+                            "geometric mean of paired candidate/reference "
+                            "session-median throughput ratios; values above one favor "
+                            "the candidate"
+                        ),
+                        "geometric_mean_throughput_ratio": throughput_ratio,
+                        "throughput_log_t_95_lower": throughput_lower,
+                        "throughput_log_t_95_upper": throughput_upper,
+                        "paired_throughput_ratios": json.dumps(
+                            throughput_ratios, separators=(",", ":")
                         ),
                         "geometric_mean_peak_live_ratio": live_ratio,
                         "candidate_peak_live_reduction_percent": (
@@ -1088,7 +1159,7 @@ def export(
     _atomic_csv(paths["variants"], variants)
     _atomic_csv(paths["contrasts"], contrasts)
     summary = {
-        "schema_version": "1.0",
+        "schema_version": EXPORT_SCHEMA_VERSION,
         "analysis_id": "e24_e25_e27_revision_benchmark_export",
         "derivation": (
             "CPU-only validation and deterministic aggregation of existing raw GPU "

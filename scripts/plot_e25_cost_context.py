@@ -18,7 +18,7 @@ from typing import Any
 from scripts import export_e24_e25_e27_tables as exporter
 
 ANALYSIS_ID = "e24_e25_e27_revision_benchmark_export"
-FIGURE_DATA_SCHEMA_VERSION = "1.0"
+FIGURE_DATA_SCHEMA_VERSION = "1.1"
 EXPECTED_OUTPUT_ROWS = {
     exporter.OUTPUT_FILES["sessions"]: 145,
     exporter.OUTPUT_FILES["variants"]: 29,
@@ -33,12 +33,14 @@ SESSION_COLUMNS = (
     "workload_kind",
     "mode",
     "shape",
+    "batch_size",
     "session",
     "variant",
     "variant_role",
     "outcome",
     "steady_state_observations",
     "session_median_latency_ms",
+    "session_median_throughput_samples_per_s",
     "compilation_ms",
     "first_compiled_call_ms",
     "peak_live_gib",
@@ -193,7 +195,7 @@ def validate_bundle(
     }
     audit = _read_json(paths["audit"])
     expected_identity = {
-        "schema_version": "1.0",
+        "schema_version": exporter.EXPORT_SCHEMA_VERSION,
         "analysis_id": ANALYSIS_ID,
         "protocol_version": exporter.EXPECTED_PROTOCOL_VERSION,
         "expected_run_commit": exporter.EXPECTED_COMMIT,
@@ -259,6 +261,10 @@ def validate_bundle(
         e25_audit.get("expected_config_hashes"),
         context="E25 expected_config_hashes",
     )
+    batch_sizes = _require_mapping(
+        e25_audit.get("expected_batch_sizes"),
+        context="E25 expected_batch_sizes",
+    )
 
     all_sessions = _read_sessions(paths["sessions"])
     if len(all_sessions) != EXPECTED_OUTPUT_ROWS[exporter.OUTPUT_FILES["sessions"]]:
@@ -301,6 +307,15 @@ def validate_bundle(
         config_hash = _require_sha256(
             config_hashes.get(workload_id), context=f"{workload_id} config hash"
         )
+        expected_batch_size = batch_sizes.get(workload_id)
+        if isinstance(expected_batch_size, bool) or not isinstance(
+            expected_batch_size, int
+        ):
+            raise ValueError(f"{workload_id}: audit batch size must be an integer")
+        if expected_batch_size not in {1, 8}:
+            raise ValueError(
+                f"{workload_id}: unexpected validated batch size {expected_batch_size}"
+            )
         for session in SESSIONS:
             for variant, _variant_label, _role in VARIANTS:
                 row = indexed[(workload_id, session, variant)]
@@ -310,6 +325,7 @@ def validate_bundle(
                     "jaxlib_version": "0.4.25",
                     "workload_kind": "unet",
                     "mode": workload_modes[workload_id],
+                    "batch_size": str(expected_batch_size),
                     "variant_role": variant_roles[variant],
                     "outcome": "ok",
                     "protocol_version": exporter.EXPECTED_PROTOCOL_VERSION,
@@ -328,14 +344,35 @@ def validate_bundle(
                         )
                 if int(row["steady_state_observations"]) != 200:
                     raise ValueError("E25 figure rows must contain 200 steady-state calls")
+                try:
+                    shape = json.loads(row["shape"])
+                except json.JSONDecodeError as error:
+                    raise ValueError(f"{workload_id}: invalid shape JSON") from error
+                if not isinstance(shape, dict) or shape.get("batch") != expected_batch_size:
+                    raise ValueError(f"{workload_id}: shape batch does not match audit")
+                latency = _finite_positive(
+                    row["session_median_latency_ms"],
+                    context=f"{workload_id}/{variant} latency",
+                )
+                throughput = _finite_positive(
+                    row["session_median_throughput_samples_per_s"],
+                    context=f"{workload_id}/{variant} throughput",
+                )
+                expected_throughput = 1000.0 * expected_batch_size / latency
+                if not math.isclose(
+                    throughput, expected_throughput, rel_tol=1e-12, abs_tol=0.0
+                ):
+                    raise ValueError(
+                        f"{workload_id}/{variant}: throughput does not match "
+                        "validated batch size and latency"
+                    )
                 validated.append(
                     {
                         **row,
                         "session": session,
-                        "session_median_latency_ms": _finite_positive(
-                            row["session_median_latency_ms"],
-                            context=f"{workload_id}/{variant} latency",
-                        ),
+                        "batch_size": expected_batch_size,
+                        "session_median_latency_ms": latency,
+                        "session_median_throughput_samples_per_s": throughput,
                         "peak_live_gib": _finite_positive(
                             row["peak_live_gib"],
                             context=f"{workload_id}/{variant} peak live allocation",
@@ -365,6 +402,9 @@ def build_figure_data(
         for variant, variant_label, variant_role in VARIANTS:
             selected = [indexed[(workload_id, session, variant)] for session in SESSIONS]
             latencies = [float(row["session_median_latency_ms"]) for row in selected]
+            throughputs = [
+                float(row["session_median_throughput_samples_per_s"]) for row in selected
+            ]
             peaks = [float(row["peak_live_gib"]) for row in selected]
             exemplar = selected[0]
             output.append(
@@ -382,6 +422,7 @@ def build_figure_data(
                     "workload_kind": "unet",
                     "mode": mode,
                     "shape": exemplar["shape"],
+                    "batch_size": exemplar["batch_size"],
                     "variant": variant,
                     "variant_label": variant_label,
                     "variant_role": variant_role,
@@ -394,6 +435,12 @@ def build_figure_data(
                     "median_latency_ms": statistics.median(latencies),
                     "min_latency_ms": min(latencies),
                     "max_latency_ms": max(latencies),
+                    "session_throughput_samples_per_s": json.dumps(
+                        throughputs, separators=(",", ":")
+                    ),
+                    "median_throughput_samples_per_s": statistics.median(throughputs),
+                    "min_throughput_samples_per_s": min(throughputs),
+                    "max_throughput_samples_per_s": max(throughputs),
                     "peak_live_gib_by_session": json.dumps(peaks, separators=(",", ":")),
                     "median_peak_live_gib": statistics.median(peaks),
                     "min_peak_live_gib": min(peaks),
@@ -401,6 +448,11 @@ def build_figure_data(
                     "latency_definition": (
                         "median of five session-level medians; each session median uses "
                         "200 synchronized steady-state calls"
+                    ),
+                    "throughput_definition": (
+                        "for each session, 1000 times validated batch size divided by "
+                        "that session's synchronized steady-state median latency in "
+                        "milliseconds; summaries span five sessions"
                     ),
                     "memory_definition": (
                         "process-lifetime JAX allocator peak through the final "
@@ -447,12 +499,12 @@ def build_figure(figure_data: Sequence[Mapping[str, Any]]) -> Any:
         session_offsets = (-0.046, -0.023, 0.0, 0.023, 0.046)
         panels = (
             (
-                "session_median_latency_ms",
-                "median_latency_ms",
-                "min_latency_ms",
-                "max_latency_ms",
-                "a  Steady-state latency",
-                "Session-summary latency (ms)",
+                "session_throughput_samples_per_s",
+                "median_throughput_samples_per_s",
+                "min_throughput_samples_per_s",
+                "max_throughput_samples_per_s",
+                "a  Steady-state throughput",
+                "Throughput (samples/s)",
             ),
             (
                 "peak_live_gib_by_session",
