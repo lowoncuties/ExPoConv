@@ -11,6 +11,7 @@ import jax.numpy as jnp
 from poincare_exec.core.hnnpp import conv2d, dense, init_conv2d, init_dense
 from poincare_exec.core.operations import (
     average_pool2d,
+    euclidean_batch_norm,
     init_midpoint_batch_norm,
     midpoint_batch_norm,
     mobius_residual_tangent,
@@ -119,13 +120,17 @@ def residual_block_forward(
 
     residual = tangent
     stride = 2 if "downsample" in params else 1
-    tangent = conv2d(
-        params["conv1"], tangent, curvature, variant=variant, stride=stride
-    )
-    tangent = midpoint_batch_norm(params["bn1"], tangent, curvature, epsilon=epsilon)
+    tangent = conv2d(params["conv1"], tangent, curvature, variant=variant, stride=stride)
+    if variant == "E":
+        tangent = euclidean_batch_norm(params["bn1"], tangent, epsilon=epsilon)
+    else:
+        tangent = midpoint_batch_norm(params["bn1"], tangent, curvature, epsilon=epsilon)
     tangent = jax.nn.relu(tangent)
     tangent = conv2d(params["conv2"], tangent, curvature, variant=variant)
-    tangent = midpoint_batch_norm(params["bn2"], tangent, curvature, epsilon=epsilon)
+    if variant == "E":
+        tangent = euclidean_batch_norm(params["bn2"], tangent, epsilon=epsilon)
+    else:
+        tangent = midpoint_batch_norm(params["bn2"], tangent, curvature, epsilon=epsilon)
     if "downsample" in params:
         residual = conv2d(
             params["downsample"],
@@ -135,8 +140,10 @@ def residual_block_forward(
             stride=stride,
             padding="SAME",
         )
-    tangent = mobius_residual_tangent(
-        tangent, residual, curvature, order=residual_order
+    tangent = (
+        tangent + residual
+        if variant == "E"
+        else mobius_residual_tangent(tangent, residual, curvature, order=residual_order)
     )
     return jax.nn.relu(tangent)
 
@@ -155,8 +162,10 @@ def _resnet20_forward(
 
     intermediates: dict[str, Array] = {}
     tangent = conv2d(params["stem_conv"], inputs, curvature, variant=variant)
-    tangent = midpoint_batch_norm(
-        params["stem_bn"], tangent, curvature, epsilon=epsilon
+    tangent = (
+        euclidean_batch_norm(params["stem_bn"], tangent, epsilon=epsilon)
+        if variant == "E"
+        else midpoint_batch_norm(params["stem_bn"], tangent, curvature, epsilon=epsilon)
     )
     tangent = jax.nn.relu(tangent)
     if retain_intermediates:

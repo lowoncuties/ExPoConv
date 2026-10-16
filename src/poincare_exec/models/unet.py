@@ -49,9 +49,7 @@ def init_unet(
     widths = [initial_width * 2**index for index in range(depth + 1)]
     params: ParameterTree = {
         "curvature_raw": inverse_softplus(initial_curvature, dtype=dtype),
-        "input_block": init_double_conv(
-            keys, input_channels, widths[0], dtype=dtype
-        ),
+        "input_block": init_double_conv(keys, input_channels, widths[0], dtype=dtype),
         "down_blocks": [],
         "up_blocks": [],
     }
@@ -71,9 +69,7 @@ def init_unet(
         params["up_blocks"].append(
             {
                 "transpose": transpose,
-                "conv": init_double_conv(
-                    keys, 2 * output_width, output_width, dtype=dtype
-                ),
+                "conv": init_double_conv(keys, 2 * output_width, output_width, dtype=dtype),
             }
         )
     params["output_conv"] = init_conv2d(
@@ -128,7 +124,11 @@ def decoder_block_forward(
         variant=variant,
     )
     tangent = _crop_or_pad_like(tangent, skip)
-    tangent = beta_concat_tangent(skip, tangent)
+    tangent = (
+        jnp.concatenate((skip, tangent), axis=-1)
+        if variant == "E"
+        else beta_concat_tangent(skip, tangent)
+    )
     return apply_double_conv(
         params["conv"],
         tangent,
@@ -149,7 +149,11 @@ def _unet_forward(
 ) -> tuple[Array, dict[str, Array]]:
     """Apply the U-Net and optionally retain registered stage boundaries."""
 
-    curvature = jax.nn.softplus(params["curvature_raw"])
+    curvature = (
+        jnp.asarray(0.0, dtype=inputs.dtype)
+        if variant == "E"
+        else jax.nn.softplus(params["curvature_raw"])
+    )
     intermediates: dict[str, Array] = {}
     tangent = apply_double_conv(
         params["input_block"],

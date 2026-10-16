@@ -55,9 +55,7 @@ def poincare_midpoint(point: Array, curvature: Array, *, axis: int = 0) -> Array
     count = point.shape[axis]
     denominator = jnp.sum(gamma_sq, axis=axis, keepdims=True) - 0.5 * count
     fraction = numerator / positive_denominator(denominator)
-    fraction_radius_sq = curvature * jnp.sum(
-        jnp.square(fraction), axis=-1, keepdims=True
-    )
+    fraction_radius_sq = curvature * jnp.sum(jnp.square(fraction), axis=-1, keepdims=True)
     gamma = 1.0 / jnp.sqrt(positive_denominator(1.0 - fraction_radius_sq))
     return gamma * fraction / (1.0 + gamma)
 
@@ -89,6 +87,28 @@ def midpoint_batch_norm(
     scale = jnp.sqrt(params.weight / (variance + epsilon))
     output_point = expmap(bias_point, scale * transported, curvature)
     return jnp.reshape(logmap0(output_point, curvature), original_shape)
+
+
+def euclidean_batch_norm(
+    params: MidpointBatchNormParams,
+    value: Array,
+    *,
+    epsilon: float = 1.0e-6,
+) -> Array:
+    """Apply current-batch Euclidean normalization with the shared parameter shape.
+
+    The sample and spatial axes are reduced together, matching the reduction axes
+    used by :func:`midpoint_batch_norm`. The source-shaped scalar weight broadcasts
+    over channels; no running statistics are introduced into the timing control.
+    """
+
+    if value.shape[-1] != params.bias.shape[0]:
+        raise ValueError("normalization bias and channel dimensions do not agree")
+    axes = tuple(range(value.ndim - 1))
+    mean = jnp.mean(value, axis=axes, keepdims=True)
+    variance = jnp.mean(jnp.square(value - mean), axis=axes, keepdims=True)
+    normalized = (value - mean) / jnp.sqrt(variance + epsilon)
+    return params.weight * normalized + params.bias
 
 
 def max_pool2d(
@@ -204,13 +224,10 @@ def _fold_expanded_tangent(
     return output
 
 
-def _nonnegative_pair(
-    value: int | Sequence[int], *, name: str
-) -> tuple[int, int]:
+def _nonnegative_pair(value: int | Sequence[int], *, name: str) -> tuple[int, int]:
     values = (value, value) if isinstance(value, int) else tuple(value)
     if len(values) != 2 or any(
-        isinstance(item, bool) or not isinstance(item, int) or item < 0
-        for item in values
+        isinstance(item, bool) or not isinstance(item, int) or item < 0 for item in values
     ):
         raise ValueError(f"{name} must contain two nonnegative Python integers")
     return values
@@ -227,7 +244,7 @@ def transpose_conv2d(
     padding: int | Sequence[int] = 0,
     variant: str,
 ) -> Array:
-    """Apply the source FC-plus-Poincare-fold transpose convolution."""
+    """Apply the source FC-plus-fold transpose convolution."""
 
     kernel = spatial_pair(kernel_size, name="kernel_size")
     strides = spatial_pair(stride, name="stride")
@@ -237,8 +254,10 @@ def transpose_conv2d(
         raise ValueError("transpose parameters do not match kernel/output channels")
     expanded = dense(params, tangent, curvature, variant=variant)
     stacked_dimension = expected
-    fold_scale = 1.0 / beta_ratio(
-        stacked_dimension, output_channels, dtype=tangent.dtype
+    fold_scale = (
+        jnp.asarray(1.0, dtype=tangent.dtype)
+        if variant == "E"
+        else 1.0 / beta_ratio(stacked_dimension, output_channels, dtype=tangent.dtype)
     )
     folded = _fold_expanded_tangent(
         fold_scale * expanded,
@@ -247,6 +266,8 @@ def transpose_conv2d(
         stride=strides,
         padding=paddings,
     )
+    if variant == "E":
+        return folded
     if variant == "T":
         return project_tangent(folded, curvature)
     return logmap0(expmap0(folded, curvature), curvature)

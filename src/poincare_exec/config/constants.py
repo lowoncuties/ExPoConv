@@ -15,6 +15,10 @@ GPU_IDLE_SETTLE_TIMEOUT_SECONDS = 30.0
 GPU_IDLE_POLL_INTERVAL_SECONDS = 1.0
 
 HYPERBOLIC_VARIANTS = ("R", "F", "T")
+# Layers also accept benchmark-only controls. M retains an explicit tangent patch
+# while avoiding its elementwise ball map; E is the Euclidean topology reference.
+# Both stay out of registered numerical and training matrices that iterate R/F/T.
+EXECUTION_VARIANTS = (*HYPERBOLIC_VARIANTS, "M", "E")
 CONV_DIMENSION_NUMBERS = ("NHWC", "HWIO", "NHWC")
 MIN_POSITIVE_DENOMINATOR = 1.0e-15
 SERIES_CUTOFF_FLOAT32 = 1.0e-3

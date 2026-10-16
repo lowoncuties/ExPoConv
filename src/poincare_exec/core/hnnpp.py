@@ -11,7 +11,7 @@ import jax.numpy as jnp
 from jax import lax
 from jax.scipy.special import betaln
 
-from poincare_exec.config.constants import CONV_DIMENSION_NUMBERS, HYPERBOLIC_VARIANTS
+from poincare_exec.config.constants import CONV_DIMENSION_NUMBERS, EXECUTION_VARIANTS
 from poincare_exec.core.geometry import (
     expmap0,
     logmap0,
@@ -198,13 +198,12 @@ def _reconstruct_scores(scores: Array, curvature: Array) -> tuple[Array, Array]:
     direct_dimensionless = sqrt_curvature * direct_scores
     direct_sinh = jnp.sinh(direct_dimensionless)
     direct_norm_sq = jnp.sum(jnp.square(direct_sinh), axis=-1, keepdims=True)
-    direct_point = direct_sinh / (
-        sqrt_curvature * (1.0 + jnp.sqrt(1.0 + direct_norm_sq))
-    )
-    direct_tangent = 0.5 * direct_scores * sinhc(
-        direct_dimensionless
-    ) * asinhc_from_square(
-        direct_norm_sq
+    direct_point = direct_sinh / (sqrt_curvature * (1.0 + jnp.sqrt(1.0 + direct_norm_sq)))
+    direct_tangent = (
+        0.5
+        * direct_scores
+        * sinhc(direct_dimensionless)
+        * asinhc_from_square(direct_norm_sq)
     )
 
     scaled_dimensionless = jnp.where(
@@ -282,9 +281,7 @@ def _scores_from_radius_products(
     projected_normalized_sq = jnp.minimum(raw_normalized_sq, jnp.square(maximum))
 
     raw_radial_over_radius = sqrt_curvature * tanhc_from_square(dimensionless_radius_sq)
-    radius = jnp.sqrt(
-        jnp.where(radius_sq > 0.0, radius_sq, jnp.ones_like(radius_sq))
-    )
+    radius = jnp.sqrt(jnp.where(radius_sq > 0.0, radius_sq, jnp.ones_like(radius_sq)))
     clipped_radial_over_radius = maximum / radius
     clipped = raw_normalized_sq > jnp.square(maximum)
     radial_over_radius = jnp.where(
@@ -292,9 +289,7 @@ def _scores_from_radius_products(
     )
 
     conformal = 2.0 / positive_denominator(1.0 - projected_normalized_sq)
-    oriented_dimensionless = (
-        radial_over_radius * directional_products / safe_weight_norm
-    )
+    oriented_dimensionless = radial_over_radius * directional_products / safe_weight_norm
     doubled_offset = 2.0 * sqrt_curvature * offset
     argument = conformal * oriented_dimensionless * jnp.cosh(doubled_offset)
     argument -= (conformal - 1.0) * jnp.sinh(doubled_offset)
@@ -312,9 +307,17 @@ def _variant_output(
 ) -> Array:
     if variant == "T":
         return scores_to_projected_tangent(scores, curvature, margin=margin)
-    if variant in {"R", "F"}:
+    if variant in {"R", "F", "M"}:
         return logmap0(scores_to_ball(scores, curvature, margin=margin), curvature)
     raise ValueError(f"unsupported hyperbolic variant: {variant}")
+
+
+def _radius_products(vectors: Array, weight: Array) -> tuple[Array, Array]:
+    """Return ``||v||^2`` and ``v . w`` from explicit tangent vectors."""
+
+    radius_sq = jnp.sum(jnp.square(vectors), axis=-1, keepdims=True)
+    products = jnp.einsum("...i,io->...o", vectors, weight)
+    return radius_sq, products
 
 
 def dense(
@@ -325,21 +328,26 @@ def dense(
     variant: str,
     margin: Array | None = None,
 ) -> Array:
-    """Apply one R/F/T dense layer at a common tangent-coordinate boundary."""
+    """Apply one R/F/T/M/E dense layer at a common coordinate boundary.
 
-    if variant not in HYPERBOLIC_VARIANTS:
-        raise ValueError(f"variant must be one of {HYPERBOLIC_VARIANTS}")
+    A dense layer has no patch to materialize, so M executes as F. E applies the
+    parameter-shape-matched Euclidean affine map and does not use curvature.
+    """
+
+    if variant not in EXECUTION_VARIANTS:
+        raise ValueError(f"variant must be one of {EXECUTION_VARIANTS}")
     weight = params.weight
     if weight.ndim != 2 or tangent.shape[-1] != weight.shape[0]:
         raise ValueError("dense weight/input dimensions do not agree")
     if params.offset.shape != (weight.shape[1],):
         raise ValueError("dense offset has the wrong shape")
+    if variant == "E":
+        return jnp.einsum("...i,io->...o", tangent, weight) + params.offset
     if variant == "R":
         point = expmap0(tangent, curvature, margin=margin)
         scores = hyperplane_scores_ball(point, weight, params.offset, curvature)
     else:
-        radius_sq = jnp.sum(jnp.square(tangent), axis=-1, keepdims=True)
-        products = jnp.einsum("...i,io->...o", tangent, weight)
+        radius_sq, products = _radius_products(tangent, weight)
         scores = _scores_from_radius_products(
             radius_sq,
             products,
@@ -431,6 +439,37 @@ def _factorized_conv_scores(
     )
 
 
+def _materialized_patch_scores(
+    params: HNNPPParams,
+    patches: Array,
+    curvature: Array,
+    *,
+    margin: Array | None = None,
+) -> Array:
+    """Score R's explicit beta-scaled tangent patches through F (ablation M).
+
+    M contracts R's materialized patch ``P`` with the flattened kernel by R's
+    einsum to form ``D = z . P``, takes ``R^2 = ||P||^2`` from the same patch,
+    and evaluates F's clipped score; ``conv2d`` then applies F's output map.
+    M versus R isolates the pointwise ball geometry R applies to the n*K*C_in
+    patch elements; F versus M isolates F's native convolutions, which never
+    materialize the patch.
+    """
+
+    kernel = params.weight
+    radius_sq, products = _radius_products(
+        patches, jnp.reshape(kernel, (patches.shape[-1], kernel.shape[-1]))
+    )
+    return _scores_from_radius_products(
+        radius_sq,
+        products,
+        safe_norm(kernel, axis=(0, 1, 2)),
+        params.offset,
+        curvature,
+        margin=margin,
+    )
+
+
 def conv2d(
     params: HNNPPParams,
     tangent: Array,
@@ -442,10 +481,10 @@ def conv2d(
     dilation: int | Sequence[int] = 1,
     margin: Array | None = None,
 ) -> Array:
-    """Apply R/F/T HNN++ Conv2D at a common BHWC tangent boundary."""
+    """Apply R/F/T/M HNN++ or E Euclidean Conv2D in BHWC layout."""
 
-    if variant not in HYPERBOLIC_VARIANTS:
-        raise ValueError(f"variant must be one of {HYPERBOLIC_VARIANTS}")
+    if variant not in EXECUTION_VARIANTS:
+        raise ValueError(f"variant must be one of {EXECUTION_VARIANTS}")
     if tangent.ndim != 4:
         raise ValueError("convolution input must have BHWC rank four")
     kernel = params.weight
@@ -459,7 +498,18 @@ def conv2d(
     strides = spatial_pair(stride, name="stride")
     dilations = spatial_pair(dilation, name="dilation")
 
-    if variant == "R":
+    if variant == "E":
+        products = lax.conv_general_dilated(
+            tangent,
+            kernel,
+            window_strides=strides,
+            padding=normalized_padding,
+            rhs_dilation=dilations,
+            dimension_numbers=CONV_DIMENSION_NUMBERS,
+        )
+        return products + params.offset
+
+    if variant in {"R", "M"}:
         kernel_height, kernel_width, input_channels, output_channels = kernel.shape
         patches = _extract_patches(
             tangent,
@@ -470,13 +520,16 @@ def conv2d(
         )
         patch_dimension = kernel_height * kernel_width * input_channels
         patches *= beta_ratio(patch_dimension, input_channels, dtype=tangent.dtype)
-        patch_points = expmap0(patches, curvature, margin=margin)
-        scores = hyperplane_scores_ball(
-            patch_points,
-            jnp.reshape(kernel, (patch_dimension, output_channels)),
-            params.offset,
-            curvature,
-        )
+        if variant == "R":
+            patch_points = expmap0(patches, curvature, margin=margin)
+            scores = hyperplane_scores_ball(
+                patch_points,
+                jnp.reshape(kernel, (patch_dimension, output_channels)),
+                params.offset,
+                curvature,
+            )
+        else:
+            scores = _materialized_patch_scores(params, patches, curvature, margin=margin)
     else:
         scores = _factorized_conv_scores(
             params,

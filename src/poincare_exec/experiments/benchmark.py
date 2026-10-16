@@ -35,7 +35,11 @@ from poincare_exec.config.constants import (
 from poincare_exec.config.loader import canonical_json, config_hash, load_yaml, require_keys
 from poincare_exec.core.geometry import expmap0, logmap0
 from poincare_exec.core.hnnpp import conv2d, dense, init_conv2d, init_dense
-from poincare_exec.core.operations import init_midpoint_batch_norm, midpoint_batch_norm
+from poincare_exec.core.operations import (
+    euclidean_batch_norm,
+    init_midpoint_batch_norm,
+    midpoint_batch_norm,
+)
 from poincare_exec.models.resnet import init_resnet20, resnet20_forward
 from poincare_exec.models.unet import init_unet, unet_forward
 from poincare_exec.training.losses import cross_entropy, dice_focal_loss
@@ -44,9 +48,7 @@ from poincare_exec.training.optimizers import adam_update, init_adam
 Array = jax.Array
 
 
-def _workload_experiment_id(
-    config: dict[str, Any], workload: dict[str, Any]
-) -> str:
+def _workload_experiment_id(config: dict[str, Any], workload: dict[str, Any]) -> str:
     groups = config.get("workload_experiment_prefixes")
     if groups is None:
         return str(config["experiment_id"])
@@ -89,9 +91,7 @@ def _state_summary(state: Any) -> dict[str, int | float | None]:
     """Return a compact synchronized summary of every state leaf."""
 
     leaves = jax.tree_util.tree_leaves(state)
-    squares = [
-        jnp.sum(jnp.square(jnp.asarray(leaf, dtype=jnp.float64))) for leaf in leaves
-    ]
+    squares = [jnp.sum(jnp.square(jnp.asarray(leaf, dtype=jnp.float64))) for leaf in leaves]
     nonfinite = [jnp.sum(~jnp.isfinite(leaf)) for leaf in leaves]
     l2_norm = jnp.sqrt(sum(squares))
     nonfinite_count = sum(nonfinite)
@@ -237,6 +237,10 @@ def _model_state(
             initial_curvature=float(task["curvature"]["initial_magnitude"]),
             dtype=dtype,
         )
+        if variant == "E":
+            # The Euclidean topology has no learned curvature. All remaining
+            # parameter arrays and their deterministic initialization are shared.
+            params.pop("curvature_raw")
 
         def forward(selected_params, selected_inputs, _selected_curvature):
             return unet_forward(
@@ -253,17 +257,13 @@ def _model_state(
                 logits,
                 targets,
                 smoothing=float(loss_config["dice_smoothing"]),
-                denominator_epsilon=float(
-                    loss_config["dice_denominator_epsilon"]
-                ),
+                denominator_epsilon=float(loss_config["dice_denominator_epsilon"]),
                 alpha=float(loss_config["focal_alpha"]),
                 gamma=float(loss_config["focal_gamma"]),
             )
 
     elif kind == "resnet20":
-        inputs = 2.0 * jax.random.uniform(
-            input_key, (batch, 32, 32, 3), dtype=dtype
-        ) - 1.0
+        inputs = 2.0 * jax.random.uniform(input_key, (batch, 32, 32, 3), dtype=dtype) - 1.0
         targets = jax.random.randint(
             target_key, (batch,), 0, int(task["classes"]), dtype=jnp.int32
         )
@@ -400,9 +400,7 @@ def _operator_state(
                         dtype=dtype,
                         initialization="normal",
                     ),
-                    "bn": init_midpoint_batch_norm(
-                        shape["output_channels"], dtype=dtype
-                    ),
+                    "bn": init_midpoint_batch_norm(shape["output_channels"], dtype=dtype),
                 }
             )
 
@@ -417,12 +415,19 @@ def _operator_state(
                     stride=workload["stride"],
                     padding=workload["padding"],
                 )
-                value = midpoint_batch_norm(
-                    layer["bn"],
-                    value,
-                    selected_curvature,
-                    epsilon=float(workload["normalization_epsilon"]),
-                )
+                if variant == "E":
+                    value = euclidean_batch_norm(
+                        layer["bn"],
+                        value,
+                        epsilon=float(workload["normalization_epsilon"]),
+                    )
+                else:
+                    value = midpoint_batch_norm(
+                        layer["bn"],
+                        value,
+                        selected_curvature,
+                        epsilon=float(workload["normalization_epsilon"]),
+                    )
                 value = jax.nn.relu(value)
             return value
 
@@ -631,12 +636,13 @@ def benchmark_worker(
             if workload["kind"] in {"conv2d", "conv_bn_relu"}
             else "BF/FO"
         ),
-        "coordinate_boundary": workload.get(
-            "coordinate_boundary", "tangent_to_tangent"
+        "coordinate_boundary": (
+            "euclidean_to_euclidean"
+            if variant == "E"
+            else workload.get("coordinate_boundary", "tangent_to_tangent")
         ),
         "operation_boundary": (
-            f"{workload['kind']}:{workload['mode']}:"
-            f"depth={workload.get('depth', 1)}"
+            f"{workload['kind']}:{workload['mode']}:depth={workload.get('depth', 1)}"
         ),
         "warmup_count": int(config["warmup_calls"]),
         "repeat_count": int(config["timed_calls_per_session"]),
@@ -800,9 +806,7 @@ def _gpu_snapshot(index: int | None) -> dict[str, Any]:
                     }
                 )
     snapshot["compute_processes"] = processes
-    snapshot["process_query_status"] = (
-        "ok" if process_result.returncode == 0 else "failed"
-    )
+    snapshot["process_query_status"] = "ok" if process_result.returncode == 0 else "failed"
     return snapshot
 
 
@@ -812,9 +816,7 @@ def _require_idle_gpu(config: dict[str, Any]) -> dict[str, Any]:
     gpu_index = _selected_physical_gpu()
     deadline = time.monotonic() + GPU_IDLE_SETTLE_TIMEOUT_SECONDS
     require_idle = bool(config.get("require_idle_gpu", False))
-    memory_limit = (
-        int(config["max_preexisting_memory_mib"]) if require_idle else 0
-    )
+    memory_limit = int(config["max_preexisting_memory_mib"]) if require_idle else 0
     utilization_limit = (
         int(config["max_preexisting_utilization_percent"]) if require_idle else 0
     )
@@ -942,9 +944,7 @@ def run_benchmark_suite(
                                     "experiment_id": experiment_id,
                                     "protocol_version": protocol["protocol_version"],
                                     "variant": variant,
-                                    "config_hash": config_hash(
-                                        protocol, config, workload
-                                    ),
+                                    "config_hash": config_hash(protocol, config, workload),
                                     "code_commit": git["commit"],
                                     "code_dirty": git["dirty"],
                                     "reference_commit": canonical_json(

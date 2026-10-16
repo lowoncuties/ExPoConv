@@ -11,6 +11,7 @@ import jax.numpy as jnp
 from poincare_exec.core.hnnpp import HNNPPParams, conv2d, init_conv2d
 from poincare_exec.core.operations import (
     MidpointBatchNormParams,
+    euclidean_batch_norm,
     init_midpoint_batch_norm,
     midpoint_batch_norm,
 )
@@ -72,11 +73,17 @@ def apply_double_conv(
 
     conv1 = params["conv1"] if convolution_bias else _zero_offset(params["conv1"])
     conv2 = params["conv2"] if convolution_bias else _zero_offset(params["conv2"])
+
+    def normalize(normalization_params: MidpointBatchNormParams, value: Array) -> Array:
+        if variant == "E":
+            return euclidean_batch_norm(normalization_params, value, epsilon=epsilon)
+        return midpoint_batch_norm(normalization_params, value, curvature, epsilon=epsilon)
+
     tangent = conv2d(conv1, tangent, curvature, variant=variant, padding="SAME")
-    tangent = midpoint_batch_norm(params["bn1"], tangent, curvature, epsilon=epsilon)
+    tangent = normalize(params["bn1"], tangent)
     tangent = jax.nn.relu(tangent)
     tangent = conv2d(conv2, tangent, curvature, variant=variant, padding="SAME")
-    tangent = midpoint_batch_norm(params["bn2"], tangent, curvature, epsilon=epsilon)
+    tangent = normalize(params["bn2"], tangent)
     return jax.nn.relu(tangent)
 
 

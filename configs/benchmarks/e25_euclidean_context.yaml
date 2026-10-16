@@ -1,0 +1,53 @@
+schema_version: "1.0"
+experiment_id: E25
+description: "Paired Euclidean cost context for parameter-shape-matched U-Net and ResNet-20 with XLA_PYTHON_CLIENT_MEM_FRACTION=0.95 and preallocation disabled by scripts/run_e25.sh."
+campaign_scope: "Measure how close factorized Poincare execution comes to Euclidean throughput and memory on the same hardware and software stack."
+variants: [R, F, E]
+sessions: 5
+warmup_calls: 50
+timed_calls_per_session: 200
+require_idle_gpu: true
+max_preexisting_memory_mib: 512
+max_preexisting_utilization_percent: 5
+shared_state_policy: "Within each session, R/F/E receive identical deterministic inputs, targets, and initial weight arrays. E omits the U-Net curvature scalar because Euclidean execution has no curvature."
+euclidean_contract: "E uses fused affine convolution/dense layers, current-batch Euclidean normalization over the same axes, ordinary skip concatenation or addition, and the same FC-plus-fold decoder topology. It introduces no running statistics and does not use curvature."
+timing_scope: "Compilation and the first compiled call are recorded but excluded from steady-state latency. Every measured call is synchronized. Complete updates include the same loss, reverse-mode gradient, optimizer, and update boundary."
+memory_evidence_policy: "Process-lifetime JAX allocator peak through the final synchronized measured call; includes initialization, compilation, first call, and warmup and is not isolated activation memory."
+allocator_policy: "XLA_PYTHON_CLIENT_MEM_FRACTION=0.95 and XLA_PYTHON_CLIENT_PREALLOCATE=false."
+workloads:
+  - id: unet_b1_forward
+    kind: unet
+    mode: forward
+    shape: {batch: 1, height: 256, width: 256}
+    curvature: 0.1
+    dtype: float32
+  - id: unet_b8_forward
+    kind: unet
+    mode: forward
+    shape: {batch: 8, height: 256, width: 256}
+    curvature: 0.1
+    dtype: float32
+  - id: unet_b8_update
+    kind: unet
+    mode: update
+    shape: {batch: 8, height: 256, width: 256}
+    curvature: 0.1
+    dtype: float32
+  - id: resnet20_b1_forward
+    kind: resnet20
+    mode: forward
+    shape: {batch: 1, height: 32, width: 32}
+    curvature: 0.1
+    dtype: float32
+  - id: resnet20_b128_forward
+    kind: resnet20
+    mode: forward
+    shape: {batch: 128, height: 32, width: 32}
+    curvature: 0.1
+    dtype: float32
+  - id: resnet20_b128_update
+    kind: resnet20
+    mode: update
+    shape: {batch: 128, height: 32, width: 32}
+    curvature: 0.1
+    dtype: float32
