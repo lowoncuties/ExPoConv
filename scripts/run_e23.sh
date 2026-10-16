@@ -30,7 +30,8 @@ export XLA_PYTHON_CLIENT_PREALLOCATE=false
 
 cd "$repository_root"
 mkdir -p "$artifact_dir"
+output=${POINCARE_EXEC_E23_OUTPUT:-$artifact_dir/e23_unet_b1_forward_memory_${mode}.csv}
 "$environment_dir/bin/poincare-exec" benchmark \
-  --protocol configs/protocols/protocol_1_11.yaml \
+  --protocol protocol.yaml \
   --config "$config" \
-  --output "$artifact_dir/e23_unet_b1_forward_memory_${mode}.csv"
+  --output "$output"

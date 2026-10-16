@@ -1,6 +1,6 @@
 cff-version: 1.2.0
 message: "If you use this software, cite the accompanying article and the versioned software release."
-title: "Efficient Poincaré Convolutions through Sufficient-Statistics Factorization: Experiments"
+title: "Efficient Poincaré Convolutions through Energy–Projection Factorization: Experiments"
 type: software
 authors:
   - family-names: Jochymek

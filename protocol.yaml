@@ -1,10 +1,10 @@
-protocol_version: "1.14"
-protocol_date: "2026-10-07"
+protocol_version: "1.15"
+protocol_date: "2026-10-16"
 target_journal: "Neural Networks"
 working_title: "Exact and Efficient Execution of Poincare Neural Networks"
 study_scope: "HNN++ and Poincare operator-preserving execution"
 framework: "JAX standalone; HyperJAX-independent"
-confirmatory_status: "initial_task_quality_complete; prospective replication frozen"
+confirmatory_status: "initial_task_quality_complete; prospective replication complete; post-review extensions frozen before result inspection"
 
 source_documents:
   experiment_plan:
@@ -91,6 +91,11 @@ protocol_amendments:
     affected_experiments: [E20, E21]
     reason: "The protocol-1.13 disjoint-fold lowering passed bitwise value/gradient checks but did not resolve the retained JAX 0.5.3 GPU compiler failure and is reverted before accepted training. Freeze E20/E21 to the unchanged scientific implementation and the original JAX/JAXLIB 0.4.25 CUDA-11.8 user-space stack on one RTX A6000. Exact batch-2/256 backward and complete-update diagnostics compiled and completed finitely before restart. E12 remains a separate unrun CUDA-12 portability experiment."
     case_manifest_changed: false
+  - version: "1.15"
+    date: "2026-10-16"
+    affected_experiments: [E22, E23, E24, E25, E26, E27]
+    reason: "Before inspecting revision-extension outcomes, freeze six separately reported reviewer-requested checks. E22 tests allocator sensitivity at fraction 0.95 and adds a batch-16/512 workload expected to exceed physical memory. E23 tests whether batch-one forward allocation changes when GPU convolution autotuning is disabled. E24 adds benchmark-only M, which materializes R's identical beta-scaled tangent patch but evaluates the exact HNN++ score from patch energy and directional products, so R-versus-M isolates elementwise patch geometry and M-versus-F isolates explicit patch materialization from fused convolutions. E25 adds contextual E, which uses parameter-shape-matched Euclidean convolution/dense layers, current-batch Euclidean normalization over the same axes, ordinary skip concatenation/addition, and the same FC-plus-fold decoder topology without curvature. E26 is a fresh post-repair structured replay reporting elementwise relative-error quantiles without replacing the accepted E02 gate. E27 is a separate RTX-A6000 current-JAX/CUDA-12 portability cohort and is not pooled with or substituted for the primary JAX-0.4.25/CUDA-11.8 results. None of these post-hoc extensions changes the registered R/F/T numerical or training matrices."
+    case_manifest_changed: true
 
 variants:
   numerical: [R, F, T]
@@ -102,6 +107,14 @@ variants:
     ablation: T
   contextual: [E]
   official_cross_framework: [O]
+  revision_benchmark_controls:
+    materialized_patch_exact_score: M
+    euclidean_same_topology_context: E
+  revision_benchmark_roles:
+    reference: R
+    primary_method: F
+    mechanism_ablation: M
+    contextual_reference: E
 
 seeds:
   training: [11, 29, 47, 71, 101]
@@ -134,6 +147,64 @@ training_extensions:
     primary_reporting: "report E20/E21 separately from E09/E10"
     pooled_reporting: "secondary descriptive platform-stratified estimate only"
 
+revision_benchmarks:
+  E22:
+    role: "allocator-sensitivity and beyond-physical-memory capacity diagnostic"
+    config: "configs/benchmarks/e22_unet_allocator_fraction.yaml"
+    variants: [R, F]
+    workloads: [unet_update_b8_r512, unet_update_b16_r512, unet_update_b8_r256]
+    sessions: 5
+    warmup_calls: 50
+    timed_calls_per_session: 200
+    allocator_fraction: 0.95
+    preallocate: false
+    runtime_profile: "primary V100 JAX/JAXLIB 0.4.25 CUDA-11.8 stack"
+  E23:
+    role: "post-hoc batch-one forward process-lifetime allocation diagnostic"
+    config: "configs/benchmarks/e23_unet_b1_forward_memory.yaml"
+    variants: [R, F]
+    compiler_modes: [default, autotune_level_0]
+    interpretation: "A change with autotuning disabled is consistent with compiler-workspace involvement but does not identify every contributor to process-lifetime peak allocation."
+    runtime_profile: "primary V100 JAX/JAXLIB 0.4.25 CUDA-11.8 stack"
+  E24:
+    role: "paired mechanism attribution; no quality or numerical-equivalence claim beyond the tested exact agreement"
+    config: "configs/benchmarks/e24_unet_mechanism_ablation.yaml"
+    variants: [R, M, F]
+    workloads: [unet_b1_forward, unet_b8_forward, unet_b8_update]
+    sessions: 5
+    warmup_calls: 50
+    timed_calls_per_session: 200
+    allocator_fraction: 0.95
+    preallocate: false
+    runtime_profile: "JAX/JAXLIB 0.4.25 with pinned CUDA-11.8 user-space libraries on one idle RTX A6000"
+  E25:
+    role: "paired same-hardware Euclidean throughput and memory context; E is contextual, not an equivalence candidate"
+    config: "configs/benchmarks/e25_euclidean_context.yaml"
+    variants: [R, F, E]
+    workloads: [unet_b1_forward, unet_b8_forward, unet_b8_update, resnet20_b1_forward, resnet20_b128_forward, resnet20_b128_update]
+    sessions: 5
+    warmup_calls: 50
+    timed_calls_per_session: 200
+    allocator_fraction: 0.95
+    preallocate: false
+    runtime_profile: "JAX/JAXLIB 0.4.25 with pinned CUDA-11.8 user-space libraries on the same idle RTX A6000"
+  E26:
+    role: "post-hoc descriptive elementwise agreement extension"
+    config: "configs/numerics/e26_elementwise_agreement.yaml"
+    variants: [R, F, T]
+    reference_experiment: E02
+    interpretation: "Fresh replay only; does not replace or modify the accepted E02 agreement gate."
+  E27:
+    role: "separate software-stack portability sanity check"
+    config: "configs/benchmarks/e27_current_jax_unet_update.yaml"
+    variants: [R, F]
+    workloads: [unet_update_b8_r256]
+    sessions: 5
+    warmup_calls: 50
+    timed_calls_per_session: 200
+    runtime_profile: "JAX/JAXLIB 0.11.2 CUDA-12 plugin on one idle RTX A6000"
+    reporting_policy: "Report separately from all JAX-0.4.25 cohorts; do not pool, substitute, or reinterpret earlier results."
+
 precision:
   oracle: float64
   primary: float32
@@ -157,6 +228,7 @@ numerics:
   structured_config: "configs/numerics/e02_structured.yaml"
   repair_config: "configs/numerics/e02_repair.yaml"
   repair_structured_config: "configs/numerics/e02_repair_structured.yaml"
+  elementwise_agreement_extension_config: "configs/numerics/e26_elementwise_agreement.yaml"
   float32_contract_oracle_projection_margin: 0.004
   dtype_default_float64_oracle_is_context_only: true
   structured_scope: "isolated layer, two/eight-layer stacks, Conv-BN-ReLU, beta skip, ordered residual, transpose decoder, decoder block, and small U-Net"
@@ -287,6 +359,7 @@ hardware:
   primary_runtime: "JAX/JAXLIB 0.4.25, CUDA 11.8, cuDNN 8.6"
   secondary_training_runtime: "JAX/JAXLIB 0.4.25 with the pinned CUDA 11.8 and cuDNN 8.6 user-space libraries on RTX A6000"
   secondary_runtime: "JAX/JAXLIB 0.5.3 CUDA 12 plugin; joint hardware/runtime portability"
+  revision_current_runtime: "JAX/JAXLIB 0.11.2 CUDA 12 plugin; separately reported software-stack portability check"
   secondary_gpus:
     - host: "aibox1a6000"
       endpoint_alias: "AIVSBCLUSTER1A"

@@ -20,6 +20,6 @@ export XLA_PYTHON_CLIENT_PREALLOCATE=false
 cd "$repository_root"
 mkdir -p "$artifact_dir"
 "$environment_dir/bin/poincare-exec" benchmark \
-  --protocol configs/protocols/protocol_1_11.yaml \
+  --protocol protocol.yaml \
   --config "$config" \
   --output "$output"

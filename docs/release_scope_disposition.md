@@ -10,8 +10,8 @@ and must not be used to relabel a historical protocol or configuration hash.
 The byte-exact protocol snapshots and their dated amendments remain the
 authoritative prospective records for each accepted result.
 
-The current manuscript makes a bounded claim about sufficient-statistics
-execution of the spatial HNN++ Poincare convolution. Author-run data for that
+The current manuscript makes a bounded claim about energy--projection
+factorization of the spatial HNN++ Poincare convolution. Author-run data for that
 claim are complete. The broader original experiment plan is not complete.
 
 ## Status definitions

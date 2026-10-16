@@ -2,7 +2,7 @@
 
 Code and compact evidence for the manuscript
 
-Jochymek L. **Efficient Poincaré Convolutions through Sufficient-Statistics
+Jochymek L. **Efficient Poincaré Convolutions through Energy–Projection
 Factorization.** (2026, manuscript in preparation)
 
 The repository is a paper companion, not a general library. It contains the
@@ -29,7 +29,7 @@ normalization, curvature, data order, and optimizer:
 | **T** | F plus direct evaluation of the projected origin-tangent output | ablation only |
 
 Spatial patch factorization is the primary contribution. The packaged F/T
-model paths also apply the analogous sufficient-statistics score evaluation to
+model paths also apply the analogous energy--projection score evaluation to
 HNN++ dense layers, including the ResNet classifier and the fully connected
 part of U-Net transpose decoding; `docs/derivation.md` maps both cases to code.
 

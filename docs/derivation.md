@@ -193,7 +193,7 @@ gradient misses remain failures rather than being explained by the derivation.
 Not separately validated by an accepted experiment row:
 
 - factorized-score gradients that intentionally select the input-clipping branch;
-- an isolated exact-zero sufficient-statistics score value/JVP case for the
+- an isolated exact-zero factorized-score value/JVP case for the
   $u_j(0,0)$ extension;
 - an isolated gradient oracle at and around the orientation norm floor; and
 - an isolated dense-gradient equivalence comparison.
