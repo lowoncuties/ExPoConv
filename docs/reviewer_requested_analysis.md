@@ -119,3 +119,17 @@ large points are medians, and ranges are session minima and maxima rather than
 confidence intervals. The figure-data CSV retains the latency summaries and
 adds the throughput values used by the plot. No E24/E25, software-stack, or
 hardware strata are pooled.
+
+The validated E25 matrix contains all 90 registered groups. At the complete-
+update boundaries, the R and F paths are respectively 6.596 and 3.185 times
+slower than E for U-Net, and 5.542 and 3.209 times slower than E for ResNet-20.
+The paired R-to-F speedups are 2.071 (95% interval 2.059--2.082) and 1.727
+(1.696--1.759). These are computational context comparisons only; E25 contains
+no task-quality evaluation.
+
+The validated E27 matrix contains all ten registered batch-eight U-Net update
+groups under JAX/JAXLIB 0.11.2 and its CUDA-12 plugin. R/F median latencies are
+114.710/68.822 ms and median process-lifetime peaks are 4.687/2.386 GiB. The
+paired R-to-F speedup is 1.667 (1.662--1.672). E27 is a single-workload post-hoc
+portability check and is not pooled with or used as a causal comparison against
+the pinned JAX 0.4.25 stack.

@@ -1,0 +1,199 @@
+{
+  "all_planned_groups_accounted_for": true,
+  "analysis_code": {
+    "commit": "0fe368245173992dd28a863c39e2f5ba76546bfc",
+    "dirty": false,
+    "status_porcelain": []
+  },
+  "analysis_id": "e24_e25_e27_revision_benchmark_export",
+  "cohorts": [
+    {
+      "config": {
+        "bytes": 1913,
+        "exists": true,
+        "name": "e24_unet_mechanism_ablation.yaml",
+        "sha256": "3c78660e9bb45090d31d30b91a3ff417087ef39bf48a55b94a3ca81cc738f54e"
+      },
+      "expected_batch_sizes": {
+        "unet_b1_forward": 1,
+        "unet_b8_forward": 8,
+        "unet_b8_update": 8
+      },
+      "expected_config_hashes": {
+        "unet_b1_forward": "3ae7c199bf88dddf288259f025ca365f20691b9429327bd908c8ebabe064a6ff",
+        "unet_b8_forward": "a6a357da2c906d3ccae41cf0b56aa2425fcb1ad486c8e0f9f72fff4e6e31e3b5",
+        "unet_b8_update": "1b422ec1f00ea8c4cc012ba3083c90c02abca935b67e938fbc8804e80ae5a4f3"
+      },
+      "experiment_id": "E24",
+      "failed_worker_groups": 0,
+      "failures": {
+        "exists": false,
+        "name": "e24_unet_mechanism_ablation.csv.failures.jsonl"
+      },
+      "outcomes": {
+        "ok": 45
+      },
+      "planned_groups": 45,
+      "raw": {
+        "bytes": 16979940,
+        "exists": true,
+        "name": "e24_unet_mechanism_ablation.csv",
+        "sha256": "7e5b3c393c2439d0006e5f478667167385ff5fc9fe99c184fb0f86260d4f74b5"
+      },
+      "raw_rows": 9135,
+      "successful_worker_groups": 45
+    },
+    {
+      "config": {
+        "bytes": 2458,
+        "exists": true,
+        "name": "e25_euclidean_context.yaml",
+        "sha256": "af81f60ae1b8dcc8ea1b4169c1bb190416a7f0e222b1231dac8cee729a3bce8e"
+      },
+      "expected_batch_sizes": {
+        "resnet20_b128_forward": 128,
+        "resnet20_b128_update": 128,
+        "resnet20_b1_forward": 1,
+        "unet_b1_forward": 1,
+        "unet_b8_forward": 8,
+        "unet_b8_update": 8
+      },
+      "expected_config_hashes": {
+        "resnet20_b128_forward": "88c12d8a63fbbc2f3c656437d2e0a3570ad12c0490288cf1b1367a4ca042d90f",
+        "resnet20_b128_update": "f2980a5652aeabd4a95bfac8157e98e6bc2961340a73c72188b769b8ff1d43ee",
+        "resnet20_b1_forward": "e65fcc7d912404cf16d15e2a9e32ad71cb4360aedbd1b18cf5db1f5bc5feaabb",
+        "unet_b1_forward": "66b276fb32ef01f7e7ef5ecf2e92bdc146a8af490f2dfd763ca6c01bdc598c45",
+        "unet_b8_forward": "5a0026f97cbfceea32b5cfd6cb0adea19705582862076a710085751d580674ed",
+        "unet_b8_update": "a5d8958db70267d59e52f5f985dbf16693f069bed8d2fdaa631f5512955c3c7d"
+      },
+      "experiment_id": "E25",
+      "failed_worker_groups": 0,
+      "failures": {
+        "exists": false,
+        "name": "e25_euclidean_context.csv.failures.jsonl"
+      },
+      "outcomes": {
+        "ok": 90
+      },
+      "planned_groups": 90,
+      "raw": {
+        "bytes": 34030176,
+        "exists": true,
+        "name": "e25_euclidean_context.csv",
+        "sha256": "5e021da1b4ede65d7d51b2e0092bb013ff697b9dcafddf8b0d4e0edf8a4f075d"
+      },
+      "raw_rows": 18270,
+      "successful_worker_groups": 90
+    },
+    {
+      "config": {
+        "bytes": 1688,
+        "exists": true,
+        "name": "e27_current_jax_unet_update.yaml",
+        "sha256": "d756467d8a2659623c20caace5893aabd3f74674406c24854744abb87cd87b88"
+      },
+      "expected_batch_sizes": {
+        "unet_update_b8_r256": 8
+      },
+      "expected_config_hashes": {
+        "unet_update_b8_r256": "13c0a7f7ce612f9de88551792180a5c5886cdcf6dad9e96da63b8a98fe3cdb66"
+      },
+      "experiment_id": "E27",
+      "failed_worker_groups": 0,
+      "failures": {
+        "exists": false,
+        "name": "e27_current_jax_unet_update.csv.failures.jsonl"
+      },
+      "outcomes": {
+        "ok": 10
+      },
+      "planned_groups": 10,
+      "raw": {
+        "bytes": 3838735,
+        "exists": true,
+        "name": "e27_current_jax_unet_update.csv",
+        "sha256": "114d527115bb6faba2992e494f8856f733216ab5c81b9be93451323630f5c040"
+      },
+      "raw_rows": 2030,
+      "successful_worker_groups": 10
+    }
+  ],
+  "derivation": "CPU-only validation and deterministic aggregation of existing raw GPU artifacts; no benchmark is launched by this exporter. Failed groups are retained as planned outcomes and excluded explicitly from paired ratios.",
+  "expected_run_commit": "df3f6f556a314f74a6966701b38ac5d135a10a62",
+  "output_evidence": {
+    "e24_e25_e27_contrasts.csv": {
+      "bytes": 28992,
+      "exists": true,
+      "name": "e24_e25_e27_contrasts.csv",
+      "sha256": "a2f98545075f71b7cf372943e879735eae45084ee4e1a4e32d866df1403e54ad"
+    },
+    "e24_e25_e27_session_outcomes.csv": {
+      "bytes": 68701,
+      "exists": true,
+      "name": "e24_e25_e27_session_outcomes.csv",
+      "sha256": "513546228e616e185e6f37355db3fe752dd201240865cce2e2acd638f1774213"
+    },
+    "e24_e25_e27_variant_summary.csv": {
+      "bytes": 28451,
+      "exists": true,
+      "name": "e24_e25_e27_variant_summary.csv",
+      "sha256": "8a32b6ee5e86f9bfd61b48f896508c6b9a0ac5d7de0b82ba4359a63c327203c8"
+    }
+  },
+  "output_rows": {
+    "e24_e25_e27_contrasts.csv": 25,
+    "e24_e25_e27_session_outcomes.csv": 145,
+    "e24_e25_e27_variant_summary.csv": 29
+  },
+  "physical_device": {
+    "hostname": "aibox2a6000",
+    "logical_id": 0,
+    "name": "NVIDIA RTX A6000",
+    "physical_index": 1,
+    "uuid": "GPU-6daddab9-4b59-fdde-bf0b-09ecd8f31723"
+  },
+  "protocol": {
+    "bytes": 21609,
+    "exists": true,
+    "name": "protocol.yaml",
+    "sha256": "3dadcc5e27bc93f535506168d48ff9f3e8667e6f6f98c24c44cb56beba23eb1e"
+  },
+  "protocol_version": "1.17",
+  "runtime_captures": {
+    "current_jax_0_11_2_cuda_12_portability": {
+      "environment": {
+        "bytes": 27123,
+        "exists": true,
+        "name": "e27_environment.json",
+        "sha256": "dbb3f689548623633fa6990df8e1f78ebbaf04d2c629af5d213dcfaebe138b8d"
+      },
+      "jax_version": "0.11.2",
+      "jaxlib_version": "0.11.2",
+      "runtime_gate": {
+        "bytes": 536,
+        "exists": true,
+        "name": "e27_runtime_gate.json",
+        "sha256": "743ad4bfb66894c620d56492294c35cd153f5d073e33b95b193d9565af891534"
+      },
+      "runtime_role": "current_jax_0_11_2_cuda_12_portability"
+    },
+    "pinned_jax_0_4_25_cuda_11_8": {
+      "environment": {
+        "bytes": 27903,
+        "exists": true,
+        "name": "e24_e25_environment.json",
+        "sha256": "cf3c2e6f72d9d79b4eb38a5ef65be005fd4b70e3fb6e5b7a9de6c7db5eb190eb"
+      },
+      "jax_version": "0.4.25",
+      "jaxlib_version": "0.4.25",
+      "runtime_gate": {
+        "bytes": 1492,
+        "exists": true,
+        "name": "e24_e25_runtime_gate.json",
+        "sha256": "89246d7826623305e4e196594a069e4d88520a89f1660e41db23e83e9062063a"
+      },
+      "runtime_role": "pinned_jax_0_4_25_cuda_11_8"
+    }
+  },
+  "schema_version": "1.1"
+}
