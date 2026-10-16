@@ -36,7 +36,7 @@ pool the V100 and A6000 cohorts.
   and 35.37 versus 21.38 minutes for E21 R/F. Compute time remains separate
   because it is the registered fixed-budget timing scope.
 
-## Elementwise error requires a fresh structured-numerics rerun
+## Elementwise error and replay stability
 
 The accepted post-repair E02 structured JSONL has 2,720 agreement rows, but it
 retains only tensor-level relative L2 error, reference L2 norm, and maximum
@@ -44,7 +44,7 @@ absolute error. Elementwise quantiles cannot be reconstructed from those
 aggregates. The available NPZ with per-element tensors belongs to the excluded
 pre-repair campaign and must not be substituted.
 
-The E26 structured-numerics extension now prospectively records
+The completed E26 structured-numerics extension records
 
 `abs(candidate - reference) / max(abs(reference), 1e-12)`
 
@@ -52,21 +52,20 @@ with the fraction of denominators affected by the floor, linear p50, p90, p95,
 p99, p99.9, and maximum. The median describes the center, p90/p95 the broad
 tail, p99/p99.9 the rare tail, and the maximum preserves the worst element. The
 floored-denominator fraction exposes sensitivity to zero and near-zero
-reference entries.
+reference entries. The complete per-tensor export is
+`e26_elementwise_tensor_statistics.csv`; scope- and case-level summaries are
+retained alongside it.
 
-Run E26 into a fresh artifact; do not append to or replace the accepted E02
-`ce009c1` source:
-
-```bash
-./.venv/bin/poincare-exec structured-numerics \
-  --protocol protocol.yaml \
-  --config configs/numerics/e26_elementwise_agreement.yaml \
-  --output /fresh/path/e26_elementwise_agreement.jsonl
-```
-
-This rerun changes only diagnostic fields in the raw artifact schema. It does
-not change model operations, inputs, gradients, tolerances, RNG, or the
-registered acceptance calculation.
+E26 passes 2,688 of 2,720 tensors but does not reproduce E02's variant-specific
+FP32 pattern: 32 small-U-Net realization-2 gradients miss under F, whereas E02
+places the analogous pattern under T and adds one T curvature-gradient miss.
+E28 therefore repeats the affected 408-tensor deterministic prefix in three
+fresh processes. Every E28 process passes 375/408 tensors: all 204 F tensors
+pass and the same 33 T tensors miss. The resulting 375 stable passes, 33 stable
+failures, and zero mixed outcomes reproduce E02 at the mixed-criterion level,
+but the separate E26 outcome prevents a general claim of bitwise identity or
+path-specific finite-precision gradient superiority. Neither post-hoc replay
+replaces the accepted E02 gate.
 
 ## Reproduction
 
@@ -84,3 +83,13 @@ available tables with:
 The compact training CSVs and E20/E21 run audit default to their tracked paths.
 `analysis_summary.json` records their hashes and the hashes of all 40 raw
 curvature sources. The exporter never modifies a raw input.
+
+The completed E23 and E28 diagnostics have separate fail-closed exporters:
+
+```bash
+./.venv/bin/python scripts/export_e23_autotune_memory.py --help
+./.venv/bin/python scripts/export_e28_replay_stability.py --help
+```
+
+Their tracked JSON summaries record raw hashes, identities, row counts, and the
+scope of each post-hoc interpretation.
