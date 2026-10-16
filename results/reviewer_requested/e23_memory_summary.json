@@ -1,0 +1,71 @@
+{
+  "analysis_status": "post_hoc_compiler_workspace_diagnostic",
+  "compiler_setting_provenance": {
+    "autotune0_contract": "XLA_FLAGS=--xla_gpu_autotune_level=0",
+    "default_contract": "XLA_FLAGS unset",
+    "note": "Compiler setting is assigned from the explicit CLI file role and the registered run_e23.sh contract; XLA_FLAGS is not embedded in E23 rows.",
+    "registered_wrapper": "scripts/run_e23.sh",
+    "registered_wrapper_sha256": "b79eba9fd5970f5d1c80ed3d4510cb5e3e231d63ad2dda71031802fd4019787f",
+    "status": "wrapper_and_source_file_role_not_raw_embedded"
+  },
+  "contrast_summary_bytes": {
+    "F_default_minus_autotune0_bytes": {
+      "max": 404291328,
+      "median": 404291328,
+      "min": 404291328
+    },
+    "R_default_minus_autotune0_bytes": {
+      "max": 116916224,
+      "median": 116916224,
+      "min": 116916224
+    },
+    "autotune0_F_minus_R_bytes": {
+      "max": -117440512,
+      "median": -117440512,
+      "min": -117440512
+    },
+    "default_F_minus_R_bytes": {
+      "max": 169934592,
+      "median": 169934592,
+      "min": 169934592
+    },
+    "difference_in_differences_bytes": {
+      "max": 287375104,
+      "median": 287375104,
+      "min": 287375104
+    }
+  },
+  "identity": {
+    "code_commit": "30142ce2c9f60a115fa77cf844cac14166446b27",
+    "code_dirty": false,
+    "config_hash": "0d9fa81f314e3f825fe06400866f53c119aa34f82aded04eff5926e3cd3b3f33",
+    "device_id": "argexpr3.vsb.cz::gpu:0::Tesla V100-PCIE-32GB",
+    "experiment_id": "E23",
+    "physical_gpu_uuid": "GPU-4e0547c3-d65d-7d8b-9f6a-d40ad61a0f0f",
+    "protocol_version": "1.15"
+  },
+  "interpretation": "Changes between settings are consistent with compiler autotuning-workspace involvement but do not uniquely attribute every process-lifetime allocation.",
+  "latency_interpretation": "Autotune-disabled latency is a diagnostic and is not a performance result.",
+  "memory_estimand": "process lifetime through final synchronized steady-state output; includes initialization, compilation, and warmup; excludes post-run state summary",
+  "output_rows": {
+    "e23_memory_contrasts.csv": 5,
+    "e23_memory_sessions.csv": 20,
+    "e23_memory_summary.csv": 4
+  },
+  "schema_version": "1.0",
+  "scientific_behavior_change": false,
+  "sources": {
+    "autotune0": {
+      "bytes": 3798436,
+      "file": "e23_unet_b1_forward_memory_protocol115_autotune0.csv",
+      "rows": 2030,
+      "sha256": "746a36f9d39d29b739fd045496250e5a7eed3654d314c51f0e66568445252a88"
+    },
+    "default": {
+      "bytes": 3802666,
+      "file": "e23_unet_b1_forward_memory_protocol115_default.csv",
+      "rows": 2030,
+      "sha256": "64e439c854dd87683d08d1537f3ad99c1e56382b54a1f118ef3bbd39069bf767"
+    }
+  }
+}

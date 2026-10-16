@@ -1,0 +1,64 @@
+{
+  "analysis_status": "post_hoc_descriptive_replay_stability_diagnostic",
+  "identity": {
+    "code_commit": "df3f6f556a314f74a6966701b38ac5d135a10a62",
+    "code_dirty": false,
+    "config_hash": "83ae5c2243f631bef869e368a43920c60b9581485643284c2425a83b5c3ed503",
+    "device_id": "argexpr3.vsb.cz::gpu:0::Tesla V100-PCIE-32GB",
+    "experiment_id": "E28",
+    "protocol_version": "1.17"
+  },
+  "interpretation": "Post-hoc descriptive process replay only. E28 does not replace or modify the accepted E02/E26 numerical-agreement gate.",
+  "mixed_criterion": {
+    "absolute_tolerance": 2e-05,
+    "comparison": "max_absolute_error <= absolute + relative * reference_l2_norm",
+    "relative_tolerance": 2e-05
+  },
+  "output_rows": {
+    "e28_replay_stability_summary.csv": 24,
+    "e28_replay_tensor_stability.csv": 408,
+    "e28_replay_tensor_statistics.csv": 1224
+  },
+  "overall": {
+    "mixed_tensors": 0,
+    "replay_0_nonfinite_tensors": 0,
+    "replay_0_passed_tensors": 375,
+    "replay_1_nonfinite_tensors": 0,
+    "replay_1_passed_tensors": 375,
+    "replay_2_nonfinite_tensors": 0,
+    "replay_2_passed_tensors": 375,
+    "stable_fail_tensors": 33,
+    "stable_pass_tensors": 375
+  },
+  "replay_provenance": {
+    "note": "Replay index and separate-process status are assigned from explicit CLI file roles and the registered run_e28.sh contract; neither is embedded in E28 rows.",
+    "registered_wrapper": "scripts/run_e28.sh",
+    "registered_wrapper_sha256": "15d8907f712ee567920ea147b8a6c318b262680960957947b26def9eb01d76f3",
+    "status": "wrapper_and_source_file_role_not_raw_embedded"
+  },
+  "schema_version": "1.0",
+  "scientific_behavior_change": false,
+  "sources": [
+    {
+      "bytes": 849387,
+      "file": "e28_elementwise_replay_0.jsonl",
+      "replay": 0,
+      "rows": 408,
+      "sha256": "6e7603aa08b77d892837a3210374435eec33a0db4d688d945f6ab6eee28b5349"
+    },
+    {
+      "bytes": 849401,
+      "file": "e28_elementwise_replay_1.jsonl",
+      "replay": 1,
+      "rows": 408,
+      "sha256": "6b11b314efab71826b75698b2e5bc52c31f616277ef6818db7465b40aee1aeff"
+    },
+    {
+      "bytes": 849387,
+      "file": "e28_elementwise_replay_2.jsonl",
+      "replay": 2,
+      "rows": 408,
+      "sha256": "c7123f3baaaf9360c78f5c36831676a1ba34ef0768b484f843e967a66c0184f4"
+    }
+  ]
+}
