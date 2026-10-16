@@ -1,0 +1,21 @@
+{
+  "accepted_agreement_rows": 2720,
+  "accepted_source_file": "e02_repair_structured_ce009c1.jsonl",
+  "accepted_source_rows": 3800,
+  "accepted_source_sha256": "0663506dfb3116870f1324be465b17a5fc7723fb190bd53d04840963e07d4e59",
+  "missing_elementwise_fields": [
+    "elementwise_relative_error_elements",
+    "elementwise_relative_error_max",
+    "elementwise_relative_error_p50",
+    "elementwise_relative_error_p90",
+    "elementwise_relative_error_p95",
+    "elementwise_relative_error_p99",
+    "elementwise_relative_error_p99_9"
+  ],
+  "overwrite_warning": "E26 requires a fresh output path. Do not append E26 rows to the accepted E02 ce009c1 artifact or replace the accepted raw source.",
+  "prospective_definition": "abs(candidate-reference)/max(abs(reference),1e-12); report the fraction of denominators floored, linear p50/p90/p95/p99/p99.9, and max",
+  "quantile_justification": "p50 describes the center; p90/p95 the broad tail; p99/p99.9 the rare tail; max retains the worst element. Reporting the floored-denominator fraction exposes sensitivity to exact and near zeros.",
+  "reason": "The accepted post-repair JSONL stores tensor-level relative L2, reference L2, and maximum absolute errors, but not reference and candidate elements. Quantiles cannot be reconstructed from those aggregates. The archived per-element NPZ is pre-repair and excluded.",
+  "required_fresh_command": "./.venv/bin/poincare-exec structured-numerics --protocol protocol.yaml --config configs/numerics/e26_elementwise_agreement.yaml --output /fresh/path/e26_elementwise_agreement.jsonl",
+  "status": "rerun_required"
+}

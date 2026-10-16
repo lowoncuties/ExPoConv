@@ -1,0 +1,36 @@
+schema_version: "1.0"
+experiment_id: E26
+description: "Prospective reviewer-requested elementwise agreement extension of the accepted post-repair structured E02 design."
+analysis_status: "prospective reviewer-requested diagnostic; not part of the original E02 acceptance gate"
+source_design: "E02-REPAIR-STRUCTURED at protocol 1.5; same topology definitions, precisions, realizations, seed, initialization, inputs, cotangents, and R same-precision reference"
+comparison_scope: "R versus F and T outputs and reverse-mode gradients; finite-difference sweeps are not repeated"
+precisions: [float32, float64]
+realizations: 10
+finite_difference_relative_steps: []
+curvature: 0.1
+input_scale: 0.05
+normalization_epsilon: 0.000001
+elementwise_relative_error:
+  denominator_floor: 1.0e-12
+  quantiles: [0.5, 0.9, 0.95, 0.99, 0.999]
+  quantile_method: linear
+  report_denominator_floored_fraction: true
+cases:
+  - id: convolution_stack_8
+    kind: convolution_stack
+    input_shape: [2, 7, 7, 4]
+    input_channels: 4
+    output_channels: 4
+    kernel_size: 3
+    stride: 1
+    padding: SAME
+    depth: 8
+    activation: relu
+  - id: small_unet
+    kind: small_unet
+    input_shape: [2, 16, 16, 3]
+    input_channels: 3
+    classes: 2
+    initial_width: 2
+    depth: 2
+    initial_curvature: 0.1

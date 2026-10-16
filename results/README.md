@@ -17,6 +17,7 @@ Verify the bundle with `sha256sum --check SHA256SUMS` in this directory.
 | `e19_preflight/` | E19 same-machine technical preflight | author-authorized clean-clone record, bounded-numerics summary, five-session R/F/T medians, paired speedups, and raw-evidence audit summary |
 | `checkpoints/` | E06 (supporting, not in the manuscript) | replay audit, task agreement, aggregate, and the inventory of archived checkpoints |
 | `diagnostics/` | E07-J2 (one bounded manuscript sentence; full detail supporting) | source audit, key metrics, gradient/update/logit agreement, 100-update trajectory and figure |
+| `reviewer_requested/` | post-hoc reviewer-requested analyses | E09/E20 learned-curvature trajectories and finals, explicitly exploratory TOST, per-seed absolute R/F runtime minutes, and the documented need for a fresh E02 elementwise-error rerun |
 | `claims.csv` | all | manuscript claims mapped to supporting files |
 | `environment.json` | V100 result families | byte-preserved measured V100 hardware/software record used by the registered E13 hash; its historical description predates E20/E21 and must not be read as covering them. Their A6000 runtime is in `e20_e21_training_replication/e20_e21_gate_audit.json` |
 
@@ -34,6 +35,7 @@ Verify the bundle with `sha256sum --check SHA256SUMS` in this directory.
 | Original V100 all-endpoints appendix figure | `training/training_all_endpoints.{pdf,png}`, regenerated and cohort-gated by `scripts/plot_training_all_endpoints.py`; `training/figure_training_paired_endpoints.{pdf,png}` is the raw exporter's rendering of the same compact endpoint values |
 | Fifteen-seed A6000 replications and current non-pooled four-cohort training figure | `e20_e21_training_replication/e20_e21_training_variant_summary.csv`, `e20_e21_training_replication/e20_e21_paired_quality_summary.csv`, `e20_e21_training_replication/e20_e21_paired_training_efficiency_summary.csv`, `e20_e21_training_replication/e09_e10_e20_e21_platform_strata.csv`; archival exporter figure `e20_e21_training_replication/e09_e10_e20_e21_quality_strata.{pdf,png}`; presentation-only derivative `e20_e21_training_replication/e09_e10_e20_e21_quality_strata_manuscript.{pdf,png}` |
 | Same-machine clean-clone technical preflight | `e19_preflight/technical_preflight_record.md`, `e19_preflight/numerics_summary.json`, `e19_preflight/steady_state_session_medians.csv`, `e19_preflight/paired_speedup_summary.csv`, `e19_preflight/summary.json` |
+| Reviewer-requested curvature, exploratory equivalence, and absolute runtime | `reviewer_requested/isic16_curvature_trajectories.csv`, `reviewer_requested/isic16_curvature_finals_by_seed.csv`, `reviewer_requested/isic16_curvature_final_summary.csv`, `reviewer_requested/quality_tost.csv`, `reviewer_requested/training_runtime_minutes_by_seed.csv`, `reviewer_requested/training_runtime_minutes_summary.csv`, `reviewer_requested/elementwise_relative_error_status.json` |
 | Provenance appendix | `*/summary.json`, `training/training_runs.csv`, `e20_e21_training_replication/e20_e21_gate_audit.json`, `e20_e21_training_replication/e20_e21_run_audit.csv` |
 
 ## Supporting diagnostics retained in full only in the repository

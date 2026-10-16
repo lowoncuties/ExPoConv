@@ -12,6 +12,9 @@ from typing import Any
 import jax
 import jax.numpy as jnp
 
+from poincare_exec.analysis.reviewer_requested import (
+    elementwise_relative_error_summary,
+)
 from poincare_exec.artifacts import (
     append_jsonl,
     base_result_row,
@@ -551,6 +554,40 @@ def _validate_config(config: dict[str, Any]) -> None:
         _dtype(precision)
 
 
+def _elementwise_settings(
+    config: dict[str, Any], protocol: dict[str, Any]
+) -> tuple[float, tuple[float, ...]] | None:
+    settings = config.get("elementwise_relative_error")
+    if settings is None:
+        return None
+    if not isinstance(settings, dict):
+        raise ValueError("elementwise_relative_error must be a mapping")
+    required = {
+        "denominator_floor",
+        "quantiles",
+        "quantile_method",
+        "report_denominator_floored_fraction",
+    }
+    if set(settings) != required:
+        raise ValueError(
+            "elementwise_relative_error fields differ from the frozen schema"
+        )
+    floor = float(settings["denominator_floor"])
+    protocol_floor = float(protocol["numerics"]["norm_floor"])
+    if floor != protocol_floor:
+        raise ValueError(
+            "elementwise denominator floor must equal numerics.norm_floor"
+        )
+    quantiles = tuple(float(value) for value in settings["quantiles"])
+    if quantiles != (0.5, 0.9, 0.95, 0.99, 0.999):
+        raise ValueError("elementwise quantiles differ from the frozen E26 set")
+    if settings["quantile_method"] != "linear":
+        raise ValueError("elementwise quantile method must be linear")
+    if settings["report_denominator_floored_fraction"] is not True:
+        raise ValueError("E26 must report denominator-floor exposure")
+    return floor, quantiles
+
+
 def _existing_keys(path: Path) -> set[tuple[str, str, int, str, str, str]]:
     completed = set()
     if not path.exists():
@@ -610,6 +647,7 @@ def run_structured_numerics(
     completed = _existing_keys(output)
     seed = int(protocol["seeds"]["numerical"])
     norm_floor = float(protocol["numerics"]["norm_floor"])
+    elementwise_settings = _elementwise_settings(config, protocol)
     written = 0
     for case_index, spec in enumerate(config["cases"]):
         case_id = spec["id"]
@@ -689,6 +727,16 @@ def run_structured_numerics(
                         )
                         if row_key in completed:
                             continue
+                        elementwise = (
+                            elementwise_relative_error_summary(
+                                reference_groups[group],
+                                candidate,
+                                elementwise_settings[0],
+                                quantiles=elementwise_settings[1],
+                            )
+                            if elementwise_settings is not None
+                            else {}
+                        )
                         rows.append(
                             {
                                 **base,
@@ -699,6 +747,7 @@ def run_structured_numerics(
                                 **_finite_metrics(
                                     reference_groups[group], candidate, norm_floor
                                 ),
+                                **elementwise,
                             }
                         )
                         completed.add(row_key)
