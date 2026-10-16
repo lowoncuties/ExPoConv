@@ -69,7 +69,7 @@ def test_euclidean_batch_norm_uses_batch_and_spatial_axes() -> None:
 def test_euclidean_unet_has_no_curvature_dependency() -> None:
     params = init_unet(jax.random.PRNGKey(3), initial_width=2, depth=1, dtype=jnp.float32)
     params.pop("curvature_raw")
-    inputs = jax.random.normal(jax.random.PRNGKey(5), (2, 8, 8, 3))
+    inputs = jax.random.normal(jax.random.PRNGKey(5), (2, 8, 8, 3), dtype=jnp.float32)
 
     logits = unet_forward(params, inputs, variant="E")
     parameter_gradients = jax.grad(
@@ -90,7 +90,7 @@ def test_euclidean_resnet_is_curvature_independent() -> None:
         blocks_per_group=(1, 1, 1),
         classes=5,
     )
-    inputs = jax.random.normal(jax.random.PRNGKey(11), (2, 32, 32, 3))
+    inputs = jax.random.normal(jax.random.PRNGKey(11), (2, 32, 32, 3), dtype=jnp.float32)
 
     finite = resnet20_forward(params, inputs, jnp.asarray(0.1), variant="E")
     nonfinite = resnet20_forward(params, inputs, jnp.asarray(jnp.nan), variant="E")
