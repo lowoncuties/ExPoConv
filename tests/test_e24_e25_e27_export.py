@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import csv
+import hashlib
 import json
 from pathlib import Path
 from typing import Any
@@ -10,6 +11,7 @@ import pytest
 from poincare_exec.artifacts.provenance import precision_policy
 from poincare_exec.config.loader import canonical_json
 from scripts import export_e24_e25_e27_tables as exporter
+from scripts import plot_e25_cost_context as cost_figure
 
 
 def _runtime_environment(ld_library_path: str | None) -> dict[str, Any]:
@@ -410,3 +412,81 @@ def test_role_specs_cover_exact_frozen_variant_matrices() -> None:
         experiment_id: len(exporter._expected_groups(experiment_id, registration))
         for experiment_id, registration in registrations.items()
     } == {"E24": 45, "E25": 90, "E27": 10}
+
+
+def test_e25_cost_figure_is_exact_deterministic_and_fails_closed(
+    tmp_path: Path,
+) -> None:
+    artifacts = tmp_path / "artifacts"
+    validated = tmp_path / "validated"
+    artifacts.mkdir()
+    _write_artifacts(artifacts)
+    exporter.export(artifacts, validated)
+
+    audit_path = validated / exporter.OUTPUT_FILES["audit"]
+    audit = json.loads(audit_path.read_text(encoding="utf-8"))
+    audit["analysis_code"] = {
+        "commit": "a" * 40,
+        "dirty": False,
+        "status_porcelain": [],
+    }
+    audit_path.write_text(json.dumps(audit, sort_keys=True) + "\n", encoding="utf-8")
+
+    pdf, png, figure_csv = cost_figure.render(validated, tmp_path / "figure-a")
+    pdf_repeat, png_repeat, figure_csv_repeat = cost_figure.render(
+        validated, tmp_path / "figure-b"
+    )
+    assert pdf.read_bytes().startswith(b"%PDF")
+    assert png.read_bytes().startswith(b"\x89PNG\r\n\x1a\n")
+    assert pdf.read_bytes() == pdf_repeat.read_bytes()
+    assert png.read_bytes() == png_repeat.read_bytes()
+    assert figure_csv.read_bytes() == figure_csv_repeat.read_bytes()
+
+    figure_rows = _csv(figure_csv)
+    assert len(figure_rows) == 9
+    assert [(row["workload_id"], row["variant"]) for row in figure_rows] == [
+        (workload_id, variant)
+        for workload_id, _label, _mode in cost_figure.WORKLOADS
+        for variant, _label, _role in cost_figure.VARIANTS
+    ]
+    e = next(
+        row
+        for row in figure_rows
+        if row["workload_id"] == "unet_b1_forward" and row["variant"] == "E"
+    )
+    assert json.loads(e["session_ids"]) == [0, 1, 2, 3, 4]
+    assert json.loads(e["session_median_latency_ms"]) == pytest.approx(
+        [1.00995, 1.01995, 1.02995, 1.03995, 1.04995]
+    )
+    assert float(e["median_latency_ms"]) == pytest.approx(1.02995)
+    assert json.loads(e["peak_live_gib_by_session"]) == [4.0] * 5
+    assert float(e["median_peak_live_gib"]) == 4.0
+    assert {row["physical_gpu_uuid"] for row in figure_rows} == {
+        exporter.EXPECTED_DEVICE["uuid"]
+    }
+    assert {row["runtime_role"] for row in figure_rows} == {"pinned_jax_0_4_25_cuda_11_8"}
+    with pytest.raises(FileExistsError, match="refusing to overwrite"):
+        cost_figure.render(validated, tmp_path / "figure-a")
+
+    sessions_path = validated / exporter.OUTPUT_FILES["sessions"]
+    session_rows = _csv(sessions_path)
+    target = next(
+        row
+        for row in session_rows
+        if row["experiment_id"] == "E25"
+        and row["workload_id"] == "unet_b1_forward"
+        and row["session"] == "0"
+        and row["variant"] == "E"
+    )
+    target["jax_version"] = "0.11.2"
+    _write_csv(sessions_path, session_rows)
+    with pytest.raises(ValueError, match="audit evidence mismatch"):
+        cost_figure.render(validated, tmp_path / "tampered-evidence")
+
+    audit = json.loads(audit_path.read_text(encoding="utf-8"))
+    session_evidence = audit["output_evidence"][sessions_path.name]
+    session_evidence["bytes"] = sessions_path.stat().st_size
+    session_evidence["sha256"] = hashlib.sha256(sessions_path.read_bytes()).hexdigest()
+    audit_path.write_text(json.dumps(audit, sort_keys=True) + "\n", encoding="utf-8")
+    with pytest.raises(ValueError, match="unexpected jax_version"):
+        cost_figure.render(validated, tmp_path / "tampered-provenance")
