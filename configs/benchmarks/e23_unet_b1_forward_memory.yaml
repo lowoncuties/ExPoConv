@@ -1,0 +1,20 @@
+schema_version: "1.0"
+experiment_id: E23
+description: "Revision R1 diagnostic for the E08 batch-1 forward peak-allocation difference (R 0.237 GiB, F 0.395 GiB). scripts/run_e23.sh runs this unchanged E08 workload once with default XLA flags and once with XLA_FLAGS=--xla_gpu_autotune_level=0; provenance records the flags."
+campaign_scope: "Attribute the higher F batch-1 forward process-lifetime peak to compilation-time convolution autotuning scratch or to the compiled program by comparing peaks with autotuning enabled and disabled. Latency under disabled autotuning is not a performance result."
+variants: [R, F]
+sessions: 5
+warmup_calls: 50
+timed_calls_per_session: 200
+require_idle_gpu: true
+max_preexisting_memory_mib: 512
+max_preexisting_utilization_percent: 5
+shared_state_policy: "Within each session, R and F receive identical deterministic initial parameters and inputs."
+memory_evidence_policy: "Process-lifetime peak after completed outputs are dereferenced before the next call; includes initialization, compilation, and warmup and is not an isolated activation/workspace peak."
+workloads:
+  - id: unet_b1_forward
+    kind: unet
+    mode: forward
+    shape: {batch: 1, height: 256, width: 256}
+    curvature: 0.1
+    dtype: float32
