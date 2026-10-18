@@ -1,0 +1,21 @@
+{
+  "all_layer_fractions": {
+    "E09_F": 0.0,
+    "E09_R": 0.0,
+    "E10_F": 2.5510204081632652e-08,
+    "E10_R": 1.2755102040816326e-08
+  },
+  "analysis_status": "post_hoc_reviewer_requested_trained_model_diagnostic",
+  "cap_definition": "rho^2 >= m_c^2 with rho = tanh(sqrt(c R^2)) in FP32, m_c = 1 - float32_relative_margin",
+  "checkpoints": "final-update checkpoints (checkpoints/final.pkl)",
+  "code_commit": "768301c76b05baa4802f9f7b5e47db004a8f9129",
+  "code_dirty": false,
+  "device": "TFRT_CPU_0",
+  "experiment_id": "E33",
+  "output_rows": {
+    "e33_cap_activity_by_checkpoint.csv": 400,
+    "e33_cap_activity_summary.csv": 84
+  },
+  "protocol_version": "1.17",
+  "split": "official test, manifest order, registered evaluation batch size"
+}
