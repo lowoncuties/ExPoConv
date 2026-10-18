@@ -11,6 +11,8 @@ The driver launches `python benchmark.py worker ...` for each session.
 """
 
 import argparse
+import csv
+import hashlib
 import json
 import math
 import os
@@ -29,6 +31,26 @@ VARIANTS = ["hypll", "factorized"]
 SESSIONS, WARMUP, TIMED, ORDER_SEED = 5, 50, 200, 314159
 CURVATURE, BATCH = 0.1, 8
 T_975_DF4 = 2.7764451051977987  # Student t quantile, 0.975, 4 degrees of freedom
+PROTOCOL = {
+    "sessions_per_workload": SESSIONS,
+    "warmup_calls": WARMUP,
+    "timed_calls": TIMED,
+    "variant_order": "shuffled per workload and session by random.Random(314159); "
+    "each variant of a session runs in a fresh process",
+    "session_seed": "314159 + session, shared by both variants",
+    "latency": "time.perf_counter() around each call, which ends with "
+    "torch.cuda.synchronize(); a session contributes its median",
+    "speedup": "geometric mean of session-median ratios hypll/factorized; "
+    "95% log-t interval with df = 4",
+    "steady_state_peak": "torch.cuda.max_memory_allocated() over the timed calls, after "
+    "reset_peak_memory_stats() following warmup",
+    "process_peak": "largest torch.cuda.max_memory_allocated() over the whole process, "
+    "including setup and warmup",
+    "precision": "FP32; torch.backends.cuda.matmul.allow_tf32 = False; "
+    "torch.backends.cudnn.allow_tf32 = False; cudnn.benchmark left at its default",
+    "curvature": CURVATURE,
+    "batch": BATCH,
+}
 
 
 def gpu_apps():
@@ -365,12 +387,53 @@ def summarize(args):
         summary_rows.append(row)
     write_csv(Path(f"{args.prefix}_sessions.csv"), session_rows)
     write_csv(Path(f"{args.prefix}_latency_memory.csv"), summary_rows)
+    gpus = {(r["gpu_name"], r["gpu_uuid"], r["driver"], r["gpu_index"]) for r in launches}
+    summary = {
+        "measurement_commit": args.source_commit,
+        "hyperbolic_unet_commit": args.unet_commit,
+        "environment": [
+            json.loads(e) for e in sorted({json.dumps(r["env"]) for r in rows})
+        ],
+        "gpu": [
+            dict(zip(("name", "uuid", "driver", "index"), g, strict=True)) for g in gpus
+        ],
+        "protocol": PROTOCOL,
+        "workloads": summary_rows,
+        "inputs": {"sessions_jsonl_sha256": sha256(args.sessions)},
+    }
+    if args.equivalence:
+        summary["equivalence"] = equivalence_digest(args.equivalence)
+        summary["inputs"]["equivalence_csv_sha256"] = sha256(args.equivalence)
+    Path(f"{args.prefix}_summary.json").write_text(json.dumps(summary, indent=1) + "\n")
     print(json.dumps(summary_rows, indent=1))
 
 
-def write_csv(path, rows):
-    import csv
+def equivalence_digest(path):
+    """Largest finite errors and criterion passes per case group and dtype."""
+    columns = ["rel_l2_error", "max_abs_error", "ref_rel_l2_vs_fp64", "fac_rel_l2_vs_fp64"]
+    digest = {}
+    with open(path, newline="") as handle:
+        for r in csv.DictReader(handle):
+            group = "S1-S3 and stride 2" if r["regime"] == "smooth" else r["case"]
+            d = digest.setdefault(group, {}).setdefault(r["dtype"], {"comparisons": 0})
+            d["comparisons"] += 1
+            d["paper_criterion_pass"] = d.get("paper_criterion_pass", 0) + (
+                r["paper_criterion_pass"] == "True"
+            )
+            for key in ("nonfinite_ref", "nonfinite_mismatch"):
+                d[key] = d.get(key, 0) + int(r[key])
+            for key in columns:
+                value = float(r.get(key) or "nan")
+                if math.isfinite(value):
+                    d[f"largest_{key}"] = max(d.get(f"largest_{key}", 0.0), value)
+    return digest
 
+
+def sha256(path):
+    return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+
+
+def write_csv(path, rows):
     with path.open("w", newline="") as handle:
         fields = list(dict.fromkeys(key for row in rows for key in row))
         writer = csv.DictWriter(handle, fieldnames=fields)
@@ -394,6 +457,9 @@ def main():
     p = sub.add_parser("summarize")
     p.add_argument("sessions")
     p.add_argument("--prefix", required=True)
+    p.add_argument("--equivalence", help="equivalence CSV of check_equivalence.py")
+    p.add_argument("--source-commit", help="commit of the measured code")
+    p.add_argument("--unet-commit", help="commit of the Hyperbolic U-Net sources")
     args = parser.parse_args()
     {"run": driver, "worker": worker, "summarize": summarize}[args.command](args)
 
