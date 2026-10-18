@@ -1,0 +1,35 @@
+schema_version: "1.0"
+experiment_id: E30
+description: "Paired V100 R/F Poincare U-Net complete-update timing at wider initial channel widths, under the default JAX allocator (XLA_PYTHON_CLIENT_MEM_FRACTION unset) with preallocation disabled by scripts/run_e30.sh."
+campaign_scope: "Test how the F-over-R complete-update advantage changes as the U-Net initial width grows from the registered 8 (E13 unet_update_b8_r256) to 16 and 32 channels at batch 8 and 256-by-256. Every other workload field is copied from the E13 batch-8, 256-by-256 workload. Model, loss, optimizer, precision, timing boundary, sessions, warmup, and observation counts are unchanged; retain every explicit OOM or failure."
+variants: [R, F]
+sessions: 5
+warmup_calls: 50
+timed_calls_per_session: 200
+require_idle_gpu: true
+max_preexisting_memory_mib: 512
+max_preexisting_utilization_percent: 5
+memory_budget_bytes: 34359738368
+shared_state_policy: "Within each session, R and F receive identical deterministic initial parameters, inputs, targets, and optimizer state, then evolve independently through the same number of complete updates."
+timing_scope: "Each synchronized call includes loss, reverse-mode gradients, gradient clipping, coupled L2, and a complete Adam update; compilation, initialization, and host transfer are excluded from steady-state latency."
+memory_evidence_policy: "Process-lifetime JAX allocator peak through the final synchronized measured update; includes initialization, compilation, first call, and warmup and is not isolated activation memory."
+failure_policy: "Retain every failed group. Explicit allocator diagnostics are classified as oom and the last entered phase distinguishes initialization, compilation, first update, warmup updates, measured updates, and post-measurement work. Signal-only termination is not labeled OOM. An OOM under the default allocator cap is a valid outcome and is not rerun under another allocator setting."
+allocator_policy: "Default JAX allocator fraction (XLA_PYTHON_CLIENT_MEM_FRACTION unset) and XLA_PYTHON_CLIENT_PREALLOCATE=false, the conditions of E13."
+width_policy: "initial_width sets the first U-Net level; later levels double it as in the registered builder, so widths 16 and 32 give levels 16-256 and 32-512 channels."
+workloads:
+  - id: unet_update_b8_r256_iw16
+    kind: unet
+    mode: update
+    sweep_axes: [initial_width]
+    shape: {batch: 8, height: 256, width: 256}
+    initial_width: 16
+    curvature: 0.1
+    dtype: float32
+  - id: unet_update_b8_r256_iw32
+    kind: unet
+    mode: update
+    sweep_axes: [initial_width]
+    shape: {batch: 8, height: 256, width: 256}
+    initial_width: 32
+    curvature: 0.1
+    dtype: float32
