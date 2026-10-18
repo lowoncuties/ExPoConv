@@ -1,0 +1,56 @@
+{
+  "analysis_status": "post_hoc_reviewer_requested_accuracy_diagnostic",
+  "candidates": [
+    "R_float32",
+    "F_float32",
+    "T_float32",
+    "F_float64",
+    "T_float64"
+  ],
+  "curvature_override": "convolution_stack_8 receives curvature as an argument; small_unet sets initial_curvature, which only sets curvature_raw; keys, inputs, weights, and cotangents are unchanged",
+  "curvatures": [
+    0.06,
+    0.1,
+    0.13
+  ],
+  "denominator_floor": 1e-12,
+  "e26_realization_check": {
+    "compared_outputs": 20,
+    "e26_outputs": 20,
+    "max_relative_difference_oracle_vs_e26_v100_R_fp32_output_norm": 2.46844723688593e-06
+  },
+  "elementwise_definition": "abs(candidate-oracle)/max(abs(oracle),1e-12)",
+  "experiment_id": "E33",
+  "identity": {
+    "code_commit": "620b0bfb08cef0c4a4815723d4053c3456c993c1",
+    "code_dirty": false,
+    "design_config": "configs/numerics/e26_elementwise_agreement.yaml",
+    "design_config_hash": "bcbfbece6e4797aad89e7905048f743346b29cb7a456d05699f695a3f8da63dc",
+    "device": "TFRT_CPU_0",
+    "jax_version": "0.4.25",
+    "protocol_version": "1.17",
+    "seed": 20260906
+  },
+  "oracle": {
+    "definition": "R evaluated in FP64 on the FP32 realization cast to FP64, with every projection margin fixed to the FP32 value",
+    "name": "R_float64_fixed_float32_margin",
+    "projection_margin": 0.004
+  },
+  "output_rows": {
+    "e33_oracle_accuracy_paired_summary.csv": 36,
+    "e33_oracle_accuracy_scope_summary.csv": 90,
+    "e33_oracle_accuracy_tensor_statistics.csv": 10200
+  },
+  "quantiles": [
+    0.5,
+    0.9,
+    0.95,
+    0.99,
+    0.999
+  ],
+  "realizations_per_case": 10,
+  "registered_curvature": 0.1,
+  "relative_l2_definition": "||candidate-oracle||_2 / max(||oracle||_2, 1e-12)",
+  "schema_version": "1.0",
+  "scientific_behavior_change": false
+}
