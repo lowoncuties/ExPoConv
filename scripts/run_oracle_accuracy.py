@@ -237,11 +237,15 @@ def _case_scopes(row: dict[str, Any]) -> tuple[str, str]:
     return ("all_cases", row["case_id"])
 
 
-def scope_summary(rows: Sequence[dict[str, Any]]) -> list[dict[str, Any]]:
+def scope_summary(
+    rows: Sequence[dict[str, Any]], tolerances: dict[str, dict[str, float]]
+) -> list[dict[str, Any]]:
     """Summarize errors per curvature, case scope, dtype, path, and tensor scope.
 
     Like E26, quantile columns are maxima of per-tensor quantiles; medians across
-    tensors are added because a single realization can set every maximum.
+    tensors are added because a single realization can set every maximum. The
+    registered mixed criterion (max abs <= atol + rtol * ||oracle||) is applied
+    against the oracle with the candidate dtype's protocol tolerances.
     """
 
     cells: dict[tuple[Any, ...], list[dict[str, Any]]] = defaultdict(list)
@@ -264,6 +268,9 @@ def scope_summary(rows: Sequence[dict[str, Any]]) -> list[dict[str, Any]]:
                 ),
                 "reference": ORACLE,
                 "tensor_count": len(selected),
+                "mixed_criterion_failed_tensors": sum(
+                    not _mixed_pass(row, tolerances[row["dtype"]]) for row in selected
+                ),
                 "median_tensor_relative_l2_error": statistics.median(relative),
                 "largest_tensor_relative_l2_error": max(relative),
                 "largest_max_absolute_error": max(
@@ -289,6 +296,11 @@ def scope_summary(rows: Sequence[dict[str, Any]]) -> list[dict[str, Any]]:
             }
         )
     return output
+
+
+def _mixed_pass(row: dict[str, Any], tolerance: dict[str, float]) -> bool:
+    threshold = tolerance["absolute"] + tolerance["relative"] * row["oracle_l2_norm"]
+    return bool(row["finite"]) and row["max_absolute_error"] <= threshold
 
 
 def paired_summary(rows: Sequence[dict[str, Any]]) -> list[dict[str, Any]]:
@@ -417,6 +429,7 @@ def _parser() -> argparse.ArgumentParser:
 
 def main() -> int:
     arguments = _parser().parse_args()
+    provenance = git_provenance()  # before any output is written
     protocol, design, floor, quantiles = load_design()
     count = arguments.realizations or int(design["realizations"])
     cells = [
@@ -436,12 +449,11 @@ def main() -> int:
 
     output_dir = arguments.output_dir
     output_dir.mkdir(parents=True, exist_ok=True)
-    scopes = scope_summary(rows)
+    scopes = scope_summary(rows, protocol["numerics"]["tolerances"])
     pairs = paired_summary(rows)
     write_csv(output_dir / "e33_oracle_accuracy_tensor_statistics.csv", rows)
     write_csv(output_dir / "e33_oracle_accuracy_scope_summary.csv", scopes)
     write_csv(output_dir / "e33_oracle_accuracy_paired_summary.csv", pairs)
-    provenance = git_provenance()
     registered = float(design["curvature"])
     summary = {
         "schema_version": "1.0",

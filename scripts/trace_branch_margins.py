@@ -46,6 +46,7 @@ from run_oracle_accuracy import (
     realization,
 )
 
+from poincare_exec.artifacts.provenance import git_provenance
 from poincare_exec.experiments.numerical_structured import _evaluate, _gradient_groups
 from poincare_exec.experiments.numerics import _cast_tree
 from poincare_exec.models import common, unet
@@ -303,8 +304,15 @@ def _relative_l2(candidate, reference) -> float:
     return float(difference / max(np.linalg.norm(reference.ravel()), 1.0e-12))
 
 
-def recorded_differences() -> dict[str, dict[str, float]]:
-    """V100 E26 F-vs-R and E02 T-vs-R relative L2 for small_unet realization 2."""
+def _norms(groups: dict[str, Any]) -> dict[str, float]:
+    return {
+        group: float(np.linalg.norm(np.asarray(value, dtype=np.float64).ravel()))
+        for group, value in groups.items()
+    }
+
+
+def recorded_v100(field: str) -> dict[str, dict[str, float]]:
+    """A field of the V100 E26 F-vs-R and E02 T-vs-R rows for small_unet r2."""
 
     recorded: dict[str, dict[str, float]] = {"E26_F_vs_R": {}, "E02_T_vs_R": {}}
     for path, label, variant in (
@@ -315,7 +323,7 @@ def recorded_differences() -> dict[str, dict[str, float]]:
             for row in csv.DictReader(stream):
                 key = (row["case_id"], row["dtype"], row["realization"], row["variant"])
                 if key == ("small_unet", "float32", "2", variant):
-                    recorded[label][row["variable_group"]] = float(row["relative_l2_error"])
+                    recorded[label][row["variable_group"]] = float(row[field])
     return recorded
 
 
@@ -340,6 +348,7 @@ def _parser() -> argparse.ArgumentParser:
 
 def main() -> int:
     arguments = _parser().parse_args()
+    provenance = git_provenance()  # before any output is written
     pin_cores(0)
     _configure_jax()
     protocol, design, _, _ = load_design()
@@ -395,6 +404,8 @@ def main() -> int:
             "relative_l2_change_by_tensor": {
                 group: _relative_l2(moved[group], reference[group]) for group in reference
             },
+            "l2_norm_before_by_tensor": _norms(reference),
+            "l2_norm_after_by_tensor": _norms(moved),
         }
 
     gate = next(
@@ -436,7 +447,10 @@ def main() -> int:
         "margin": margin,
         "device": str(jax.devices()[0]),
         "gate_flip_target": {"layer": gate_target[0], "element": list(gate_target[1])},
-        "recorded_v100_relative_l2": recorded_differences(),
+        "recorded_v100_relative_l2": recorded_v100("relative_l2_error"),
+        "recorded_v100_R_reference_l2_norm": recorded_v100("reference_l2_norm"),
+        "code_commit": provenance["commit"],
+        "code_dirty": provenance["dirty"],
         "flip_tests": flips,
     }
     with (arguments.output_dir / f"{stem}_flip_test.json").open(

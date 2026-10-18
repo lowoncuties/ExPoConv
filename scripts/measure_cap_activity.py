@@ -243,6 +243,7 @@ def main() -> int:
         "--output-dir", type=Path, default=ROOT / "results/reviewer_requested"
     )
     arguments = parser.parse_args()
+    provenance = git_provenance()  # before any output is written
     protocol = load_yaml(ROOT / "protocol.yaml")
     cells = [
         (experiment, variant, seed)
@@ -259,7 +260,6 @@ def main() -> int:
     summary = summary_rows(rows)
     write_csv(arguments.output_dir / "e33_cap_activity_by_checkpoint.csv", rows)
     write_csv(arguments.output_dir / "e33_cap_activity_summary.csv", summary)
-    provenance = git_provenance()
     metadata = {
         "experiment_id": "E33",
         "analysis_status": "post_hoc_reviewer_requested_trained_model_diagnostic",
