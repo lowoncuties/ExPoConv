@@ -75,6 +75,11 @@ PyPI `torch==2.4.0` is the CUDA 12.1 build. It is also the version pinned by Hyp
    patches, inputs beyond HypLL's projection radius (source-radius cap active), and large weights
    (output projection active). The compared tensors are the output and the gradients with
    respect to the input, weights, bias and curvature for one shared Gaussian cotangent.
+   Random values are drawn once in FP64 and cast to each dtype. Errors cover the entries that
+   are finite in both implementations, and a separate column counts entries where only one of
+   them is finite. Each FP32 result is also compared with an FP64 oracle: HypLL evaluated in FP64
+   on the same FP32-rounded values with HypLL's FP32 projection margin. This separates FP32
+   rounding from differences between the two formulations.
 2. Run the benchmark sessions. The driver refuses to launch a session unless
    `nvidia-smi --query-compute-apps` shows no process on the selected GPU:
 
