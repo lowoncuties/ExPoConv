@@ -1,0 +1,438 @@
+protocol_version: "1.19"
+protocol_date: "2026-10-18"
+target_journal: "Neural Networks"
+working_title: "Exact and Efficient Execution of Poincare Neural Networks"
+study_scope: "HNN++ and Poincare operator-preserving execution"
+framework: "JAX standalone; HyperJAX-independent"
+confirmatory_status: "initial_task_quality_complete; prospective replication complete; post-review extensions frozen before result inspection"
+
+source_documents:
+  experiment_plan:
+    path: "/data2/joc0027/optimizatio-paper/Neural_Networks_Experiment_Plan.md"
+    sha256: "a491a34d8926b11e5180d3f45fa1dcdb18cb3536f2f4cc14e930a3d56fc00ac1"
+  derivation_addendum:
+    path: "/data2/joc0027/bone-suppression/HyperbolicGAN_Block_Optimization_Addendum.md"
+    sha256: "90afe9d116e67654b0a2245f43e829bfaec467af53a582ef46bbad4388825fd7"
+
+reference_commits:
+  hyperbolic_unet: "bec504e2f4d198ee4c438579b86d72f9d8186d78"
+  poincare_resnet: "fbbbbf890571115444b89b114f9ed52d128d5aa3"
+  hnnpp: "28737e22822562ac18d5ea03f8c3e3929e945a83"
+candidate_commit: "c1884541ec5b090b5997cb7017dd2ce7afffffdc"
+
+protocol_amendments:
+  - version: "1.1"
+    date: "2026-09-06"
+    affected_experiments: [E02, E06, E07, E08, E09, E10, E12, E13, E14]
+    reason: "Preserve R's zero Jacobian convention at an all-zero HNN++ score vector."
+    case_manifest_changed: false
+  - version: "1.2"
+    date: "2026-09-06"
+    affected_experiments: [E03, E04, E05, E08, E11, E12, E13]
+    reason: "Require zero competing compute processes and at most 5% pre-run GPU utilization; archive physical-GPU snapshots before and after every measurement process."
+    case_manifest_changed: false
+  - version: "1.3"
+    date: "2026-09-06"
+    affected_experiments: [E02]
+    reason: "Freeze topology-level and directional finite-difference cases, and reject resumption across protocol, configuration, or code identities."
+    case_manifest_changed: true
+  - version: "1.4"
+    date: "2026-09-07"
+    affected_experiments: [E06, E07, E08, E10, E11, E12, E13]
+    reason: "Use the scalar additive identity for average pooling so JAX 0.4.25 dispatches its differentiable reduce-window-sum primitive; the averaging equation and forward computation are unchanged."
+    case_manifest_changed: false
+  - version: "1.5"
+    date: "2026-09-07"
+    affected_experiments: [E02, E03, E04, E05, E06, E07, E08, E09, E10, E11, E12, E13, E14]
+    reason: "Correct the smooth all-zero score Jacobian and projection origin derivative consistently in R/F/T; use a backward-stable norm rule and separate fixed-margin from dtype-default high-precision oracle comparisons."
+    case_manifest_changed: true
+  - version: "1.6"
+    date: "2026-09-10"
+    affected_experiments: [E08, E11, E12, E13]
+    reason: "Dereference each completed benchmark output before invoking the next call so process-lifetime peak memory is not inflated by accidental Python retention; retain only the final output for finite-value validation. Timing boundaries and model mathematics are unchanged."
+    case_manifest_changed: false
+  - version: "1.7"
+    date: "2026-09-10"
+    affected_experiments: [E08, E11]
+    reason: "Prioritize the registered complete Poincare U-Net inference and optimizer-step workloads plus its full-model profile as the bounded model-level gain gate. ResNet, dense, standalone backward, and broader profiles are deferred until this gate is interpreted; variants and measurement counts are unchanged."
+    case_manifest_changed: false
+  - version: "1.8"
+    date: "2026-09-10"
+    affected_experiments: [E07, E08, E09, E10, E12, E13, E14]
+    reason: "Materialize Adam hyperparameters in each array leaf's dtype so state-evolving FP32 computations remain FP32 when the FP64 oracle is enabled globally. This fixes a compiled-signature mismatch after the first update; the optimizer equations, clipping policy, and experiment workloads are unchanged."
+    case_manifest_changed: false
+  - version: "1.9"
+    date: "2026-09-12"
+    affected_experiments: [E06, E09, E10, E14]
+    reason: "Before any fixed-budget training run began, designate F as the primary optimized method after corrected E08 showed equivalent F/T update speed while F used less peak live memory. Add F to the predeclared R/T task-quality matrix and retain T as a mechanistic ablation; seeds, datasets, models, optimizer settings, and update budgets are unchanged."
+    case_manifest_changed: true
+  - version: "1.10"
+    date: "2026-09-12"
+    affected_experiments: [E09, E10, E14]
+    reason: "Create one JIT evaluation callable per fresh training worker and reuse its compiled batch-shape executables across epochs and final endpoints. This removes redundant per-epoch compilation; evaluation equations, batch grouping, current-batch normalization, predictions, metrics, checkpoints, and all training updates are unchanged."
+    case_manifest_changed: false
+  - version: "1.11"
+    date: "2026-09-28"
+    affected_experiments: [E13]
+    reason: "Before E13 execution, replace the older R/T capacity wording with the reference-versus-primary R/F comparison selected after corrected E08. Restrict E13 to the prespecified one-factor Poincare U-Net complete-update batch and resolution sweeps; retain every planned case and any failure or OOM. The model, loss, optimizer, precision, timing boundary, session count, warmup count, and observation count are unchanged."
+    case_manifest_changed: true
+  - version: "1.12"
+    date: "2026-10-07"
+    affected_experiments: [E12, E20, E21]
+    reason: "Before any extension run, freeze a prospective R/F-only replication cohort of 15 new matched seeds per task and a bounded R/F CUDA-12 portability timing matrix. The new training cohort is analyzed separately from the completed five-seed V100 study, has no interim endpoint stopping or seed replacement, and is not silently pooled across platforms. T remains an ablation and is not extended."
+    case_manifest_changed: true
+  - version: "1.13"
+    date: "2026-10-07"
+    affected_experiments: [E12, E20, E21]
+    reason: "After the retained pre-update E20/JAX 0.5.3 compile failure, lower the U-Net's kernel-equals-stride, zero-padding transpose fold as an exact reshape and transpose instead of four disjoint scatter-adds. The general overlapping fold is unchanged. Targeted forward, cotangent-gradient, and complete-update checks are required before restarting the frozen campaigns; no failed seed is replaced."
+    case_manifest_changed: false
+  - version: "1.14"
+    date: "2026-10-07"
+    affected_experiments: [E20, E21]
+    reason: "The protocol-1.13 disjoint-fold lowering passed bitwise value/gradient checks but did not resolve the retained JAX 0.5.3 GPU compiler failure and is reverted before accepted training. Freeze E20/E21 to the unchanged scientific implementation and the original JAX/JAXLIB 0.4.25 CUDA-11.8 user-space stack on one RTX A6000. Exact batch-2/256 backward and complete-update diagnostics compiled and completed finitely before restart. E12 remains a separate unrun CUDA-12 portability experiment."
+    case_manifest_changed: false
+  - version: "1.15"
+    date: "2026-10-16"
+    affected_experiments: [E22, E23, E24, E25, E26, E27]
+    reason: "Before inspecting revision-extension outcomes, freeze six separately reported reviewer-requested checks. E22 tests allocator sensitivity at fraction 0.95 and adds a batch-16/512 workload expected to exceed physical memory. E23 tests whether batch-one forward allocation changes when GPU convolution autotuning is disabled. E24 adds benchmark-only M, which materializes R's identical beta-scaled tangent patch but evaluates the exact HNN++ score from patch energy and directional products, so R-versus-M isolates elementwise patch geometry and M-versus-F isolates explicit patch materialization from fused convolutions. E25 adds contextual E, which uses parameter-shape-matched Euclidean convolution/dense layers, current-batch Euclidean normalization over the same axes, ordinary skip concatenation/addition, and the same FC-plus-fold decoder topology without curvature. E26 is a fresh post-repair structured replay reporting elementwise relative-error quantiles without replacing the accepted E02 gate. E27 is a separate RTX-A6000 current-JAX/CUDA-12 portability cohort and is not pooled with or substituted for the primary JAX-0.4.25/CUDA-11.8 results. None of these post-hoc extensions changes the registered R/F/T numerical or training matrices."
+    case_manifest_changed: true
+  - version: "1.16"
+    date: "2026-10-16"
+    affected_experiments: [E27]
+    reason: "Before any E24--E27 A6000 outcome was generated, a clean-clone preflight aligned E27's configuration workload identifier with its protocol registration and explicitly fixed its allocator fraction at 0.95 with preallocation disabled. The preflight also required separate version/backend/device gates and environment captures for the pinned and current JAX stacks. Workload shape, variants, sessions, warmups, timed calls, and reporting policy are unchanged."
+    case_manifest_changed: false
+  - version: "1.17"
+    date: "2026-10-16"
+    affected_experiments: [E28]
+    reason: "After inspecting the fresh E26 diagnostic, freeze a post-hoc replay-stability check for its only mixed-criterion exception pattern: the first three deterministic FP32 realizations of both original structured cases, repeated in three independent processes. E28 is descriptive, cannot replace E02 or E26, and is intended only to distinguish a stable replay result from process-to-process numerical sensitivity."
+    case_manifest_changed: true
+  - version: "1.19"
+    date: "2026-10-18"
+    affected_experiments: [E31]
+    reason: "Before any E31 outcome was generated, freeze a post-hoc reviewer-requested gather-based reference control. R builds its explicit patch with jax.lax.conv_general_dilated_patches, which JAX 0.4.25 lowers to a grouped convolution with a one-hot filter followed by a patch transpose; the official HNN++ code instead concatenates shifted slices. Benchmark-only Rg and Mg are R and M with the same beta-scaled tangent patch built by zero padding and concatenating the kernel-offset strided slices directly in R's (kernel row, kernel column, channel) order; every operation after the patch is shared with R or M, and R, M, F, and T are unchanged. E31 times R, Rg, Mg, and F in the same paired randomized fresh-process sessions on the three E24 U-Net workloads and the E25 ResNet-20 batch-128 complete update, on the RTX A6000 and JAX/JAXLIB 0.4.25 CUDA-11.8 stack of E24/E25 with allocator fraction 0.95 and preallocation disabled. A separate compile-only memory_analysis capture of R, Rg, and F for the batch-8 U-Net update reports compiler temporary, argument, and output bytes, and a descriptive GPU check compares the R and Rg patch tensors and one compiled call of R with Rg and M with Mg for every E31 workload. Version 1.18 is reserved for the E29/E30 registration on a parallel branch and is not used here. Protocol 1.17 is preserved verbatim as configs/protocols/protocol_1_17.yaml for the E24/E25/E27 exports whose configuration hashes bind it. No earlier result, registered matrix, or analysis is changed."
+    case_manifest_changed: true
+
+variants:
+  numerical: [R, F, T]
+  timing: [R, F, T]
+  core_training: [R, F, T]
+  training_roles:
+    baseline: R
+    primary_method: F
+    ablation: T
+  contextual: [E]
+  official_cross_framework: [O]
+  revision_benchmark_controls:
+    materialized_patch_exact_score: M
+    euclidean_same_topology_context: E
+    gathered_patch_reference: Rg
+    gathered_patch_exact_score: Mg
+  revision_benchmark_roles:
+    reference: R
+    primary_method: F
+    mechanism_ablation: M
+    contextual_reference: E
+    gathered_patch_reference: Rg
+    gathered_patch_mechanism_ablation: Mg
+
+seeds:
+  training: [11, 29, 47, 71, 101]
+  development: [3, 5]
+  split: 1729
+  measurement_order: 314159
+  numerical: 20260906
+  bootstrap: 20260907
+
+training_extensions:
+  E20:
+    role: "prospective independent-platform replication"
+    task: isic16_poincare_unet
+    dataset: isic16
+    variants: [R, F]
+    runtime_profile: "JAX/JAXLIB 0.4.25 with pinned CUDA-11.8 user-space libraries on RTX A6000"
+    seeds: [1898335833, 205785622, 1338995025, 1192596770, 864171589, 1052495617, 1147609747, 1619140427, 458014223, 646228129, 821637680, 1059645469, 1209522243, 1985788232, 565813932]
+  E21:
+    role: "prospective independent-platform replication"
+    task: cifar100_poincare_resnet20
+    dataset: cifar100
+    variants: [R, F]
+    runtime_profile: "JAX/JAXLIB 0.4.25 with pinned CUDA-11.8 user-space libraries on RTX A6000"
+    seeds: [1898335833, 205785622, 1338995025, 1192596770, 864171589, 1052495617, 1147609747, 1619140427, 458014223, 646228129, 821637680, 1059645469, 1209522243, 1985788232, 565813932]
+  analysis_policy:
+    seed_rule: "SHA-256 first-31-bit values of ExPoConv-E09E10-RF-extension-v1:{i}, rejecting zero, prior seeds, and duplicates"
+    no_interim_endpoint_stopping: true
+    replace_failed_seeds: false
+    inspect_official_test_aggregate_only_after_all_pairs_complete: true
+    primary_reporting: "report E20/E21 separately from E09/E10"
+    pooled_reporting: "secondary descriptive platform-stratified estimate only"
+
+revision_benchmarks:
+  E22:
+    role: "allocator-sensitivity and beyond-physical-memory capacity diagnostic"
+    config: "configs/benchmarks/e22_unet_allocator_fraction.yaml"
+    variants: [R, F]
+    workloads: [unet_update_b8_r512, unet_update_b16_r512, unet_update_b8_r256]
+    sessions: 5
+    warmup_calls: 50
+    timed_calls_per_session: 200
+    allocator_fraction: 0.95
+    preallocate: false
+    runtime_profile: "primary V100 JAX/JAXLIB 0.4.25 CUDA-11.8 stack"
+  E23:
+    role: "post-hoc batch-one forward process-lifetime allocation diagnostic"
+    config: "configs/benchmarks/e23_unet_b1_forward_memory.yaml"
+    variants: [R, F]
+    compiler_modes: [default, autotune_level_0]
+    interpretation: "A change with autotuning disabled is consistent with compiler-workspace involvement but does not identify every contributor to process-lifetime peak allocation."
+    runtime_profile: "primary V100 JAX/JAXLIB 0.4.25 CUDA-11.8 stack"
+  E24:
+    role: "paired mechanism attribution; no quality or numerical-equivalence claim beyond the tested exact agreement"
+    config: "configs/benchmarks/e24_unet_mechanism_ablation.yaml"
+    variants: [R, M, F]
+    workloads: [unet_b1_forward, unet_b8_forward, unet_b8_update]
+    sessions: 5
+    warmup_calls: 50
+    timed_calls_per_session: 200
+    allocator_fraction: 0.95
+    preallocate: false
+    runtime_profile: "JAX/JAXLIB 0.4.25 with pinned CUDA-11.8 user-space libraries on one idle RTX A6000"
+  E25:
+    role: "paired same-hardware Euclidean throughput and memory context; E is contextual, not an equivalence candidate"
+    config: "configs/benchmarks/e25_euclidean_context.yaml"
+    variants: [R, F, E]
+    workloads: [unet_b1_forward, unet_b8_forward, unet_b8_update, resnet20_b1_forward, resnet20_b128_forward, resnet20_b128_update]
+    sessions: 5
+    warmup_calls: 50
+    timed_calls_per_session: 200
+    allocator_fraction: 0.95
+    preallocate: false
+    runtime_profile: "JAX/JAXLIB 0.4.25 with pinned CUDA-11.8 user-space libraries on the same idle RTX A6000"
+  E26:
+    role: "post-hoc descriptive elementwise agreement extension"
+    config: "configs/numerics/e26_elementwise_agreement.yaml"
+    variants: [R, F, T]
+    reference_experiment: E02
+    interpretation: "Fresh replay only; does not replace or modify the accepted E02 agreement gate."
+  E27:
+    role: "separate software-stack portability sanity check"
+    config: "configs/benchmarks/e27_current_jax_unet_update.yaml"
+    variants: [R, F]
+    workloads: [unet_update_b8_r256]
+    sessions: 5
+    warmup_calls: 50
+    timed_calls_per_session: 200
+    allocator_fraction: 0.95
+    preallocate: false
+    runtime_profile: "JAX/JAXLIB 0.11.2 CUDA-12 plugin on one idle RTX A6000"
+    reporting_policy: "Report separately from all JAX-0.4.25 cohorts; do not pool, substitute, or reinterpret earlier results."
+  E28:
+    role: "post-outcome descriptive replay-stability diagnostic for E26"
+    config: "configs/numerics/e28_elementwise_replay_stability.yaml"
+    variants: [R, F, T]
+    cases: [convolution_stack_8, small_unet]
+    precisions: [float32]
+    realizations: [0, 1, 2]
+    independent_process_replays: 3
+    reference_experiment: E26
+    interpretation: "Report every replay separately; do not select a favorable replay, pool it into E02/E26, or use it as a new acceptance gate."
+  E31:
+    role: "paired gather-based reference control; Rg and Mg are benchmark-only controls with R's patch, not new numerical or training variants"
+    config: "configs/benchmarks/e31_gather_reference.yaml"
+    variants: [R, Rg, Mg, F]
+    workloads: [unet_b1_forward, unet_b8_forward, unet_b8_update, resnet20_b128_update]
+    reference_experiments: [E24, E25]
+    sessions: 5
+    warmup_calls: 50
+    timed_calls_per_session: 200
+    allocator_fraction: 0.95
+    preallocate: false
+    runtime_profile: "JAX/JAXLIB 0.4.25 with pinned CUDA-11.8 user-space libraries on the same idle RTX A6000 as E24/E25"
+    contrasts: [[R, Rg], [Rg, F], [R, F], [Rg, Mg], [Mg, F]]
+    compiled_memory_analysis:
+      script: "scripts/capture_e31_compiled_memory.py"
+      workload: unet_b8_update
+      variants: [R, Rg, F]
+    gpu_equivalence_check:
+      script: "scripts/check_e31_gpu_equivalence.py"
+      pairs: [[R, Rg], [M, Mg]]
+    reporting_policy: "Report E31 separately with paired geometric-mean session-median ratios and log-t 95% intervals; do not pool with or replace E24/E25; compiler memory_analysis bytes are compile-time buffer-assignment sizes, not measured allocator peaks."
+
+precision:
+  oracle: float64
+  primary: float32
+  reduced_precision_enabled: false
+  matmul_precision: highest
+  tf32: false
+
+projection:
+  preserve_source_projection: true
+  float32_relative_margin: 0.004
+  float64_relative_margin: 0.00001
+  report_clip_count: true
+
+numerics:
+  configurations: 100
+  realizations_per_configuration: 10
+  norm_floor: 1.0e-12
+  curvatures: [0.001, 0.1, 1.0, 10.0]
+  normalized_radii: [0.0, 1.0e-6, 0.1, 0.5, 0.9, 0.99, 0.9999, 0.999999]
+  finite_difference_relative_steps: [0.0001, 0.00001, 0.000001]
+  structured_config: "configs/numerics/e02_structured.yaml"
+  repair_config: "configs/numerics/e02_repair.yaml"
+  repair_structured_config: "configs/numerics/e02_repair_structured.yaml"
+  elementwise_agreement_extension_config: "configs/numerics/e26_elementwise_agreement.yaml"
+  float32_contract_oracle_projection_margin: 0.004
+  dtype_default_float64_oracle_is_context_only: true
+  structured_scope: "isolated layer, two/eight-layer stacks, Conv-BN-ReLU, beta skip, ordered residual, transpose decoder, decoder block, and small U-Net"
+  tolerances:
+    float64: {absolute: 1.0e-10, relative: 1.0e-10}
+    float32: {absolute: 2.0e-5, relative: 2.0e-5}
+
+timing:
+  sessions: 5
+  warmup_calls: 50
+  timed_calls_per_session: 200
+  synchronize_full_state: true
+  fresh_process_per_variant: true
+  randomized_order: true
+  checkpointing_policy: "disabled"
+  require_idle_gpu: true
+  max_preexisting_memory_mib: 512
+  max_preexisting_utilization_percent: 5
+  output_retention_policy: "dereference completed output before next invocation; retain only final output for validation"
+  peak_memory_scope: "process lifetime including initialization, compilation, and warmup; not an isolated activation/workspace peak"
+
+quality:
+  primary_checkpoint: "fixed_final_update"
+  secondary_checkpoint: "validation_best_with_earliest_update_tie_break"
+  validation_cadence_epochs: 1
+  formal_noninferiority: false
+  margins_and_rationale: null
+  evaluation_bootstrap_replicates: 10000
+
+data_independence:
+  linked_source_definition: "byte-identical raw input SHA-256"
+  primary_test_partition: "official_test"
+  secondary_test_partition: "official_test_excluding_exact_official-training_duplicates"
+  patient_or_lesion_independence_claimed: false
+  split_manifests:
+    isic16: "81cfd817749daf15c4093d3d81d5b5185d8484f7aa6f31658f013c6d58f29466"
+    cifar100: "fb6ed7e666e6f3fde78671be5120df60b580790e57fe698ba38117a2133d1eca"
+    fashion_mnist: "0505c07db913e0ecbbb33f4d12fa2cc9cc81ee981cb10c412eb1a76ff010c227"
+
+campaign:
+  core_tasks: [isic16_poincare_unet, cifar100_poincare_resnet20]
+  include_dense_training_extension: true
+  include_euclidean_quality_context: false
+  primary_training_runs: 30
+  dense_extension_runs: 15
+
+tasks:
+  isic16_poincare_unet:
+    model: {levels: 4, initial_width: 8, decoder: transpose_convolution}
+    input: {height: 256, width: 256, channels: 3, scaling: zero_to_one}
+    classes: 2
+    normalization: {kind: poincare_midpoint_batch_norm, epsilon: 1.0e-6}
+    curvature: {trainable: true, initial_magnitude: 0.1, transform: softplus}
+    optimizer:
+      name: adam
+      learning_rate: 0.001
+      weight_decay: 0.0001
+      weight_decay_mode: coupled_l2
+      scheduler: none
+      gradient_clip_global_norm: 1.0
+      parameter_coordinates: euclidean_source_coordinates
+    loss:
+      name: dice_plus_focal
+      dice_weight: 1.0
+      focal_weight: 1.0
+      dice_classes: [0, 1]
+      dice_aggregation: batch_and_spatial_per_class_then_class_mean
+      dice_smoothing: 1.0e-6
+      dice_denominator_epsilon: 1.0e-7
+      focal_mode: summed_one_vs_all_binary_logits
+      focal_alpha: 0.25
+      focal_gamma: 2.0
+    batch_size: 8
+    epochs: 50
+    max_updates: 5100
+    remainder_handling: variable_shape_keep_all
+    evaluation_batch_size: 8
+    evaluation_order: manifest_order
+    augmentation: none
+    primary_metric: mean_per_image_foreground_dice
+  cifar100_poincare_resnet20:
+    model: {channels: [8, 16, 32], blocks_per_group: [3, 3, 3], skip_order: fr}
+    input: {height: 32, width: 32, channels: 3, normalization: minus_one_to_one}
+    classes: 100
+    normalization: {kind: poincare_midpoint_batch_norm, epsilon: 1.0e-6}
+    curvature: {trainable: false, initial_magnitude: 0.1, transform: identity}
+    optimizer:
+      name: adam
+      learning_rate: 0.001
+      weight_decay: 0.0001
+      weight_decay_mode: coupled_l2
+      scheduler: none
+      gradient_clip_global_norm: null
+      parameter_coordinates: euclidean_source_coordinates
+    loss: {name: cross_entropy, label_smoothing: 0.0}
+    batch_size: 128
+    epochs: 100
+    max_updates: 35200
+    remainder_handling: variable_shape_keep_all
+    evaluation_batch_size: 128
+    evaluation_order: manifest_order
+    augmentation: {random_crop_padding: 4, horizontal_flip_probability: 0.5}
+    primary_metric: top1_accuracy
+  fashion_mnist_hnnpp_mlp:
+    model: {hidden_widths: [256, 256, 256], activation: tangent_relu}
+    input: {features: 784, scaling: zero_to_one}
+    classes: 10
+    curvature: {trainable: false, initial_magnitude: 0.1, transform: identity}
+    optimizer:
+      name: adam
+      learning_rate: 0.001
+      weight_decay: 0.0
+      weight_decay_mode: coupled_l2
+      scheduler: none
+      gradient_clip_global_norm: null
+      parameter_coordinates: euclidean_source_coordinates
+    loss: {name: cross_entropy, label_smoothing: 0.0}
+    batch_size: 128
+    epochs: 50
+    max_updates: 21100
+    remainder_handling: variable_shape_keep_all
+    evaluation_batch_size: 128
+    evaluation_order: manifest_order
+    primary_metric: top1_accuracy
+
+hardware:
+  primary_gpu: "Tesla V100-PCIE-32GB"
+  primary_runtime: "JAX/JAXLIB 0.4.25, CUDA 11.8, cuDNN 8.6"
+  secondary_training_runtime: "JAX/JAXLIB 0.4.25 with the pinned CUDA 11.8 and cuDNN 8.6 user-space libraries on RTX A6000"
+  secondary_runtime: "JAX/JAXLIB 0.5.3 CUDA 12 plugin; joint hardware/runtime portability"
+  revision_current_runtime: "JAX/JAXLIB 0.11.2 CUDA 12 plugin; separately reported software-stack portability check"
+  secondary_gpus:
+    - host: "aibox1a6000"
+      endpoint_alias: "AIVSBCLUSTER1A"
+      physical_index: 0
+      uuid: "GPU-aeea9beb-30cf-3743-3165-4b3c9dfd78d6"
+      model: "NVIDIA RTX A6000"
+      driver: "560.35.03"
+      advertised_cuda: "12.6"
+    - host: "aibox2a6000"
+      endpoint_alias: "AIVSBCLUSTER1B"
+      physical_index: 0
+      uuid: "GPU-5da09691-8c31-e018-5324-7e17bc805bcb"
+      model: "NVIDIA RTX A6000"
+      driver: "560.35.03"
+      advertised_cuda: "12.6"
+    - host: "aibox2a6000"
+      endpoint_alias: "AIVSBCLUSTER1B"
+      physical_index: 1
+      uuid: "GPU-6daddab9-4b59-fdde-bf0b-09ecd8f31723"
+      model: "NVIDIA RTX A6000"
+      driver: "560.35.03"
+      advertised_cuda: "12.6"
+      authorization: "user-authorized for E12/E20/E21 on 2026-10-07 when idle"
+  memory_budget_bytes: 34359738368

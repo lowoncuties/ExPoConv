@@ -1,0 +1,41 @@
+schema_version: "1.0"
+experiment_id: E31
+description: "Paired gather-based reference control for the complete U-Net and ResNet-20 with XLA_PYTHON_CLIENT_MEM_FRACTION=0.95 and preallocation disabled by scripts/run_e31.sh."
+campaign_scope: "Measure how much of F's advantage over R remains when R and M build the identical patch from shifted strided slices instead of a one-hot grouped convolution followed by a transpose."
+variants: [R, Rg, Mg, F]
+sessions: 5
+warmup_calls: 50
+timed_calls_per_session: 200
+require_idle_gpu: true
+max_preexisting_memory_mib: 512
+max_preexisting_utilization_percent: 5
+shared_state_policy: "Within each session, R/Rg/Mg/F receive identical deterministic parameters, inputs, targets, curvature, and optimizer state."
+gather_contract: "Rg and Mg are R and M with the beta-scaled tangent patch built by zero padding and concatenating the kernel-offset strided slices in R's (kernel row, kernel column, channel) order; every operation after the patch is shared with R or M. On CPU the patch equals R's patch bitwise except that the one-hot convolution turns a negative zero into a positive zero; R and Rg outputs differ only by XLA fusion rounding and are bitwise equal when the patch is materialized."
+timing_scope: "Compilation and the first compiled call are recorded but excluded from steady-state latency. Every measured call is synchronized. Complete updates include loss, reverse-mode gradients, gradient clipping, coupled L2, and Adam."
+memory_evidence_policy: "Process-lifetime JAX allocator peak through the final synchronized measured call; includes initialization, compilation, first call, and warmup and is not isolated activation memory."
+allocator_policy: "XLA_PYTHON_CLIENT_MEM_FRACTION=0.95 and XLA_PYTHON_CLIENT_PREALLOCATE=false."
+workloads:
+  - id: unet_b1_forward
+    kind: unet
+    mode: forward
+    shape: {batch: 1, height: 256, width: 256}
+    curvature: 0.1
+    dtype: float32
+  - id: unet_b8_forward
+    kind: unet
+    mode: forward
+    shape: {batch: 8, height: 256, width: 256}
+    curvature: 0.1
+    dtype: float32
+  - id: unet_b8_update
+    kind: unet
+    mode: update
+    shape: {batch: 8, height: 256, width: 256}
+    curvature: 0.1
+    dtype: float32
+  - id: resnet20_b128_update
+    kind: resnet20
+    mode: update
+    shape: {batch: 128, height: 32, width: 32}
+    curvature: 0.1
+    dtype: float32
