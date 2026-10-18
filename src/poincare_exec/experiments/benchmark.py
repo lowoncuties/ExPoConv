@@ -214,6 +214,15 @@ def _model_state(
     task_name = task_names[kind]
     task = protocol["tasks"][task_name]
     shape = workload["shape"]
+    # Optional U-Net width override; absent means the registered task width.
+    initial_width = workload.get("initial_width", task["model"].get("initial_width"))
+    if "initial_width" in workload and (
+        kind != "unet"
+        or isinstance(initial_width, bool)
+        or not isinstance(initial_width, int)
+        or initial_width < 1
+    ):
+        raise ValueError("initial_width must be a positive integer on a unet workload")
     key = jax.random.PRNGKey(seed)
     input_key, target_key, parameter_key = jax.random.split(key, 3)
     dtype = _dtype(workload["dtype"])
@@ -232,7 +241,7 @@ def _model_state(
             parameter_key,
             input_channels=3,
             classes=int(task["classes"]),
-            initial_width=int(task["model"]["initial_width"]),
+            initial_width=int(initial_width),
             depth=int(task["model"]["levels"]),
             initial_curvature=float(task["curvature"]["initial_magnitude"]),
             dtype=dtype,
