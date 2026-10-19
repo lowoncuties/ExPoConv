@@ -284,7 +284,7 @@ described in `CITATION.cff`:
 
 ```bibtex
 @software{jochymek2026expoconv,
-  author  = {Jochymek, Luk{\'a}{\v{s}}},
+  author  = {Jochymek, Lukáš},
   title   = {Efficient Poincar{\'e} Convolutions through Patch-Statistics Factorization: Experiments},
   version = {0.2.0},
   year    = {2026},
