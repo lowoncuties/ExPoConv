@@ -146,9 +146,7 @@ def test_figure_has_compact_labels_and_nonoverlapping_x_ticks() -> None:
                 ),
                 key=lambda box: box.x0,
             )
-            assert all(
-                left.x1 <= right.x0 for left, right in pairwise(tick_boxes)
-            )
+            assert all(left.x1 <= right.x0 for left, right in pairwise(tick_boxes))
     finally:
         from matplotlib import pyplot as plt
 
@@ -202,12 +200,8 @@ def test_compact_csv_cli_is_jax_free_and_byte_deterministic(tmp_path: Path) -> N
         assert stem.with_suffix(".pdf").is_file()
         assert stem.with_suffix(".png").is_file()
 
-    assert _digest(stems[0].with_suffix(".pdf")) == _digest(
-        stems[1].with_suffix(".pdf")
-    )
-    assert _digest(stems[0].with_suffix(".png")) == _digest(
-        stems[1].with_suffix(".png")
-    )
+    assert _digest(stems[0].with_suffix(".pdf")) == _digest(stems[1].with_suffix(".pdf"))
+    assert _digest(stems[0].with_suffix(".png")) == _digest(stems[1].with_suffix(".png"))
     pdf_bytes = stems[0].with_suffix(".pdf").read_bytes()
     assert b"/CreationDate" not in pdf_bytes
     assert b"/ModDate" not in pdf_bytes
@@ -216,9 +210,7 @@ def test_compact_csv_cli_is_jax_free_and_byte_deterministic(tmp_path: Path) -> N
         assert "Creation Time" not in image.info
     assert _digest(source) == source_digest
 
-    tracked_before = {
-        name: _digest(RESULT_DIR / name) for name in DERIVATIVE_HASHES
-    }
+    tracked_before = {name: _digest(RESULT_DIR / name) for name in DERIVATIVE_HASHES}
     refused = subprocess.run(
         [sys.executable, str(script), "--input-csv", str(source)],
         cwd=REPOSITORY_ROOT,
@@ -246,9 +238,9 @@ def test_tracked_historical_and_derivative_hashes(tmp_path: Path) -> None:
     pdf, png = write_quality_strata_figure_from_csv(
         RESULT_DIR / "e09_e10_e20_e21_platform_strata.csv", regenerated
     )
-    assert _digest(pdf) == DERIVATIVE_HASHES[
-        "e09_e10_e20_e21_quality_strata_manuscript.pdf"
-    ]
-    assert _digest(png) == DERIVATIVE_HASHES[
-        "e09_e10_e20_e21_quality_strata_manuscript.png"
-    ]
+    assert (
+        _digest(pdf) == DERIVATIVE_HASHES["e09_e10_e20_e21_quality_strata_manuscript.pdf"]
+    )
+    assert (
+        _digest(png) == DERIVATIVE_HASHES["e09_e10_e20_e21_quality_strata_manuscript.png"]
+    )

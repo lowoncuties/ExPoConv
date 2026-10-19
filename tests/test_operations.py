@@ -22,9 +22,7 @@ def test_midpoint_batch_norm_has_finite_values_and_gradients() -> None:
     curvature = jnp.asarray(0.7, dtype=jnp.float64)
 
     def loss(selected_params, selected_input, selected_curvature):
-        output = midpoint_batch_norm(
-            selected_params, selected_input, selected_curvature
-        )
+        output = midpoint_batch_norm(selected_params, selected_input, selected_curvature)
         return jnp.sum(jnp.square(output))
 
     value, gradients = jax.value_and_grad(loss, argnums=(0, 1, 2))(

@@ -12,9 +12,7 @@ def cross_entropy(logits: Array, targets: Array) -> Array:
     """Mean multiclass cross-entropy without label smoothing."""
 
     log_probabilities = jax.nn.log_softmax(logits, axis=-1)
-    selected = jnp.take_along_axis(
-        log_probabilities, targets[..., None], axis=-1
-    )[..., 0]
+    selected = jnp.take_along_axis(log_probabilities, targets[..., None], axis=-1)[..., 0]
     return -jnp.mean(selected)
 
 
@@ -43,16 +41,12 @@ def dice_focal_loss(
 
     positive_logits = jnp.maximum(logits, 0.0)
     binary_cross_entropy = (
-        positive_logits
-        - logits * one_hot
-        + jnp.log1p(jnp.exp(-jnp.abs(logits)))
+        positive_logits - logits * one_hot + jnp.log1p(jnp.exp(-jnp.abs(logits)))
     )
     probability_correct = jnp.exp(-binary_cross_entropy)
     alpha_factor = alpha * one_hot + (1.0 - alpha) * (1.0 - one_hot)
     focal_by_element = (
-        alpha_factor
-        * jnp.power(1.0 - probability_correct, gamma)
-        * binary_cross_entropy
+        alpha_factor * jnp.power(1.0 - probability_correct, gamma) * binary_cross_entropy
     )
     focal = jnp.sum(jnp.mean(focal_by_element, axis=reduction_axes))
     return dice + focal

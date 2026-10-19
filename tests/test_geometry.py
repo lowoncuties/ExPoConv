@@ -75,12 +75,8 @@ def test_tangent_projection_derivatives_match_ball_round_trip_away_from_cap() ->
             lambda value: jnp.vdot(ball_round_trip(value), cotangent)
         )(tangent)
 
-        assert jnp.allclose(
-            direct_value, round_trip_value, atol=2.0e-10, rtol=2.0e-10
-        )
-        assert jnp.allclose(
-            direct_jvp, round_trip_jvp, atol=2.0e-10, rtol=2.0e-10
-        )
+        assert jnp.allclose(direct_value, round_trip_value, atol=2.0e-10, rtol=2.0e-10)
+        assert jnp.allclose(direct_jvp, round_trip_jvp, atol=2.0e-10, rtol=2.0e-10)
         assert jnp.allclose(
             direct_gradient, round_trip_gradient, atol=2.0e-10, rtol=2.0e-10
         )
@@ -96,9 +92,7 @@ def test_tangent_projection_has_identity_derivative_at_origin() -> None:
         (origin,),
         (direction,),
     )
-    jacobian = jax.jacrev(lambda tangent: project_tangent(tangent, curvature))(
-        origin
-    )
+    jacobian = jax.jacrev(lambda tangent: project_tangent(tangent, curvature))(origin)
 
     assert jnp.array_equal(value, origin)
     assert jnp.array_equal(derivative, direction)

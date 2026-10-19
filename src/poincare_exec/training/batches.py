@@ -9,9 +9,7 @@ import numpy as np
 from poincare_exec.data.datasets import DatasetBundle, augment_cifar100
 
 
-def materialize_dataset(
-    bundle: DatasetBundle, *, batch_size: int = 16
-) -> DatasetBundle:
+def materialize_dataset(bundle: DatasetBundle, *, batch_size: int = 16) -> DatasetBundle:
     """Materialize a lazy image dataset once using its frozen preprocessing."""
 
     if bundle.images is not None:
@@ -32,9 +30,7 @@ def materialize_dataset(
     )
 
 
-def ordered_batches(
-    count: int, batch_size: int, seed: int, epoch: int
-) -> list[np.ndarray]:
+def ordered_batches(count: int, batch_size: int, seed: int, epoch: int) -> list[np.ndarray]:
     """Return a seed/epoch-indexed permutation with a retained remainder batch."""
 
     random = np.random.default_rng(np.random.SeedSequence([seed, epoch]))

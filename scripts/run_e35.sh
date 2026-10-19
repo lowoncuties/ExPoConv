@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # E35: FP32 R/F/T gradients and the FP64 oracle at the E07-J2 ResNet-20 states.
-# Run on the E07-J2 device (argexpr3 physical V100 GPU 1) with the CUDA 11.8 stack:
+# Run on the E07-J2 device (physical V100 GPU 1) with the CUDA 11.8 stack:
 #   CUDA_VISIBLE_DEVICES=1 ./scripts/with_cuda_11_8.sh ./scripts/run_e35.sh
 # Set E35_ORACLE_DEVICE=cpu only if the FP64 oracle cannot run on the GPU.
 # Export afterwards with scripts/export_e35_retained_oracle.py --artifact-dir <output>.

@@ -1,10 +1,11 @@
 cff-version: 1.2.0
 message: "If you use this software, cite the accompanying article and the versioned software release."
-title: "Efficient Poincaré Convolutions through Energy–Projection Factorization: Experiments"
+title: "Efficient Poincaré Convolutions through Patch-Statistics Factorization: Experiments"
 type: software
 authors:
   - family-names: Jochymek
     given-names: Lukáš
+repository-code: "https://github.com/lowoncuties/ExPoConv"
 license: MIT
-version: 0.1.0
-date-released: 2026-10-16
+version: 0.2.0
+date-released: 2026-10-19

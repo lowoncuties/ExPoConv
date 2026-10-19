@@ -69,13 +69,10 @@ def test_figure_retains_every_matched_seed_and_endpoint() -> None:
                 for line, seed in zip(axis.lines, SEEDS, strict=True):
                     assert list(line.get_xdata()) == list(range(len(VARIANTS)))
                     assert list(line.get_ydata()) == [
-                        lookup[(task, variant, seed, endpoint)]
-                        for variant in VARIANTS
+                        lookup[(task, variant, seed, endpoint)] for variant in VARIANTS
                     ]
                 mean_collections = axis.collections[-len(VARIANTS) :]
-                for variant, collection in zip(
-                    VARIANTS, mean_collections, strict=True
-                ):
+                for variant, collection in zip(VARIANTS, mean_collections, strict=True):
                     offsets = collection.get_offsets()
                     expected_mean = sum(
                         lookup[(task, variant, seed, endpoint)] for seed in SEEDS
@@ -178,9 +175,7 @@ def test_compact_csv_cli_is_jax_free_and_byte_deterministic(tmp_path: Path) -> N
 
 def test_tracked_source_and_figure_hashes(tmp_path: Path) -> None:
     assert _digest(SOURCE) == SOURCE_SHA256
-    assert {
-        name: _digest(RESULT_DIR / name) for name in FIGURE_HASHES
-    } == FIGURE_HASHES
+    assert {name: _digest(RESULT_DIR / name) for name in FIGURE_HASHES} == FIGURE_HASHES
 
     regenerated = tmp_path / "training_all_endpoints"
     pdf, png = write_training_endpoint_figure_from_csv(SOURCE, regenerated)

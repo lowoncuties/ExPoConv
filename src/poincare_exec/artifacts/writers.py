@@ -45,9 +45,7 @@ def validate_jsonl_identity(
                     f"{field}={actual!r} (expected {wanted!r})"
                     for field, (actual, wanted) in mismatches.items()
                 )
-                raise ValueError(
-                    f"cannot resume {source}: row {line_number} has {detail}"
-                )
+                raise ValueError(f"cannot resume {source}: row {line_number} has {detail}")
 
 
 def write_json(path: str | Path, value: Any, *, overwrite: bool = False) -> None:

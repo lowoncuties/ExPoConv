@@ -141,19 +141,11 @@ def _finalize_array_statistics(
         "relative_l2_error": relative_error,
         "element_count": int(statistics["element_count"]),
         "nonfinite_count": int(statistics["nonfinite_count"]),
-        "reference_nonfinite_count": int(
-            statistics["reference_nonfinite_count"]
-        ),
-        "comparison_nonfinite_count": int(
-            statistics["comparison_nonfinite_count"]
-        ),
-        "projection_saturation_count": int(
-            statistics["projection_saturation_count"]
-        ),
+        "reference_nonfinite_count": int(statistics["reference_nonfinite_count"]),
+        "comparison_nonfinite_count": int(statistics["comparison_nonfinite_count"]),
+        "projection_saturation_count": int(statistics["projection_saturation_count"]),
         "projection_vector_count": int(statistics["projection_vector_count"]),
-        "maximum_normalized_radius": float(
-            statistics["maximum_normalized_radius"]
-        ),
+        "maximum_normalized_radius": float(statistics["maximum_normalized_radius"]),
     }
 
 
@@ -200,9 +192,7 @@ def _compatibility_metrics(
     output_batches: dict[str, list[np.ndarray]] = {
         f"{variant}__logits": [] for variant in variants
     }
-    output_batches.update(
-        {f"{variant}__probabilities": [] for variant in variants}
-    )
+    output_batches.update({f"{variant}__probabilities": [] for variant in variants})
     target_batches: list[np.ndarray] = []
     sample_ids: list[str] = []
     retained_activations: dict[str, list[np.ndarray]] = {}
@@ -232,9 +222,9 @@ def _compatibility_metrics(
                         raise RuntimeError(
                             f"configured E06 activation group is unavailable: {name}"
                         )
-                    retained_activations.setdefault(
-                        f"{variant}__{name}", []
-                    ).append(activations[name])
+                    retained_activations.setdefault(f"{variant}__{name}", []).append(
+                        activations[name]
+                    )
         reference, _, reference_activations = host["R"]
         reference_decision = np.argmax(reference, axis=-1)
         for variant, (candidate, probabilities, candidate_activations) in host.items():
@@ -311,14 +301,10 @@ def _compatibility_metrics(
     raw_outputs = {
         "sample_ids": np.asarray(sample_ids),
         "targets": np.concatenate(target_batches),
-        **{
-            name: np.concatenate(batches)
-            for name, batches in output_batches.items()
-        },
+        **{name: np.concatenate(batches) for name, batches in output_batches.items()},
     }
     retained = {
-        name: np.concatenate(batches)
-        for name, batches in retained_activations.items()
+        name: np.concatenate(batches) for name, batches in retained_activations.items()
     }
     retained["sample_ids"] = np.asarray(
         sample_ids[: min(retained_activation_batches * batch_size, len(sample_ids))]
@@ -371,11 +357,7 @@ def _compatibility_rows(
                     ),
                     **source_fields,
                     **array_metrics,
-                    **(
-                        variant_metrics["task"]
-                        if variable_group == "logits"
-                        else {}
-                    ),
+                    **(variant_metrics["task"] if variable_group == "logits" else {}),
                 }
             )
     return rows
@@ -449,16 +431,15 @@ def run_trained_checkpoint_evaluation(
         raise RuntimeError("retained checkpoint does not match the frozen E06 campaign")
     if source_variant not in {"R", "T"}:
         raise ValueError("E06 retained checkpoint must originate from R or T")
-    if source_variant not in training_config["variants"] or seed not in training_config[
-        "seeds"
-    ]:
+    if (
+        source_variant not in training_config["variants"]
+        or seed not in training_config["seeds"]
+    ):
         raise ValueError("retained checkpoint is outside the frozen training matrix")
     if source.get("code_dirty") is not False or not source.get("code_commit"):
         raise RuntimeError("retained checkpoint lacks clean-code provenance")
 
-    config_digest = config_hash(
-        protocol, checkpoint_config, task_entry, training_config
-    )
+    config_digest = config_hash(protocol, checkpoint_config, task_entry, training_config)
     run_identity = base_result_row(
         protocol,
         experiment_id="E06",
@@ -491,18 +472,14 @@ def run_trained_checkpoint_evaluation(
         )
 
     activation_groups = tuple(task_entry["activation_groups"])
-    retained_activation_batches = int(
-        checkpoint_config["retained_activation_batches"]
-    )
+    retained_activation_batches = int(checkpoint_config["retained_activation_batches"])
     projection_relative_tolerance = float(
         checkpoint_config["projection_detection_relative_tolerance"]
     )
     if retained_activation_batches <= 0:
         raise ValueError("retained_activation_batches must be positive")
     if not 0.0 <= projection_relative_tolerance < 1.0:
-        raise ValueError(
-            "projection_detection_relative_tolerance must be in [0, 1)"
-        )
+        raise ValueError("projection_detection_relative_tolerance must be in [0, 1)")
     checkpoint_name = (
         f"{training_config['experiment_id']}:{source_variant}:seed_{seed}:"
         f"final_update_{update}"
@@ -564,9 +541,7 @@ def run_trained_checkpoint_evaluation(
             "splits": list(splits),
             "activation_groups": list(activation_groups),
             "retained_activation_batches": retained_activation_batches,
-            "projection_detection_relative_tolerance": (
-                projection_relative_tolerance
-            ),
+            "projection_detection_relative_tolerance": (projection_relative_tolerance),
             "compatibility": all_metrics,
         },
     )

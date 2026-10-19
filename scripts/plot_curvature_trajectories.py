@@ -51,8 +51,7 @@ def main() -> None:
                 )
             epochs = [epoch for epoch, _ in series[0]]
             mean_curve = [
-                fmean(values[index][1] for values in series)
-                for index in range(len(epochs))
+                fmean(values[index][1] for values in series) for index in range(len(epochs))
             ]
             axis.plot(
                 epochs,

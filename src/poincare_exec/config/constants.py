@@ -40,20 +40,6 @@ REQUIRED_RESULT_FIELDS = (
     "timestamp_utc",
 )
 
-BENCHMARK_REQUIRED_FIELDS = (
-    *REQUIRED_RESULT_FIELDS,
-    "shape",
-    "kernel",
-    "layout",
-    "operation_boundary",
-    "warmup_count",
-    "repeat_count",
-    "compiler_mode",
-    "synchronization_method",
-    "gpu_snapshot_before",
-    "gpu_snapshot_after",
-)
-
 PLOT_COLORS = {
     "R": "#8C8C8C",
     "F": "#0072B2",

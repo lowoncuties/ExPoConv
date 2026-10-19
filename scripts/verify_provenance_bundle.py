@@ -1,14 +1,20 @@
 #!/usr/bin/env python3
+"""Verify the archived exact-history bundle for accepted results."""
+
 from __future__ import annotations
 
 import argparse
+import csv
 import hashlib
 import json
 import subprocess
 import tempfile
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 from pathlib import Path
 from typing import Any
+
+COMMIT_MAP_PATH = Path("provenance/commit_map.csv")
+_COMMIT_MAP_FIELDS = ["old_commit", "new_commit", "tree"]
 
 
 def _run(command: Sequence[str], *, cwd: Path | None = None) -> str:
@@ -28,6 +34,68 @@ def _sha256(path: Path) -> str:
         for block in iter(lambda: stream.read(1024 * 1024), b""):
             digest.update(block)
     return digest.hexdigest()
+
+
+def _is_full_sha1(value: str) -> bool:
+    return len(value) == 40 and all(character in "0123456789abcdef" for character in value)
+
+
+def load_commit_map(repository: Path) -> dict[str, tuple[str, str]]:
+    """Read ``recorded commit -> (published commit, tree)``; no map file is empty."""
+
+    path = Path(repository) / COMMIT_MAP_PATH
+    if not path.is_file():
+        return {}
+    mapping: dict[str, tuple[str, str]] = {}
+    with path.open(encoding="ascii", newline="") as stream:
+        reader = csv.DictReader(stream)
+        if reader.fieldnames != _COMMIT_MAP_FIELDS:
+            raise ValueError(f"{COMMIT_MAP_PATH} header must be old_commit,new_commit,tree")
+        for row in reader:
+            values = [row[field] for field in _COMMIT_MAP_FIELDS]
+            if not all(_is_full_sha1(value) for value in values) or values[0] in mapping:
+                raise ValueError(f"invalid {COMMIT_MAP_PATH} row: {values}")
+            mapping[values[0]] = (values[1], values[2])
+    return mapping
+
+
+def resolve_recorded_commit(
+    repository: Path,
+    commit: str,
+    tip: str = "HEAD",
+    commit_map: Mapping[str, tuple[str, str]] | None = None,
+) -> str:
+    """Return the commit reachable from ``tip`` that holds a recorded commit's tree.
+
+    A recorded commit that is an ancestor of ``tip`` resolves to itself. Otherwise
+    the commit map must name an ancestor of ``tip`` whose tree is the mapped tree.
+    """
+
+    def is_ancestor(candidate: str) -> bool:
+        result = subprocess.run(
+            ["git", "merge-base", "--is-ancestor", candidate, tip],
+            cwd=repository,
+            check=False,
+            capture_output=True,
+        )
+        return result.returncode == 0
+
+    if not _is_full_sha1(commit):
+        raise ValueError(f"recorded commit is not a full lowercase SHA-1: {commit!r}")
+    if is_ancestor(commit):
+        return commit
+    if commit_map is None:
+        commit_map = load_commit_map(repository)
+    if commit not in commit_map:
+        raise ValueError(f"recorded commit is not reachable from {tip}: {commit}")
+    published, tree = commit_map[commit]
+    if not is_ancestor(published) or (
+        _run(["git", "rev-parse", f"{published}^{{tree}}"], cwd=repository) != tree
+    ):
+        raise ValueError(
+            f"mapped commit {published} for {commit} is not reachable with tree {tree}"
+        )
+    return published
 
 
 def _load_manifest(path: Path) -> dict[str, Any]:
@@ -62,9 +130,7 @@ def verify_bundle(manifest_path: Path, bundle_path: Path) -> dict[str, Any]:
         )
     actual_size = bundle_path.stat().st_size
     if actual_size != int(manifest["size_bytes"]):
-        raise ValueError(
-            f"bundle size mismatch: {actual_size} != {manifest['size_bytes']}"
-        )
+        raise ValueError(f"bundle size mismatch: {actual_size} != {manifest['size_bytes']}")
     actual_sha256 = _sha256(bundle_path)
     if actual_sha256 != manifest["sha256"]:
         raise ValueError(
@@ -85,9 +151,7 @@ def verify_bundle(manifest_path: Path, bundle_path: Path) -> dict[str, Any]:
     if len(commits) != len(set(commits)):
         raise ValueError("accepted commit list contains duplicates")
     for commit in commits:
-        invalid_character = any(
-            character not in "0123456789abcdef" for character in commit
-        )
+        invalid_character = any(character not in "0123456789abcdef" for character in commit)
         if len(commit) != 40 or invalid_character:
             raise ValueError(f"accepted commit is not a full lowercase SHA-1: {commit!r}")
 
@@ -105,9 +169,7 @@ def verify_bundle(manifest_path: Path, bundle_path: Path) -> dict[str, Any]:
             ]
         )
         git_directory = checkout / ".git"
-        observed_tip = _run(
-            ["git", f"--git-dir={git_directory}", "rev-parse", "HEAD"]
-        )
+        observed_tip = _run(["git", f"--git-dir={git_directory}", "rev-parse", "HEAD"])
         if observed_tip != manifest["bundle_tip"]:
             raise ValueError(
                 f"cloned bundle tip mismatch: {observed_tip} != {manifest['bundle_tip']}"

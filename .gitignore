@@ -1,5 +1,5 @@
 .venv/
-/.venv-cuda12/
+/.venv-jax0112-cuda12/
 __pycache__/
 *.py[cod]
 .pytest_cache/

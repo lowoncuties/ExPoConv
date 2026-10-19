@@ -70,14 +70,42 @@ def validate_hashed_document(
     if len(expected) != 64 or any(value not in "0123456789abcdef" for value in expected):
         raise ValueError(f"{field}.sha256 must be a lowercase SHA-256 digest")
     root = Path(repository_root).expanduser().resolve()
+    relative = protocol_snapshot_for_pin(metadata, relative, expected, root)
     document = (root / relative).resolve()
     if not document.is_relative_to(root) or not document.is_file():
         raise ValueError(f"{field}.path is missing or outside the repository")
-    digest = hashlib.sha256()
-    with document.open("rb") as stream:
-        for block in iter(lambda: stream.read(1024 * 1024), b""):
-            digest.update(block)
-    actual = digest.hexdigest()
+    actual = _sha256_file(document)
     if actual != expected:
         raise ValueError(f"{field} SHA-256 mismatch")
     return relative.as_posix(), actual
+
+
+def _sha256_file(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as stream:
+        for block in iter(lambda: stream.read(1024 * 1024), b""):
+            digest.update(block)
+    return digest.hexdigest()
+
+
+def protocol_snapshot_for_pin(
+    metadata: Mapping[str, Any], relative: Path, expected: str, root: Path
+) -> Path:
+    """Map a pin to the amended top-level protocol onto its frozen snapshot.
+
+    A manifest that pins ``protocol.yaml`` with a ``version`` keeps validating
+    after later amendments when ``configs/protocols/protocol_<version>.yaml``
+    holds exactly the pinned bytes. Any other pin is returned unchanged, so the
+    SHA-256 check still decides.
+    """
+
+    version = str(metadata.get("version", ""))
+    if relative.as_posix() != "protocol.yaml" or not version:
+        return relative
+    top_level = root / relative
+    if top_level.is_file() and _sha256_file(top_level) == expected:
+        return relative
+    snapshot = Path("configs/protocols") / f"protocol_{version.replace('.', '_')}.yaml"
+    if (root / snapshot).is_file() and _sha256_file(root / snapshot) == expected:
+        return snapshot
+    return relative

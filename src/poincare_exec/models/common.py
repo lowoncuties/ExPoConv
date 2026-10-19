@@ -85,15 +85,3 @@ def apply_double_conv(
     tangent = conv2d(conv2, tangent, curvature, variant=variant, padding="SAME")
     tangent = normalize(params["bn2"], tangent)
     return jax.nn.relu(tangent)
-
-
-def count_parameters(params: Any) -> int:
-    """Count scalar array leaves in a model tree."""
-
-    return sum(int(leaf.size) for leaf in jax.tree_util.tree_leaves(params))
-
-
-def normalization_parameters(params: MidpointBatchNormParams) -> tuple[Array, Array]:
-    """Expose normalization groups for numerical result labeling."""
-
-    return params.bias, params.weight

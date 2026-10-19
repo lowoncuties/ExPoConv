@@ -156,14 +156,6 @@ def write_case_manifest(
     return manifest
 
 
-def _dtype(name: str):
-    if name == "float32":
-        return jnp.float32
-    if name == "float64":
-        return jnp.float64
-    raise ValueError(f"unsupported precision: {name}")
-
-
 def _case_parameters(case: dict[str, Any], key: Array, dtype: Any) -> HNNPPParams:
     offset_scale = 0.15 if case["offset_case"] == "nonzero" else 0.0
     params = init_conv2d(
@@ -178,9 +170,7 @@ def _case_parameters(case: dict[str, Any], key: Array, dtype: Any) -> HNNPPParam
     if case["orientation_case"] == "near_zero":
         params = HNNPPParams(weight=1.0e-12 * params.weight, offset=params.offset)
     elif case["orientation_case"] == "zero_column":
-        params = HNNPPParams(
-            weight=params.weight.at[..., 0].set(0.0), offset=params.offset
-        )
+        params = HNNPPParams(weight=params.weight.at[..., 0].set(0.0), offset=params.offset)
     return params
 
 
@@ -218,13 +208,16 @@ def _case_input(
     target_norm = jnp.arctanh(target_rho) / jnp.sqrt(curvature)
     scale = jnp.where(anchor_norm > 0.0, target_norm / anchor_norm, 0.0)
     tangent = tangent * scale
-    realized_anchor = ratio * _extract_patches(
-        tangent,
-        kernel,
-        stride=(1, 1),
-        padding="SAME",
-        dilation=(1, 1),
-    )[0, case["height"] // 2, case["width"] // 2]
+    realized_anchor = (
+        ratio
+        * _extract_patches(
+            tangent,
+            kernel,
+            stride=(1, 1),
+            padding="SAME",
+            dilation=(1, 1),
+        )[0, case["height"] // 2, case["width"] // 2]
+    )
     realized_rho = jnp.tanh(jnp.sqrt(curvature) * safe_norm(realized_anchor, axis=-1))
     return tangent, float(np.asarray(realized_rho))
 
@@ -283,9 +276,7 @@ def _finite_metrics(reference: Array, candidate: Array, floor: float) -> dict[st
     }
 
 
-def _groups(
-    output: Array, gradients: tuple[HNNPPParams, Array, Array]
-) -> dict[str, Array]:
+def _groups(output: Array, gradients: tuple[HNNPPParams, Array, Array]) -> dict[str, Array]:
     parameter_gradients, input_gradient, curvature_gradient = gradients
     return {
         "output": output,
@@ -294,5 +285,3 @@ def _groups(
         "offset_gradient": parameter_gradients.offset,
         "curvature_gradient": curvature_gradient,
     }
-
-

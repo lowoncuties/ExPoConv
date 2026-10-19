@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-environment_dir=${POINCARE_EXEC_ENV_DIR:-.venv}
+repository_root=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd -P)
+environment_dir=${POINCARE_EXEC_ENV_DIR:-$repository_root/.venv}
 "$environment_dir/bin/python" - <<'PY'
 import jax
 import jaxlib

@@ -56,9 +56,7 @@ def profile_worker(
     config = load_yaml(config_path)
     workload = next(item for item in config["workloads"] if item["id"] == workload_id)
     seed = int(protocol["seeds"]["measurement_order"])
-    function, state, inputs, curvature = _operator_state(
-        workload, variant, seed, protocol
-    )
+    function, state, inputs, curvature = _operator_state(workload, variant, seed, protocol)
     compiled = jax.jit(function).lower(state, inputs, curvature).compile()
     first = compiled(state, inputs, curvature)
     _synchronize(first)
@@ -129,9 +127,7 @@ def run_profile_suite(
         randomizer.shuffle(order)
         for variant in order:
             selected = destination / workload["id"] / variant
-            if (selected / "summary.json").exists() or (
-                selected / "failure.json"
-            ).exists():
+            if (selected / "summary.json").exists() or (selected / "failure.json").exists():
                 continue
             snapshot_before = _require_idle_gpu(config)
             selected.mkdir(parents=True, exist_ok=True)
@@ -168,9 +164,7 @@ def run_profile_suite(
                         variant=variant,
                         configuration_hash=config_hash(protocol, config, workload),
                         dtype=workload["dtype"],
-                        seed_or_session=int(
-                            protocol["seeds"]["measurement_order"]
-                        ),
+                        seed_or_session=int(protocol["seeds"]["measurement_order"]),
                         status="failed",
                     ),
                     "workload_id": workload["id"],

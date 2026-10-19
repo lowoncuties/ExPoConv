@@ -88,8 +88,7 @@ def adam_update(
     )
     second = jax.tree_util.tree_map(
         lambda moment, gradient: _scalar_like(beta2, moment) * moment
-        + (_scalar_like(1.0, moment) - _scalar_like(beta2, moment))
-        * jnp.square(gradient),
+        + (_scalar_like(1.0, moment) - _scalar_like(beta2, moment)) * jnp.square(gradient),
         state.second_moment,
         gradients,
     )
@@ -101,10 +100,7 @@ def adam_update(
         return (
             _scalar_like(learning_rate, first_value)
             * (first_value / first_scale)
-            / (
-                jnp.sqrt(second_value / second_scale)
-                + _scalar_like(epsilon, second_value)
-            )
+            / (jnp.sqrt(second_value / second_scale) + _scalar_like(epsilon, second_value))
         )
 
     updates = jax.tree_util.tree_map(

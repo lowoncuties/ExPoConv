@@ -83,9 +83,7 @@ def _rewrite_outer_checksums(package: Path) -> None:
         if path.is_file() and path.name != OUTER_CHECKSUM_NAME
     }
     (package / OUTER_CHECKSUM_NAME).write_text(
-        "".join(
-            f"{_sha256(package / name)}  ./{name}\n" for name in sorted(names)
-        ),
+        "".join(f"{_sha256(package / name)}  ./{name}\n" for name in sorted(names)),
         encoding="utf-8",
     )
 
@@ -102,9 +100,7 @@ def _refresh_artifact_fixity(package: Path, artifact_key: str) -> dict[str, obje
         "release_git_bundle": "repository_bundle_sidecar",
     }[artifact_key]
     sidecar = package / manifest["fixity"][sidecar_key]
-    sidecar.write_text(
-        f"{artifact['sha256']}  {artifact_path.name}\n", encoding="utf-8"
-    )
+    sidecar.write_text(f"{artifact['sha256']}  {artifact_path.name}\n", encoding="utf-8")
     manifest_path.write_text(
         json.dumps(manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8"
     )
@@ -288,9 +284,7 @@ def test_legacy_bundle_requires_explicit_verified_inclusion(tmp_path: Path) -> N
     with_legacy = tmp_path / "release-with-legacy"
 
     build_release_package(repository, without_legacy)
-    manifest = json.loads(
-        (without_legacy / MANIFEST_NAME).read_text(encoding="utf-8")
-    )
+    manifest = json.loads((without_legacy / MANIFEST_NAME).read_text(encoding="utf-8"))
     assert set(manifest["artifacts"]) == {
         "reviewer_source_zip",
         "release_git_bundle",
@@ -407,9 +401,9 @@ def test_release_tag_is_normalized_bundled_and_bound_to_head(tmp_path: Path) -> 
 
     manifest = json.loads((package / MANIFEST_NAME).read_text(encoding="utf-8"))
     assert manifest["release"]["release_tag"] == "refs/tags/release-v1"
-    assert "refs/tags/release-v1" in manifest["artifacts"]["release_git_bundle"][
-        "bundle_refs"
-    ]
+    assert (
+        "refs/tags/release-v1" in manifest["artifacts"]["release_git_bundle"]["bundle_refs"]
+    )
     assert verify_release_package(package)["status"] == "ok"
 
     (repository / "README.md").write_text("later commit\n", encoding="utf-8")

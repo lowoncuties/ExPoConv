@@ -37,9 +37,7 @@ def test_small_resnet_reference_and_tangent_paths_agree() -> None:
 
 
 def test_small_unet_reference_and_tangent_paths_agree() -> None:
-    params = init_unet(
-        jax.random.PRNGKey(13), classes=2, initial_width=2, depth=2
-    )
+    params = init_unet(jax.random.PRNGKey(13), classes=2, initial_width=2, depth=2)
     inputs = 0.02 * jax.random.normal(jax.random.PRNGKey(17), (2, 8, 8, 3))
     reference = unet_forward(params, inputs, variant="R")
     candidate = unet_forward(params, inputs, variant="T")

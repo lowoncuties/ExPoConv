@@ -51,7 +51,12 @@ from poincare_exec.analysis.training_extension_types import (
     ExtensionAnalysisError,
     ValidatedRun,
 )
-from poincare_exec.config.loader import canonical_json, config_hash, load_yaml
+from poincare_exec.config.loader import (
+    canonical_json,
+    config_hash,
+    load_yaml,
+    protocol_snapshot_for_pin,
+)
 from poincare_exec.training.checkpoints import load_checkpoint
 
 REQUIRED_OUTPUT_KEYS = frozenset(
@@ -120,6 +125,7 @@ def _validate_document(
         character not in "0123456789abcdef" for character in expected
     ):
         raise ValueError(f"{name}.sha256 must be a lowercase SHA-256 digest")
+    relative = protocol_snapshot_for_pin(declared, relative, expected, repository_root)
     resolved = (repository_root / relative).resolve()
     if not resolved.is_relative_to(repository_root) or not resolved.is_file():
         raise ValueError(f"{name}.path is missing or outside the repository")
@@ -164,8 +170,12 @@ def _validate_analysis_checkout(
         raise ExtensionAnalysisError(
             "analysis checkout must be clean before endpoint unblinding"
         )
-    protocol = Path(
-        str(_require_mapping(manifest["protocol_document"], name="protocol")["path"])
+    protocol_metadata = _require_mapping(manifest["protocol_document"], name="protocol")
+    protocol = protocol_snapshot_for_pin(
+        protocol_metadata,
+        Path(str(protocol_metadata["path"])),
+        str(protocol_metadata.get("sha256", "")),
+        repository_root,
     )
     contract = Path(
         str(_require_mapping(manifest["contract_document"], name="contract")["path"])
@@ -939,9 +949,9 @@ def _validate_post_worker_evidence(
         )
         last_worker_line = str(timing.get("last_worker_allocation_line", ""))
         first_foreign_line = str(timing.get("first_foreign_only_line", ""))
-        telemetry_lines = paths["wrapper_telemetry"].read_text(
-            encoding="utf-8"
-        ).splitlines()
+        telemetry_lines = (
+            paths["wrapper_telemetry"].read_text(encoding="utf-8").splitlines()
+        )
         try:
             last_worker_index = telemetry_lines.index(last_worker_line)
             first_foreign_index = telemetry_lines.index(first_foreign_line)
@@ -1089,10 +1099,11 @@ def _cohort_specs(
     *,
     repository_root: Path,
 ) -> dict[str, CohortSpec]:
-    protocol_metadata = _require_mapping(
-        manifest.get("protocol_document"), name="protocol_document"
+    protocol_relative, _ = _validate_document(
+        manifest.get("protocol_document"),
+        name="protocol_document",
+        repository_root=repository_root,
     )
-    protocol_relative = Path(str(protocol_metadata.get("path", "")))
     protocol = load_yaml(repository_root / protocol_relative)
     protocol_tasks = _require_mapping(protocol.get("tasks"), name="protocol tasks")
     raw_cohorts = _require_mapping(manifest.get("cohorts"), name="cohorts")
@@ -1826,12 +1837,8 @@ def _validate_matching_tree(
 ) -> None:
     """Require a finite candidate tree with the reference paths and array specs."""
 
-    reference_leaves, reference_definition = jax.tree_util.tree_flatten_with_path(
-        reference
-    )
-    candidate_leaves, candidate_definition = jax.tree_util.tree_flatten_with_path(
-        candidate
-    )
+    reference_leaves, reference_definition = jax.tree_util.tree_flatten_with_path(reference)
+    candidate_leaves, candidate_definition = jax.tree_util.tree_flatten_with_path(candidate)
     if reference_definition != candidate_definition:
         raise ExtensionAnalysisError(f"{context}: tree structure does not match params")
     for (reference_path, reference_leaf), (candidate_path, candidate_leaf) in zip(

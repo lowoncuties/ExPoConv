@@ -328,9 +328,7 @@ def _case(
         inputs,
         function,
         uses_external_curvature=kind != "small_unet",
-        internal_curvature_parameter=(
-            "curvature_raw" if kind == "small_unet" else None
-        ),
+        internal_curvature_parameter=("curvature_raw" if kind == "small_unet" else None),
     )
 
 
@@ -343,9 +341,7 @@ def _evaluate(
     cotangent: Array,
 ) -> tuple[Array, tuple[Any, Any, Array]]:
     def scalarized(selected_params, selected_inputs, selected_curvature):
-        output = function(
-            selected_params, selected_inputs, selected_curvature, variant
-        )
+        output = function(selected_params, selected_inputs, selected_curvature, variant)
         return jnp.sum(output * cotangent), output
 
     (_, output), gradients = jax.value_and_grad(
@@ -359,9 +355,7 @@ def _leaf_groups(prefix: str, tree: Any) -> dict[str, Array]:
     leaves = jax.tree_util.tree_leaves_with_path(tree)
     if len(leaves) == 1 and not leaves[0][0]:
         return {prefix: leaves[0][1]}
-    return {
-        f"{prefix}:{jax.tree_util.keystr(path)}": value for path, value in leaves
-    }
+    return {f"{prefix}:{jax.tree_util.keystr(path)}": value for path, value in leaves}
 
 
 def _gradient_groups(
@@ -393,9 +387,7 @@ def _normalized_direction(tree: Any, key: Array) -> Any:
         for selected_key, leaf in zip(keys, leaves, strict=True)
     ]
     norm = jnp.sqrt(sum(jnp.sum(jnp.square(leaf)) for leaf in random_leaves))
-    return jax.tree_util.tree_unflatten(
-        structure, [leaf / norm for leaf in random_leaves]
-    )
+    return jax.tree_util.tree_unflatten(structure, [leaf / norm for leaf in random_leaves])
 
 
 def _tree_scale(tree: Any, scale: float) -> Any:
@@ -569,15 +561,11 @@ def _elementwise_settings(
         "report_denominator_floored_fraction",
     }
     if set(settings) != required:
-        raise ValueError(
-            "elementwise_relative_error fields differ from the frozen schema"
-        )
+        raise ValueError("elementwise_relative_error fields differ from the frozen schema")
     floor = float(settings["denominator_floor"])
     protocol_floor = float(protocol["numerics"]["norm_floor"])
     if floor != protocol_floor:
-        raise ValueError(
-            "elementwise denominator floor must equal numerics.norm_floor"
-        )
+        raise ValueError("elementwise denominator floor must equal numerics.norm_floor")
     quantiles = tuple(float(value) for value in settings["quantiles"])
     if quantiles != (0.5, 0.9, 0.95, 0.99, 0.999):
         raise ValueError("elementwise quantiles differ from the frozen E26 set")
@@ -672,9 +660,7 @@ def run_structured_numerics(
                     curvature,
                     "R",
                 ).shape
-                cotangent = jax.random.normal(
-                    cotangent_key, output_shape, dtype=dtype
-                )
+                cotangent = jax.random.normal(cotangent_key, output_shape, dtype=dtype)
                 evaluated = {
                     variant: _evaluate(
                         selected_case.function,
@@ -688,9 +674,7 @@ def run_structured_numerics(
                 }
                 reference_groups = _gradient_groups(
                     evaluated["R"],
-                    include_external_curvature=(
-                        selected_case.uses_external_curvature
-                    ),
+                    include_external_curvature=(selected_case.uses_external_curvature),
                 )
                 shared = {
                     "case_id": case_id,
@@ -711,9 +695,7 @@ def run_structured_numerics(
                     )
                     candidate_groups = _gradient_groups(
                         evaluated[variant],
-                        include_external_curvature=(
-                            selected_case.uses_external_curvature
-                        ),
+                        include_external_curvature=(selected_case.uses_external_curvature),
                     )
                     rows = []
                     for group, candidate in candidate_groups.items():
@@ -773,19 +755,14 @@ def run_structured_numerics(
                         list(config["finite_difference_relative_steps"]),
                         difference_key,
                         norm_floor,
-                        include_external_curvature=(
-                            selected_case.uses_external_curvature
-                        ),
+                        include_external_curvature=(selected_case.uses_external_curvature),
                         internal_curvature_parameter=(
                             selected_case.internal_curvature_parameter
                         ),
                     )
                     rows = []
                     for row in finite_difference_rows:
-                        group = (
-                            f"{row['finite_difference_group']}:"
-                            f"{row['relative_step']}"
-                        )
+                        group = f"{row['finite_difference_group']}:{row['relative_step']}"
                         row_key = (
                             case_id,
                             dtype_name,

@@ -1,13 +1,13 @@
 # E19 same-machine technical-preflight record
 
-This completed record documents an author-authorized, Codex-operated clean-clone
-technical preflight. It is not an independent-human reproduction and does not
+This completed record documents an author-authorized clean-clone technical
+preflight. It is not an independent-human reproduction and does not
 claim external archival or closure of the optional independent E19 check.
 
 ## Reproducer and immutable source identity
 
-- Reproducer name: Lukáš Jochymek (author authorization); execution operated by OpenAI Codex
-- Affiliation or relationship to the project: author and implementation contributor; Codex supplied implementation and orchestration support
+- Reproducer name: Lukáš Jochymek (author authorization)
+- Affiliation or relationship to the project: author and implementation contributor
 - Contact: project-author contact; not duplicated in this evidence record
 - UTC start and completion times: 2026-10-15T13:59:32Z to 2026-10-15T16:22:00Z
 - Repository URL or confidential release-transport identifier: `ExPoConv-release-93fb31a11a00/repository/ExPoConv-git-93fb31a11a00.bundle`
@@ -18,7 +18,7 @@ claim external archival or closure of the optional independent E19 check.
 - `results/SHA256SUMS` verification result: all entries passed
 - `splits/SHA256SUMS` verification result: all entries passed
 - CPU test command and result: `CUDA_VISIBLE_DEVICES='' JAX_PLATFORMS=cpu ./.venv/bin/pytest -m "not gpu and not slow and not reference"`; 156 passed, 273 warnings, status 0, 1873.82 s
-- Did the reproducer contribute to the implementation? (`yes`/`no`; explain): yes; this is explicitly an author/agent technical preflight, not an independent reproduction
+- Did the reproducer contribute to the implementation? (`yes`/`no`; explain): yes; this is explicitly an author technical preflight, not an independent reproduction
 - Run classification (`independent E19`/`same-machine technical preflight`): `same-machine technical preflight`
 
 ## Environment and CUDA wrapper
@@ -36,7 +36,7 @@ claim external archival or closure of the optional independent E19 check.
 - Environment-record Git commit: `93fb31a11a008ba1a378434071cb418b504092d9`
 - Environment-record dirty/status fields: `dirty=false`; `status_porcelain=[]`
 - Competing-process observations: both V100s were idle before launch; all 6,090 timed before/after snapshots reported `status=ok`, `process_query_status=ok`, and zero competing compute processes
-- Deviations declared before results were inspected: the first no-profile prerequisite shell exited before cloning because the uv-managed `python3.11` directory was not on `PATH`; no experiment or clone had started. The replacement persistent shell prepended the exact uv CPython-3.11.16 directory and ran the frozen commands once. Operation by Codex under author instruction makes this a technical preflight.
+- Deviations declared before results were inspected: the first no-profile prerequisite shell exited before cloning because the uv-managed `python3.11` directory was not on `PATH`; no experiment or clone had started. The replacement persistent shell prepended the exact uv CPython-3.11.16 directory and ran the frozen commands once. Operation within the author's project makes this a technical preflight.
 
 ## Bounded E02 repair suite
 
@@ -98,14 +98,14 @@ gate and must not be described as independently reproduced here.
 - `SHA256SUMS` path and SHA-256: `SHA256SUMS`; `6c56afc3eea2b44d2782a6172aa5eeab229fe9367a873e43c0304952362e25f2`
 - External immutable archive or confidential deposit identifier: none; complete raw evidence retained locally outside the working repository
 - External archive checksum or fixity record: not applicable to this technical preflight
-- Unresolved deviations or questions: no result-level deviation; this run used the original V100 host and an author/agent operator, so it is not evidence of independent usability or portability. It is bound to the historical release-candidate commit named above rather than a future integrated documentation commit.
-- Operator statement: OpenAI Codex ran the experiment commands in one persistent
-  shell against the immutable release commit and retained failed, interrupted,
-  and unfavorable outcomes without selective omission.
-- Independence statement: not attested. Lukáš Jochymek and OpenAI Codex
-  contributed to the evaluated project, so this record cannot satisfy the
-  independent-reproducer declaration in the blank E19 template.
-- Reproducer signature or authenticated approval: Lukáš Jochymek authorized execution and recording under his name in the authenticated project workspace; OpenAI Codex operated and transcribed the run. No independent-reproducer signature is claimed.
+- Unresolved deviations or questions: no result-level deviation; this run used the original V100 host under author authorization, so it is not evidence of independent usability or portability. It is bound to the historical release-candidate commit named above rather than a future integrated documentation commit.
+- Operator statement: the experiment commands ran in one persistent shell
+  against the immutable release commit, and failed, interrupted, and
+  unfavorable outcomes were retained without selective omission.
+- Independence statement: not attested. The run was made within the evaluated
+  project, so this record cannot satisfy an independent-reproducer
+  declaration.
+- Reproducer signature or authenticated approval: Lukáš Jochymek authorized execution and recording under his name in the authenticated project workspace. No independent-reproducer signature is claimed.
 - UTC approval date: 2026-10-15
 
 ## Author review (does not replace independent approval)

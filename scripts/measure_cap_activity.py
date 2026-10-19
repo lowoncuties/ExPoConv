@@ -21,6 +21,7 @@ import csv
 import hashlib
 import json
 import multiprocessing
+import os
 from collections import defaultdict
 from collections.abc import Iterator
 from concurrent.futures import ProcessPoolExecutor
@@ -44,8 +45,10 @@ from poincare_exec.training.checkpoints import load_checkpoint
 from poincare_exec.training.tasks import forward_task
 
 ROOT = Path(__file__).resolve().parents[1]
-TRAINING_ROOT = Path("/data2/joc0027/poincare-execution-experiments/artifacts/training")
-DATA_ROOT = Path("/data2/joc0027/poincare-execution-experiments/data/raw")
+# Archived E09/E10 training runs (<experiment>/<variant>/seed_<seed>/checkpoints) and the
+# raw datasets; both live outside Git.
+TRAINING_ROOT = Path(os.environ.get("EXPOCONV_TRAINING_ROOT", ROOT / "artifacts/training"))
+DATA_ROOT = Path(os.environ.get("EXPOCONV_DATA_ROOT", ROOT / "data/raw"))
 EXPERIMENTS = {
     "E09": "configs/training/e09_isic16_unet.yaml",
     "E10": "configs/training/e10_cifar100_resnet20.yaml",

@@ -98,9 +98,7 @@ def _repository_root(repository: Path) -> Path:
     if not repository.is_dir():
         raise ValueError(f"repository directory does not exist: {repository}")
     try:
-        root = Path(
-            _run(["git", "rev-parse", "--show-toplevel"], cwd=repository)
-        ).resolve()
+        root = Path(_run(["git", "rev-parse", "--show-toplevel"], cwd=repository)).resolve()
     except subprocess.CalledProcessError as error:
         raise ValueError(f"not a Git worktree: {repository}") from error
     return root
@@ -119,9 +117,7 @@ def _resolve_commit(repository: Path, ref: str) -> str:
     if not ref or ref.startswith("-") or any(character.isspace() for character in ref):
         raise ValueError(f"invalid Git ref: {ref!r}")
     try:
-        return _run(
-            ["git", "rev-parse", "--verify", f"{ref}^{{commit}}"], cwd=repository
-        )
+        return _run(["git", "rev-parse", "--verify", f"{ref}^{{commit}}"], cwd=repository)
     except subprocess.CalledProcessError as error:
         raise ValueError(f"cannot resolve Git ref: {ref!r}") from error
 
@@ -155,9 +151,7 @@ def _release_tag_identity(
     if release_tag.startswith("refs/") and not release_tag.startswith("refs/tags/"):
         raise ValueError(f"release tag must name refs/tags: {release_tag!r}")
     full_ref = (
-        release_tag
-        if release_tag.startswith("refs/tags/")
-        else f"refs/tags/{release_tag}"
+        release_tag if release_tag.startswith("refs/tags/") else f"refs/tags/{release_tag}"
     )
     try:
         _run(["git", "check-ref-format", full_ref], cwd=repository)
@@ -166,8 +160,7 @@ def _release_tag_identity(
     tag_commit = _resolve_commit(repository, full_ref)
     if tag_commit != release_commit:
         raise ValueError(
-            f"release tag {full_ref!r} is not HEAD: "
-            f"{tag_commit} != {release_commit}"
+            f"release tag {full_ref!r} is not HEAD: {tag_commit} != {release_commit}"
         )
     tag_object = _run(["git", "rev-parse", "--verify", full_ref], cwd=repository)
     return full_ref, tag_object
@@ -216,9 +209,7 @@ def _normalized_evidence_path(raw_path: str, *, manifest: str, line: int) -> str
     return path
 
 
-def _parse_evidence_checksums(
-    contents: bytes, *, manifest: str
-) -> dict[str, str]:
+def _parse_evidence_checksums(contents: bytes, *, manifest: str) -> dict[str, str]:
     try:
         lines = contents.decode("utf-8").splitlines()
     except UnicodeDecodeError as error:
@@ -230,9 +221,7 @@ def _parse_evidence_checksums(
         digest = line[:64]
         if any(character not in "0123456789abcdef" for character in digest):
             raise ValueError(f"invalid SHA-256 in {manifest} at line {line_number}")
-        path = _normalized_evidence_path(
-            line[66:], manifest=manifest, line=line_number
-        )
+        path = _normalized_evidence_path(line[66:], manifest=manifest, line=line_number)
         if path in checksums:
             raise ValueError(f"duplicate checksum path in {manifest}: {path!r}")
         checksums[path] = digest
@@ -263,13 +252,10 @@ def _verify_evidence_tree(repository: Path, commit: str, tree: str) -> None:
     unlisted = sorted(set(checksums) - set(expected))
     if missing or unlisted:
         raise ValueError(
-            f"{manifest_path} coverage mismatch: missing={missing}, "
-            f"unlisted={unlisted}"
+            f"{manifest_path} coverage mismatch: missing={missing}, unlisted={unlisted}"
         )
     for relative_path, object_id in expected.items():
-        contents = _run_bytes(
-            ["git", "cat-file", "blob", object_id], cwd=repository
-        )
+        contents = _run_bytes(["git", "cat-file", "blob", object_id], cwd=repository)
         actual = _sha256_bytes(contents)
         declared = checksums[relative_path]
         if actual != declared:
@@ -289,9 +275,7 @@ def _artifact(path: Path, *, package_root: Path, role: str) -> dict[str, Any]:
 
 
 def _write_json(path: Path, value: object) -> None:
-    path.write_text(
-        json.dumps(value, indent=2, sort_keys=True) + "\n", encoding="utf-8"
-    )
+    path.write_text(json.dumps(value, indent=2, sort_keys=True) + "\n", encoding="utf-8")
 
 
 def _write_checksums(
@@ -302,9 +286,7 @@ def _write_checksums(
     dot_prefix: bool = False,
 ) -> None:
     prefix = "./" if dot_prefix else ""
-    lines = [
-        f"{_sha256_file(root / name)}  {prefix}{name}\n" for name in sorted(names)
-    ]
+    lines = [f"{_sha256_file(root / name)}  {prefix}{name}\n" for name in sorted(names)]
     path.write_text("".join(lines), encoding="utf-8")
 
 
@@ -365,16 +347,12 @@ def build_release_package(
     _validate_tracked_paths(set(all_entries))
     for evidence_tree in ("results", "splits"):
         _verify_evidence_tree(repository, release_commit, evidence_tree)
-    release_tree = _run(
-        ["git", "rev-parse", f"{release_commit}^{{tree}}"], cwd=repository
-    )
+    release_tree = _run(["git", "rev-parse", f"{release_commit}^{{tree}}"], cwd=repository)
     tracked_file_count = len(all_entries)
 
     verified_legacy_path: Path | None = None
     legacy_manifest: dict[str, Any] | None = None
-    legacy_manifest_path = (
-        repository / "provenance/v100_accepted_history_manifest.json"
-    )
+    legacy_manifest_path = repository / "provenance/v100_accepted_history_manifest.json"
     if legacy_v100_bundle is not None:
         verified_legacy_path = Path(legacy_v100_bundle).resolve()
         if not verified_legacy_path.is_file() or verified_legacy_path.is_symlink():
@@ -401,9 +379,7 @@ def build_release_package(
         short_commit = release_commit[:12]
         reviewer_directory = package_root / "reviewer"
         reviewer_directory.mkdir()
-        reviewer_zip = (
-            reviewer_directory / f"ExPoConv-reviewer-{short_commit}.zip"
-        )
+        reviewer_zip = reviewer_directory / f"ExPoConv-reviewer-{short_commit}.zip"
         archive_prefix = f"ExPoConv-reviewer-{short_commit}/"
         _run(
             [
@@ -423,9 +399,7 @@ def build_release_package(
 
         bundle_directory = package_root / "repository"
         bundle_directory.mkdir()
-        release_bundle = (
-            bundle_directory / f"ExPoConv-git-{short_commit}.bundle"
-        )
+        release_bundle = bundle_directory / f"ExPoConv-git-{short_commit}.bundle"
         bundle_revisions = ["HEAD", release_ref]
         if release_tag is not None:
             bundle_revisions.append(release_tag)
@@ -482,9 +456,7 @@ def build_release_package(
             },
         }
         if release_tag is not None and release_tag_object is not None:
-            artifacts["release_git_bundle"]["bundle_refs"][release_tag] = (
-                release_tag_object
-            )
+            artifacts["release_git_bundle"]["bundle_refs"][release_tag] = release_tag_object
         if verified_legacy_path is not None and legacy_manifest is not None:
             accepted_commit_count = len(legacy_manifest["accepted_commits"])
             accepted_count_label = (
@@ -514,12 +486,8 @@ def build_release_package(
                 "accepted_commit_count": accepted_commit_count,
                 "bundle_ref": legacy_manifest["bundle_ref"],
                 "bundle_tip": legacy_manifest["bundle_tip"],
-                "internal_fixity": internal_fixity.relative_to(
-                    package_root
-                ).as_posix(),
-                "internal_manifest": internal_manifest.relative_to(
-                    package_root
-                ).as_posix(),
+                "internal_fixity": internal_fixity.relative_to(package_root).as_posix(),
+                "internal_manifest": internal_manifest.relative_to(package_root).as_posix(),
             }
 
         manifest = {
@@ -546,9 +514,7 @@ def build_release_package(
                 "repository_bundle_sidecar": bundle_sidecar.relative_to(
                     package_root
                 ).as_posix(),
-                "reviewer_sidecar": reviewer_sidecar.relative_to(
-                    package_root
-                ).as_posix(),
+                "reviewer_sidecar": reviewer_sidecar.relative_to(package_root).as_posix(),
             },
             "scope_limits": [
                 "The reviewer ZIP contains only files tracked at the release commit.",
@@ -623,10 +589,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--ref",
         default="HEAD",
-        help=(
-            "release ref, limited to HEAD or the checked-out branch "
-            "(default: HEAD)"
-        ),
+        help=("release ref, limited to HEAD or the checked-out branch (default: HEAD)"),
     )
     parser.add_argument(
         "--release-tag",

@@ -141,9 +141,7 @@ def distance(
 
     curvature = validate_curvature(curvature, jnp.result_type(left, right))
     difference = mobius_add(-left, right, curvature)
-    radius = jnp.sqrt(curvature) * safe_norm(
-        difference, axis=-1, keepdims=keepdims
-    )
+    radius = jnp.sqrt(curvature) * safe_norm(difference, axis=-1, keepdims=keepdims)
     return 2.0 * jnp.arctanh(radius) / jnp.sqrt(curvature)
 
 
@@ -154,12 +152,7 @@ def logmap(base: Array, point: Array, curvature: Array) -> Array:
     difference = mobius_add(-base, point, curvature)
     difference_norm = safe_norm(difference, axis=-1, keepdims=True)
     scaled_norm = jnp.sqrt(curvature) * difference_norm
-    return (
-        2.0
-        * difference
-        * atanhc(scaled_norm)
-        / conformal_factor(base, curvature)
-    )
+    return 2.0 * difference * atanhc(scaled_norm) / conformal_factor(base, curvature)
 
 
 def expmap(base: Array, tangent: Array, curvature: Array) -> Array:
@@ -170,8 +163,8 @@ def expmap(base: Array, tangent: Array, curvature: Array) -> Array:
     scaled_sq = jnp.square(
         0.5 * jnp.sqrt(curvature) * conformal_factor(base, curvature)
     ) * jnp.square(tangent_norm)
-    second = tangent * 0.5 * conformal_factor(base, curvature) * tanhc_from_square(
-        scaled_sq
+    second = (
+        tangent * 0.5 * conformal_factor(base, curvature) * tanhc_from_square(scaled_sq)
     )
     return project_ball(mobius_add(base, second, curvature), curvature)
 

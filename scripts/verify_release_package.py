@@ -131,9 +131,7 @@ def _normalized_evidence_path(raw_path: str, *, manifest: str, line: int) -> str
     return path
 
 
-def _parse_evidence_checksums(
-    contents: bytes, *, manifest: str
-) -> dict[str, str]:
+def _parse_evidence_checksums(contents: bytes, *, manifest: str) -> dict[str, str]:
     try:
         lines = contents.decode("utf-8").splitlines()
     except UnicodeDecodeError as error:
@@ -145,9 +143,7 @@ def _parse_evidence_checksums(
         digest = line[:64]
         if any(character not in "0123456789abcdef" for character in digest):
             raise ValueError(f"invalid SHA-256 in {manifest} at line {line_number}")
-        path = _normalized_evidence_path(
-            line[66:], manifest=manifest, line=line_number
-        )
+        path = _normalized_evidence_path(line[66:], manifest=manifest, line=line_number)
         if path in checksums:
             raise ValueError(f"duplicate checksum path in {manifest}: {path!r}")
         checksums[path] = digest
@@ -168,21 +164,16 @@ def _verify_evidence_tree(repository: Path, commit: str, tree: str) -> None:
     expected = {
         path.removeprefix(prefix): object_id
         for path, (mode, object_type, object_id) in entries.items()
-        if path != manifest_path
-        and mode in _REGULAR_FILE_MODES
-        and object_type == "blob"
+        if path != manifest_path and mode in _REGULAR_FILE_MODES and object_type == "blob"
     }
     missing = sorted(set(expected) - set(checksums))
     unlisted = sorted(set(checksums) - set(expected))
     if missing or unlisted:
         raise ValueError(
-            f"{manifest_path} coverage mismatch: missing={missing}, "
-            f"unlisted={unlisted}"
+            f"{manifest_path} coverage mismatch: missing={missing}, unlisted={unlisted}"
         )
     for relative_path, object_id in expected.items():
-        contents = _run_bytes(
-            ["git", "cat-file", "blob", object_id], cwd=repository
-        )
+        contents = _run_bytes(["git", "cat-file", "blob", object_id], cwd=repository)
         actual = hashlib.sha256(contents).hexdigest()
         declared = checksums[relative_path]
         if actual != declared:
@@ -198,13 +189,9 @@ def _verify_release_history(repository: Path, release_ref: str) -> int:
         raise ValueError(f"release ref has no reachable commits: {release_ref}")
     violations: list[str] = []
     for commit in commits:
-        for path, (mode, object_type, _) in _tree_entries(
-            repository, commit
-        ).items():
+        for path, (mode, object_type, _) in _tree_entries(repository, commit).items():
             if mode not in _REGULAR_FILE_MODES or object_type != "blob":
-                violations.append(
-                    f"{commit} {path!r}: mode={mode}, type={object_type}"
-                )
+                violations.append(f"{commit} {path!r}: mode={mode}, type={object_type}")
                 continue
             try:
                 _validate_tracked_paths({path})
@@ -320,9 +307,7 @@ def _validate_release(manifest: dict[str, Any]) -> dict[str, Any]:
     if release["repository_name"] != "ExPoConv":
         raise ValueError("release.repository_name must be 'ExPoConv'")
     if release["e19_status"] not in _SUPPORTED_E19_STATUSES:
-        raise ValueError(
-            "release.e19_status must be a supported reproduction status"
-        )
+        raise ValueError("release.e19_status must be a supported reproduction status")
     release_tag = release["release_tag"]
     if release_tag is not None and (
         not isinstance(release_tag, str)
@@ -408,9 +393,7 @@ def _validate_artifacts(
     if set(bundle) != bundle_fields:
         raise ValueError("release_git_bundle fields differ from schema")
     _validate_size_and_digest(bundle, name="release_git_bundle")
-    bundle_path = _normalized_relative_path(
-        bundle["path"], field="release_git_bundle.path"
-    )
+    bundle_path = _normalized_relative_path(bundle["path"], field="release_git_bundle.path")
     expected_bundle_path = f"repository/ExPoConv-git-{short_commit}.bundle"
     if bundle_path != expected_bundle_path:
         raise ValueError("release_git_bundle path does not match the release commit")
@@ -424,8 +407,7 @@ def _validate_artifacts(
         or bundle_refs.get("HEAD") != commit
         or bundle_refs.get(release["ref"]) != commit
         or any(
-            not isinstance(object_id, str)
-            or _COMMIT_RE.fullmatch(object_id) is None
+            not isinstance(object_id, str) or _COMMIT_RE.fullmatch(object_id) is None
             for object_id in bundle_refs.values()
         )
     ):
@@ -447,13 +429,9 @@ def _validate_artifacts(
             "size_bytes",
         }
         if set(legacy) != legacy_fields:
-            raise ValueError(
-                "legacy_v100_provenance_bundle fields differ from schema"
-            )
+            raise ValueError("legacy_v100_provenance_bundle fields differ from schema")
         _validate_size_and_digest(legacy, name=_OPTIONAL_ARTIFACT_KEY)
-        if legacy["path"] != (
-            "legacy-v100-provenance/v100-accepted-provenance.bundle"
-        ):
+        if legacy["path"] != ("legacy-v100-provenance/v100-accepted-provenance.bundle"):
             raise ValueError("legacy V100 bundle path mismatch")
         if legacy["internal_fixity"] != "legacy-v100-provenance/SHA256SUMS":
             raise ValueError("legacy V100 internal_fixity path mismatch")
@@ -466,9 +444,8 @@ def _validate_artifacts(
             or _COMMIT_RE.fullmatch(legacy["bundle_tip"]) is None
         ):
             raise ValueError("legacy V100 bundle_tip must be a full SHA-1")
-        if (
-            not isinstance(legacy["bundle_ref"], str)
-            or not legacy["bundle_ref"].startswith("refs/heads/")
+        if not isinstance(legacy["bundle_ref"], str) or not legacy["bundle_ref"].startswith(
+            "refs/heads/"
         ):
             raise ValueError("legacy V100 bundle_ref must be a branch ref")
         count = legacy["accepted_commit_count"]
@@ -477,9 +454,7 @@ def _validate_artifacts(
     return artifacts
 
 
-def _validate_fixity(
-    manifest: dict[str, Any], release: dict[str, Any]
-) -> dict[str, str]:
+def _validate_fixity(manifest: dict[str, Any], release: dict[str, Any]) -> dict[str, str]:
     fixity = manifest["fixity"]
     required = {
         "package_checksums",
@@ -513,9 +488,7 @@ def _parse_checksums(path: Path) -> dict[str, str]:
             raise ValueError(f"invalid checksum line {line_number} in {path.name}")
         digest, _, raw_name = match.groups()
         name = raw_name.removeprefix("./")
-        name = _normalized_relative_path(
-            name, field=f"{path.name} line {line_number}"
-        )
+        name = _normalized_relative_path(name, field=f"{path.name} line {line_number}")
         if name in checksums:
             raise ValueError(f"duplicate checksum path in {path.name}: {name!r}")
         checksums[name] = digest
@@ -540,8 +513,7 @@ def _verify_checksum_map(root: Path, checksums: dict[str, str]) -> None:
         actual_digest = _sha256(root / name)
         if actual_digest != expected_digest:
             raise ValueError(
-                f"SHA-256 mismatch for {name!r}: "
-                f"{actual_digest} != {expected_digest}"
+                f"SHA-256 mismatch for {name!r}: {actual_digest} != {expected_digest}"
             )
 
 
@@ -561,8 +533,7 @@ def _verify_legacy_internal_fixity(
     undeclared_inventory = sorted(actual - _LEGACY_ALLOWED_FILES)
     if undeclared_inventory:
         raise ValueError(
-            "legacy provenance inventory contains undeclared files: "
-            f"{undeclared_inventory}"
+            f"legacy provenance inventory contains undeclared files: {undeclared_inventory}"
         )
     if set(checksums) != actual:
         missing = sorted(actual - set(checksums))
@@ -621,8 +592,7 @@ def _verify_outer_fixity(
         missing = sorted((actual_files - {OUTER_CHECKSUM_NAME}) - set(checksums))
         unexpected = sorted(set(checksums) - actual_files)
         raise ValueError(
-            f"outer checksum coverage mismatch: missing={missing}, "
-            f"unexpected={unexpected}"
+            f"outer checksum coverage mismatch: missing={missing}, unexpected={unexpected}"
         )
     _verify_checksum_map(package_directory, checksums)
     for name, artifact in artifacts.items():
@@ -669,8 +639,7 @@ def _clone_release_bundle(
     observed_commit = _run(["git", "rev-parse", "HEAD"], cwd=destination)
     if observed_commit != release["commit"]:
         raise ValueError(
-            f"cloned release commit mismatch: "
-            f"{observed_commit} != {release['commit']}"
+            f"cloned release commit mismatch: {observed_commit} != {release['commit']}"
         )
     observed_tree = _run(["git", "rev-parse", "HEAD^{tree}"], cwd=destination)
     if observed_tree != release["tree"]:
@@ -694,9 +663,7 @@ def _clone_release_bundle(
 
 def _tracked_blobs(repository: Path, commit: str) -> dict[str, tuple[str, bytes]]:
     blobs: dict[str, tuple[str, bytes]] = {}
-    for path, (mode, object_type, object_id) in _tree_entries(
-        repository, commit
-    ).items():
+    for path, (mode, object_type, object_id) in _tree_entries(repository, commit).items():
         if object_type != "blob" or mode not in _REGULAR_FILE_MODES:
             raise ValueError(
                 f"release commit contains unsupported tracked entry {path!r} "
@@ -745,8 +712,7 @@ def _zip_file_mode(info: zipfile.ZipInfo) -> str:
     if raw_mode in {0o755, 0o100755}:
         return "100755"
     raise ValueError(
-        f"reviewer ZIP entry has unsupported Unix mode {oct(raw_mode)}: "
-        f"{info.filename!r}"
+        f"reviewer ZIP entry has unsupported Unix mode {oct(raw_mode)}: {info.filename!r}"
     )
 
 
@@ -820,9 +786,9 @@ def _verify_legacy_bundle(
 ) -> None:
     try:
         if __package__:
-            from .verify_provenance_bundle import verify_bundle
+            from .verify_provenance_bundle import resolve_recorded_commit, verify_bundle
         else:
-            from verify_provenance_bundle import verify_bundle
+            from verify_provenance_bundle import resolve_recorded_commit, verify_bundle
     except ImportError as error:
         raise ValueError("legacy provenance verifier is unavailable") from error
     internal_manifest = package_directory / artifact["internal_manifest"]
@@ -849,8 +815,8 @@ def _verify_legacy_bundle(
         raise ValueError("legacy release_history_commits contains duplicates")
     for commit in release_commits:
         try:
-            _run(["git", "cat-file", "-e", f"{commit}^{{commit}}"], cwd=checkout)
-        except subprocess.CalledProcessError as error:
+            resolve_recorded_commit(checkout, commit)
+        except (ValueError, subprocess.CalledProcessError) as error:
             raise ValueError(
                 f"legacy release-history commit is absent from current bundle: {commit}"
             ) from error

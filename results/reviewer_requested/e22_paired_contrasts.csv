@@ -1,0 +1,6 @@
+experiment_id,protocol_version,workload_id,batch,resolution,session,R_median_latency_ms,F_median_latency_ms,R_over_F_latency_ratio,R_peak_live_bytes,F_peak_live_bytes,F_minus_R_peak_live_bytes,F_peak_live_reduction_vs_R_percent,pairing_rule
+E22,1.15,unet_update_b8_r256,8,256,0,118.392698,62.793309,1.8854349274697404,6394364672,2921921536,-3472443136,54.30474041002584,included_only_when_both_R_and_F_completed
+E22,1.15,unet_update_b8_r256,8,256,1,116.307298,65.6396395,1.7719064103025735,6394364672,3015736064,-3378628608,52.83759656052347,included_only_when_both_R_and_F_completed
+E22,1.15,unet_update_b8_r256,8,256,2,116.8690625,59.567783000000006,1.961950850176848,6394364672,2921921536,-3472443136,54.30474041002584,included_only_when_both_R_and_F_completed
+E22,1.15,unet_update_b8_r256,8,256,3,117.821722,67.576254,1.7435373378346777,6394364672,2921921536,-3472443136,54.30474041002584,included_only_when_both_R_and_F_completed
+E22,1.15,unet_update_b8_r256,8,256,4,116.6101745,68.3280365,1.7066226467666754,6394364672,2921921536,-3472443136,54.30474041002584,included_only_when_both_R_and_F_completed

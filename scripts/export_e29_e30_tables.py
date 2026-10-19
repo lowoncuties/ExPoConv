@@ -82,7 +82,6 @@ REQUESTED_BYTES_PATTERN = re.compile(
 SOFT_LOCKUP_PATTERN = re.compile(r"soft lockup - CPU#\d+ stuck for (\d+)s!")
 STALL_MARGIN_SECONDS = 180
 TIMEOUT_CRASH_SECONDS = 60
-STALL_RULE = "logs/driver_stall_rule.txt"
 KERNEL_LOCKUP_LOG = "logs/kernel_driver_lockups.log"
 EUCLIDEAN_ROLE = "euclidean_same_topology_reference"
 COHORTS: dict[str, dict[str, Any]] = {

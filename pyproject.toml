@@ -4,8 +4,8 @@ build-backend = "hatchling.build"
 
 [project]
 name = "poincare-execution-experiments"
-version = "0.1.0"
-description = "Reproducible experiments for factorized execution of HNN++ Poincare networks."
+version = "0.2.0"
+description = "Experiments for Efficient Poincaré Convolutions through Patch-Statistics Factorization."
 readme = "README.md"
 requires-python = ">=3.11,<3.12"
 license = {file = "LICENSE"}
@@ -37,6 +37,9 @@ dev = [
 
 # The GPU-specific JAX build is installed by the platform script. The paper's
 # measured environment is the pinned V100/CUDA 11.8 profile.
+
+[project.urls]
+Repository = "https://github.com/lowoncuties/ExPoConv"
 
 [project.scripts]
 poincare-exec = "poincare_exec.cli:main"

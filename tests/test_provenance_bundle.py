@@ -8,7 +8,11 @@ from pathlib import Path
 
 import pytest
 
-from scripts.verify_provenance_bundle import verify_bundle
+from scripts.verify_provenance_bundle import (
+    load_commit_map,
+    resolve_recorded_commit,
+    verify_bundle,
+)
 
 
 def _run(command: list[str], *, cwd: Path) -> str:
@@ -81,15 +85,11 @@ def _add_unrelated_commit_to_bundle(
         ["git", "checkout", "--quiet", "-b", "unrelated", branch_point],
         cwd=repository,
     )
-    (repository / "unrelated.txt").write_text(
-        "not accepted history\n", encoding="utf-8"
-    )
+    (repository / "unrelated.txt").write_text("not accepted history\n", encoding="utf-8")
     _run(["git", "add", "unrelated.txt"], cwd=repository)
     _run(["git", "commit", "--quiet", "-m", "unrelated revision"], cwd=repository)
     unrelated_commit = _run(["git", "rev-parse", "HEAD"], cwd=repository)
-    _run(
-        ["git", "checkout", "--quiet", "accepted-provenance"], cwd=repository
-    )
+    _run(["git", "checkout", "--quiet", "accepted-provenance"], cwd=repository)
 
     bundle_tip = manifest["bundle_tip"]
     assert isinstance(bundle_tip, str)
@@ -106,9 +106,7 @@ def _add_unrelated_commit_to_bundle(
         + packed_objects
     )
 
-    accepted_commits.append(
-        {"family": "unrelated-fixture", "commit": unrelated_commit}
-    )
+    accepted_commits.append({"family": "unrelated-fixture", "commit": unrelated_commit})
     manifest["size_bytes"] = bundle.stat().st_size
     manifest["sha256"] = hashlib.sha256(bundle.read_bytes()).hexdigest()
     manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
@@ -178,16 +176,25 @@ def test_tracked_manifest_covers_every_results_readme_revision() -> None:
         "## Provenance of each result family", maxsplit=1
     )[1].split("The E08 forward rows", maxsplit=1)[0]
     documented_prefixes = set(re.findall(r"`([0-9a-f]{8})`", provenance_table))
-    bundled_prefixes = {
-        row["commit"][:8] for row in manifest["accepted_commits"]
-    }
-    release_prefixes = {
-        row["commit"][:8] for row in manifest["release_history_commits"]
-    }
+    bundled_prefixes = {row["commit"][:8] for row in manifest["accepted_commits"]}
+    release_prefixes = {row["commit"][:8] for row in manifest["release_history_commits"]}
 
     assert bundled_prefixes.isdisjoint(release_prefixes)
     assert documented_prefixes == bundled_prefixes | release_prefixes
     for row in manifest["release_history_commits"]:
-        commit = row["commit"]
-        _run(["git", "cat-file", "-e", f"{commit}^{{commit}}"], cwd=repository)
-        _run(["git", "merge-base", "--is-ancestor", commit, "HEAD"], cwd=repository)
+        resolve_recorded_commit(repository, row["commit"])
+
+
+def test_commit_map_links_recorded_commits_to_published_trees() -> None:
+    repository = Path(__file__).resolve().parents[1]
+    commit_map = load_commit_map(repository)
+    assert commit_map
+
+    for recorded, (published, _tree) in commit_map.items():
+        assert resolve_recorded_commit(repository, recorded) == published
+
+    recorded, (published, _tree) = next(iter(commit_map.items()))
+    with pytest.raises(ValueError, match="not reachable with tree"):
+        resolve_recorded_commit(
+            repository, recorded, commit_map={recorded: (published, "0" * 40)}
+        )

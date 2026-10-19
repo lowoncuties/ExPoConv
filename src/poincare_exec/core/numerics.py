@@ -4,7 +4,6 @@ from __future__ import annotations
 
 from collections.abc import Sequence
 from functools import partial
-from typing import Any
 
 import jax
 import jax.numpy as jnp
@@ -73,19 +72,6 @@ def _stable_norm_jvp(
     return result, derivative
 
 
-def as_real_array(value: Any, *, name: str) -> Array:
-    """Return a floating JAX array while rejecting bool/complex operands."""
-
-    array = jnp.asarray(value)
-    if jnp.issubdtype(array.dtype, jnp.bool_) or jnp.issubdtype(
-        array.dtype, jnp.complexfloating
-    ):
-        raise TypeError(f"{name} must be real-valued")
-    if not jnp.issubdtype(array.dtype, jnp.floating):
-        array = array.astype(jnp.float32)
-    return array
-
-
 def series_cutoff(dtype: jnp.dtype) -> float:
     """Return the fixed analytic-series threshold for one dtype."""
 
@@ -141,18 +127,6 @@ def sinhc(value: Array) -> Array:
     )
 
 
-def asinhc(value: Array) -> Array:
-    """Evaluate ``asinh(x) / x`` with its analytic continuation at zero."""
-
-    return _series_or_direct(
-        value,
-        lambda x: jnp.arcsinh(x) / x,
-        lambda x: 1.0
-        + jnp.square(x)
-        * (-1.0 / 6.0 + jnp.square(x) * (3.0 / 40.0 - 5.0 * jnp.square(x) / 112.0)),
-    )
-
-
 def asinhc_from_square(square: Array) -> Array:
     """Evaluate ``asinh(sqrt(q)) / sqrt(q)`` from a squared norm.
 
@@ -167,8 +141,7 @@ def asinhc_from_square(square: Array) -> Array:
     direct = jnp.arcsinh(direct_root) / direct_root
     series_square = jnp.where(use_direct, jnp.zeros_like(square), square)
     series = 1.0 + series_square * (
-        -1.0 / 6.0
-        + series_square * (3.0 / 40.0 - 5.0 * series_square / 112.0)
+        -1.0 / 6.0 + series_square * (3.0 / 40.0 - 5.0 * series_square / 112.0)
     )
     return jnp.where(use_direct, direct, series)
 
@@ -180,8 +153,7 @@ def atanhc(value: Array) -> Array:
         value,
         lambda x: jnp.arctanh(x) / x,
         lambda x: 1.0
-        + jnp.square(x)
-        * (1.0 / 3.0 + jnp.square(x) * (1.0 / 5.0 + jnp.square(x) / 7.0)),
+        + jnp.square(x) * (1.0 / 3.0 + jnp.square(x) * (1.0 / 5.0 + jnp.square(x) / 7.0)),
     )
 
 

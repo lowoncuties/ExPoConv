@@ -124,7 +124,7 @@ PyPI `torch==2.4.0` is the CUDA 12.1 build. It is also the version pinned by Hyp
 
 The measured code is commit `df03198`. The tables in `results/reviewer_requested/e32_pytorch_*`
 were produced from its raw outputs with `benchmark.py summarize` (commit `7e09135`). The runs
-used GPU `GPU-36d46918-9a7e-33a8-63a0-cb7581053039` (aibox1a6000, index 1, driver 560.35.03).
+used GPU `GPU-36d46918-9a7e-33a8-63a0-cb7581053039` (physical index 1, driver 560.35.03).
 The software was Python 3.10.21, torch 2.4.0+cu121 (CUDA runtime 12.1, cuDNN 9.1.0), hypll 0.1.1
 and numpy 1.24.4. The installed `hypll` package tree is byte-identical to `hypll/` at upstream
 commit `99a6d89e15be`. The raw session log (`sessions.jsonl`, all 200 call times per session)

@@ -85,8 +85,7 @@ def _normalize(
             row["reference_l2_norm"]
         )
         within_tolerance = bool(
-            row.get("finite") is True
-            and float(row["max_absolute_error"]) <= threshold
+            row.get("finite") is True and float(row["max_absolute_error"]) <= threshold
         )
     return {
         "selection": selection,

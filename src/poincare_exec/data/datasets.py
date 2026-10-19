@@ -61,9 +61,7 @@ def _manifest_rows(path: Path, split: str) -> list[dict[str, str]]:
         rows = list(csv.DictReader(stream))
     if split == "test_deduplicated":
         return [
-            row
-            for row in rows
-            if row["split"] == "test" and not row["exclusion_reason"]
+            row for row in rows if row["split"] == "test" and not row["exclusion_reason"]
         ]
     return [row for row in rows if row["split"] == split]
 
@@ -94,9 +92,7 @@ def _load_cifar(data_root: Path, manifest: Path, split: str) -> DatasetBundle:
         index = int(row["source_index"])
         selected_images.append(images[index])
         selected_labels.append(labels[index])
-    image_array = (
-        np.stack(selected_images).reshape(-1, 3, 32, 32).transpose(0, 2, 3, 1)
-    )
+    image_array = np.stack(selected_images).reshape(-1, 3, 32, 32).transpose(0, 2, 3, 1)
     image_array = image_array.astype(np.float32) / 127.5 - 1.0
     return DatasetBundle(
         name="cifar100",
@@ -114,8 +110,10 @@ def _load_isic(data_root: Path, manifest: Path, split: str) -> DatasetBundle:
     for row in rows:
         prefix = "Training" if row["source_partition"] == "train" else "Test"
         image = source / f"ISBI2016_ISIC_Part1_{prefix}_Data" / f"{row['sample_id']}.jpg"
-        mask = source / f"ISBI2016_ISIC_Part1_{prefix}_GroundTruth" / (
-            f"{row['sample_id']}_Segmentation.png"
+        mask = (
+            source
+            / f"ISBI2016_ISIC_Part1_{prefix}_GroundTruth"
+            / (f"{row['sample_id']}_Segmentation.png")
         )
         records.append((image, mask))
     return DatasetBundle(

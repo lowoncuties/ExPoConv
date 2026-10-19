@@ -109,6 +109,29 @@ def test_e13_unet_scaling_is_the_frozen_one_factor_grid() -> None:
     assert all(workload["dtype"] == "float32" for workload in workloads)
 
 
+def test_e20_e21_protocol_pin_resolves_to_the_byte_exact_snapshot() -> None:
+    manifest = load_yaml(
+        REPOSITORY_ROOT / "configs" / "analysis" / "e20_e21_training_replication.yaml"
+    )
+    protocol_path, protocol_digest = validate_hashed_document(
+        manifest, field="protocol_document"
+    )
+    protocol = load_yaml(REPOSITORY_ROOT / protocol_path)
+    cohort = manifest["cohorts"]["E20"]
+    config = load_yaml(REPOSITORY_ROOT / cohort["config_document"]["path"])
+
+    assert protocol_path == "configs/protocols/protocol_1_14.yaml"
+    assert protocol_digest == manifest["protocol_document"]["sha256"]
+    assert protocol["protocol_version"] == "1.14"
+    assert config_hash(protocol, config) == cohort["run_config_hash"]
+
+    wrong_pin = {**manifest["protocol_document"], "sha256": "0" * 64}
+    with pytest.raises(ValueError, match="SHA-256 mismatch"):
+        validate_hashed_document(
+            {"protocol_document": wrong_pin}, field="protocol_document"
+        )
+
+
 def test_e13_analysis_uses_the_frozen_protocol_snapshot() -> None:
     manifest = load_yaml(REPOSITORY_ROOT / "configs" / "analysis" / "e13_unet_scaling.yaml")
     protocol_path, protocol_digest = validate_hashed_document(
@@ -120,9 +143,7 @@ def test_e13_analysis_uses_the_frozen_protocol_snapshot() -> None:
     )
     protocol = load_yaml(REPOSITORY_ROOT / protocol_path)
     benchmark = load_yaml(REPOSITORY_ROOT / benchmark_path)
-    environment = json.loads(
-        (REPOSITORY_ROOT / allocator_path).read_text(encoding="utf-8")
-    )
+    environment = json.loads((REPOSITORY_ROOT / allocator_path).read_text(encoding="utf-8"))
     accepted_summary = json.loads(
         (REPOSITORY_ROOT / "results" / "e13_scaling" / "summary.json").read_text(
             encoding="utf-8"

@@ -400,7 +400,7 @@ def _fixture(
                 "epochs": SYNTHETIC_EPOCHS,
                 "max_updates": SYNTHETIC_UPDATES,
             },
-        }
+        },
     }
     protocol_path.write_text(yaml.safe_dump(protocol, sort_keys=True), encoding="utf-8")
     contract_path = repository / "contract.md"
@@ -655,9 +655,7 @@ def _register_post_worker_disposition(
         if line.strip()
     ]
     selected = [
-        row
-        for row in attempts
-        if row["variant"] == variant and int(row["seed"]) == seed
+        row for row in attempts if row["variant"] == variant and int(row["seed"]) == seed
     ]
     assert len(selected) == 1
     attempt = selected[0]
@@ -1180,9 +1178,7 @@ def test_registered_post_worker_process_is_accepted_exactly(tmp_path: Path) -> N
         seed=101,
         record_type="accepted_registered_training_run",
     )
-    assert row["post_worker_snapshot_disposition"] == (
-        "registered_post_worker_occupancy"
-    )
+    assert row["post_worker_snapshot_disposition"] == ("registered_post_worker_occupancy")
     assert row["post_worker_evidence_id"] == "synthetic_post_worker_occupancy"
 
     attempts_path = roots["E20"] / "campaign_attempts.jsonl"
@@ -1229,9 +1225,7 @@ def test_unregistered_post_worker_process_closes_gate(tmp_path: Path) -> None:
         encoding="utf-8",
     )
 
-    with pytest.raises(
-        ExtensionAnalysisError, match="no exact pre-unblinding disposition"
-    ):
+    with pytest.raises(ExtensionAnalysisError, match="no exact pre-unblinding disposition"):
         analyze_extension_campaign(
             manifest,
             roots,
@@ -1294,12 +1288,7 @@ def test_amendment_overlay_preserves_the_frozen_base(
     evidence_count: int,
 ) -> None:
     repository = extension_analysis.SOURCE_REPOSITORY_ROOT
-    manifest_path = (
-        repository
-        / "configs"
-        / "analysis"
-        / filename
-    )
+    manifest_path = repository / "configs" / "analysis" / filename
     monkeypatch.setattr(
         extension_analysis,
         "_validate_analysis_checkout",
@@ -1339,13 +1328,9 @@ def test_amendment_overlay_preserves_the_frozen_base(
             ("e21_r1619140427_post_worker_ollama", "E21", "R", 1619140427),
             ("e21_f646228129_post_worker_ollama", "E21", "F", 646228129),
         }
-        e21 = [
-            item for item in registrations if item["identity"]["experiment_id"] == "E21"
-        ]
+        e21 = [item for item in registrations if item["identity"]["experiment_id"] == "E21"]
         assert len({item["archived_remote_root"] for item in e21}) == 1
-        assert {
-            item["expected_attempt"]["timestamp_utc"] for item in e21
-        } == {
+        assert {item["expected_attempt"]["timestamp_utc"] for item in e21} == {
             "2026-10-08T08:03:43.159Z",
             "2026-10-08T09:23:01.021Z",
         }
@@ -1732,9 +1717,9 @@ def test_metric_history_is_exact_and_provenance_complete(
     elif mutation == "compute_recurrence":
         next(row for row in rows if row["split"] == "train")["compute_seconds"] += 0.01
     elif mutation == "development_compute":
-        next(row for row in rows if row["split"] == "development")[
-            "compute_seconds"
-        ] += 0.01
+        next(row for row in rows if row["split"] == "development")["compute_seconds"] += (
+            0.01
+        )
     else:  # pragma: no cover - exhaustive parameter
         raise AssertionError(mutation)
     path.write_text(
@@ -2400,9 +2385,7 @@ def test_analysis_checkout_tracks_prior_amendment_documents(
         raise AssertionError(arguments)
 
     monkeypatch.setattr(extension_analysis, "_git_command", fake_git)
-    checkout = extension_analysis._validate_analysis_checkout(
-        manifest_path, manifest, root
-    )
+    checkout = extension_analysis._validate_analysis_checkout(manifest_path, manifest, root)
 
     for path in (prior_manifest_path, prior_contract_path):
         relative = path.relative_to(root).as_posix()

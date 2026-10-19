@@ -294,9 +294,7 @@ def build_all_manifests(
         raise FileExistsError(f"refusing to replace split manifests: {existing}")
     build_isic16_manifest(data_root, outputs["isic16"], seed)
     build_cifar100_manifest(data_root, outputs["cifar100"], seed)
-    _validate_counts(
-        outputs["isic16"], {"train": 810, "development": 90, "test": 379}
-    )
+    _validate_counts(outputs["isic16"], {"train": 810, "development": 90, "test": 379})
     _validate_counts(
         outputs["cifar100"],
         {"train": 45_000, "development": 5_000, "test": 10_000},

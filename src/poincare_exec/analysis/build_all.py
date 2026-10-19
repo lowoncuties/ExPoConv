@@ -115,9 +115,11 @@ def _exact_two_sided_sign_pvalue(values: np.ndarray) -> float:
     if len(nonzero) == 0:
         return 1.0
     minority = min(int(np.sum(nonzero > 0)), int(np.sum(nonzero < 0)))
-    probability = 2.0 * sum(
-        math.comb(len(nonzero), count) for count in range(minority + 1)
-    ) / (2 ** len(nonzero))
+    probability = (
+        2.0
+        * sum(math.comb(len(nonzero), count) for count in range(minority + 1))
+        / (2 ** len(nonzero))
+    )
     return min(1.0, float(probability))
 
 
@@ -201,9 +203,7 @@ def _training_summaries(artifact_dir: Path) -> list[dict[str, Any]]:
                     "checkpoint_update": int(values["update"]),
                     "official_metric_name": metric_name,
                     "official_metric": official[metric_name],
-                    "official_mean_foreground_iou": official.get(
-                        "mean_foreground_iou"
-                    ),
+                    "official_mean_foreground_iou": official.get("mean_foreground_iou"),
                     "official_loss": official["loss"],
                     "deduplicated_metric": deduplicated[metric_name],
                     "deduplicated_mean_foreground_iou": deduplicated.get(
@@ -416,9 +416,7 @@ def _paired_training_metric_summary(
             continue
         if any(set(values) != expected_variants for values in seeds.values()):
             continue
-        resolved_metric_name = metric_name or protocol["tasks"][task][
-            "primary_metric"
-        ]
+        resolved_metric_name = metric_name or protocol["tasks"][task]["primary_metric"]
         for comparison, reference, candidate in _training_comparisons(protocol):
             random, bootstrap_stream = _bootstrap_generator(
                 protocol,
@@ -442,9 +440,7 @@ def _paired_training_metric_summary(
                 0, len(differences), size=(replicates, len(differences))
             )
             bootstrap = np.mean(differences[indices], axis=1)
-            sample_sd, standard_error, t_lower, t_upper = _paired_t_interval(
-                differences
-            )
+            sample_sd, standard_error, t_lower, t_upper = _paired_t_interval(differences)
             output.append(
                 {
                     "task": task,
@@ -456,8 +452,7 @@ def _paired_training_metric_summary(
                     "candidate_variant": candidate,
                     "pairs": len(differences),
                     "estimand": (
-                        f"mean paired {candidate}-minus-{reference} "
-                        f"{resolved_metric_name}"
+                        f"mean paired {candidate}-minus-{reference} {resolved_metric_name}"
                     ),
                     "mean_difference": float(np.mean(differences)),
                     "median_difference": float(np.median(differences)),
@@ -557,8 +552,8 @@ def paired_training_efficiency_summary(
                 log_ratios = np.log(ratios)
                 indices = random.integers(0, len(ratios), size=(replicates, len(ratios)))
                 bootstrap = np.exp(np.mean(log_ratios[indices], axis=1))
-                log_sd, log_standard_error, log_t_lower, log_t_upper = (
-                    _paired_t_interval(log_ratios)
+                log_sd, log_standard_error, log_t_lower, log_t_upper = _paired_t_interval(
+                    log_ratios
                 )
                 output.append(
                     {
@@ -727,9 +722,7 @@ def plot_paired_training_endpoints(
     figure.subplots_adjust(hspace=0.60, wspace=0.24)
     for task_index, task in enumerate(tasks):
         metric_name = protocol["tasks"][task]["primary_metric"]
-        metric_label = (
-            "Foreground Dice" if "dice" in metric_name else "Top-1 accuracy"
-        )
+        metric_label = "Foreground Dice" if "dice" in metric_name else "Top-1 accuracy"
         task_values = [
             float(row["official_metric"])
             for row in rows
@@ -753,9 +746,7 @@ def plot_paired_training_endpoints(
             ]
             by_seed: dict[int, dict[str, float]] = defaultdict(dict)
             for row in selected:
-                by_seed[int(row["seed"])][row["variant"]] = float(
-                    row["official_metric"]
-                )
+                by_seed[int(row["seed"])][row["variant"]] = float(row["official_metric"])
             for _seed, values in sorted(by_seed.items()):
                 if set(values) != set(variants):
                     continue
@@ -859,9 +850,7 @@ def build_checkpoint_outputs(
         repository_root / "configs" / "checkpoints" / "e06_e07.yaml"
     )
     attempts = checkpoint_attempts(artifact_dir)
-    audit = trained_checkpoint_campaign_audit(
-        rows, attempts, protocol, checkpoint_config
-    )
+    audit = trained_checkpoint_campaign_audit(rows, attempts, protocol, checkpoint_config)
     _write_csv(
         table_dir / "checkpoint_compatibility_summary.csv",
         checkpoint_compatibility_summary(rows),
@@ -881,9 +870,7 @@ def build_checkpoint_outputs(
     if not complete_rows:
         return
     task_agreement = trained_checkpoint_task_agreement(complete_rows, protocol)
-    _write_csv(
-        table_dir / "trained_checkpoint_task_agreement.csv", task_agreement
-    )
+    _write_csv(table_dir / "trained_checkpoint_task_agreement.csv", task_agreement)
     _write_csv(
         table_dir / "trained_checkpoint_compatibility_aggregate.csv",
         trained_checkpoint_compatibility_aggregate(task_agreement, complete_rows),

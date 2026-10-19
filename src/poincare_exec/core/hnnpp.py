@@ -62,15 +62,6 @@ def spatial_pair(value: int | Sequence[int], *, name: str) -> tuple[int, int]:
     )
 
 
-def dimension_beta(dimension: int, *, dtype: Any) -> Array:
-    """Return ``B(d/2, 1/2)`` in the requested floating dtype."""
-
-    dimension = _positive_size(dimension, name="dimension")
-    resolved = jnp.dtype(dtype)
-    half = jnp.asarray(0.5, dtype=resolved)
-    return jnp.exp(betaln(half * jnp.asarray(dimension, resolved), half))
-
-
 def beta_ratio(total_dimension: int, block_dimension: int, *, dtype: Any) -> Array:
     """Return a dimension-beta ratio in log space."""
 
@@ -265,7 +256,7 @@ def _scores_from_radius_products(
     *,
     margin: Array | None = None,
 ) -> Array:
-    """Evaluate HNN++ scores from sufficient tangent-patch statistics."""
+    """Evaluate HNN++ scores from patch statistics."""
 
     dtype = jnp.result_type(radius_sq, directional_products, weight_norm, offset, curvature)
     curvature = jnp.asarray(curvature, dtype=dtype)

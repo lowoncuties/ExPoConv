@@ -69,9 +69,7 @@ def _truth(value: str) -> bool:
     raise ValueError(f"expected a boolean CSV value, received {value!r}")
 
 
-def _audit_raw(
-    path: Path, config: dict[str, Any], visible_gpu: int
-) -> dict[str, Any]:
+def _audit_raw(path: Path, config: dict[str, Any], visible_gpu: int) -> dict[str, Any]:
     workloads = {item["id"] for item in config["workloads"]}
     variants = {str(item) for item in config["variants"]}
     sessions = set(range(int(config["sessions"])))
@@ -274,8 +272,7 @@ def _latency_summary(sessions: list[dict[str, Any]]) -> list[dict[str, Any]]:
 
 def _speedup_summary(sessions: list[dict[str, Any]]) -> list[dict[str, Any]]:
     indexed = {
-        (row["workload_id"], row["session"], row["variant"]): row
-        for row in sessions
+        (row["workload_id"], row["session"], row["variant"]): row for row in sessions
     }
     workloads = sorted({row["workload_id"] for row in sessions})
     session_ids = sorted({int(row["session"]) for row in sessions})

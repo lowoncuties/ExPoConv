@@ -31,6 +31,66 @@
     {
       "family": "E19 same-machine technical preflight",
       "commit": "93fb31a11a008ba1a378434071cb418b504092d9"
+    },
+    {
+      "family": "E22 allocator sensitivity, E23 workspace diagnostic, and E26 elementwise replay",
+      "commit": "30142ce2c9f60a115fa77cf844cac14166446b27"
+    },
+    {
+      "family": "E24 mechanism ablation, E25 Euclidean context, E27 current-JAX check, and E28 replay stability",
+      "commit": "df3f6f556a314f74a6966701b38ac5d135a10a62"
+    },
+    {
+      "family": "E29 Euclidean reference and E30 width runs",
+      "commit": "20a886e431de9cc5e38264f4bc4781f0434fe944"
+    },
+    {
+      "family": "E29/E30 export",
+      "commit": "6317557259d96c04c6307006b3e1078c9aef49bb"
+    },
+    {
+      "family": "E31 gather-reference run",
+      "commit": "486b5bd274a4c384d1f754f77f37dd6c43c3c46b"
+    },
+    {
+      "family": "E31 exporter",
+      "commit": "60d47b6fbdc05e6e2ce27bf450292f130ebd5e07"
+    },
+    {
+      "family": "E31 export",
+      "commit": "f7c87c8c0f4fc799509cea4fa917feb21ddb0926"
+    },
+    {
+      "family": "E32 PyTorch/HypLL cross-check measurement",
+      "commit": "df03198a5499c20ff106b072a9ab6190a4e34c4f"
+    },
+    {
+      "family": "E32 PyTorch/HypLL cross-check results",
+      "commit": "fac215e91f625efc5694399a144fe3e820692341"
+    },
+    {
+      "family": "E33 oracle accuracy",
+      "commit": "620b0bfb08cef0c4a4815723d4053c3456c993c1"
+    },
+    {
+      "family": "E33 branch trace",
+      "commit": "55e9c8a221d0813fceb40d690bbe049d03eb517f"
+    },
+    {
+      "family": "E33 cap activity",
+      "commit": "768301c76b05baa4802f9f7b5e47db004a8f9129"
+    },
+    {
+      "family": "E33 results",
+      "commit": "3be3ee0b2968da59843e520ef5769c8746747bfc"
+    },
+    {
+      "family": "E35 retained-state FP64 oracle registration",
+      "commit": "e98d313fa9140ca3bf55917d18ba105d466a2caa"
+    },
+    {
+      "family": "E35 results",
+      "commit": "fa74c0046bfab28d4107bff2f32bd7028981ccc4"
     }
   ],
   "accepted_commits": [

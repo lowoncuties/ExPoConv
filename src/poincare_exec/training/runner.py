@@ -332,9 +332,7 @@ def _run_training_worker(
     )
     evaluation_step = _make_evaluation_step(task_name, task, variant)
 
-    def finish_nonfinite(
-        *, epoch: int, reason: str, details: dict[str, Any]
-    ) -> None:
+    def finish_nonfinite(*, epoch: int, reason: str, details: dict[str, Any]) -> None:
         failure_checkpoint = f"nonfinite_update_{update}.pkl"
         save_checkpoint(
             run_dir / "checkpoints" / failure_checkpoint,
@@ -626,9 +624,7 @@ def _run_training_worker(
         evaluation_step,
         retain_predictions=True,
     )
-    validation_best = load_checkpoint(
-        run_dir / "checkpoints" / "validation_best.pkl"
-    )
+    validation_best = load_checkpoint(run_dir / "checkpoints" / "validation_best.pkl")
     if int(validation_best["update"]) != best_update:
         raise RuntimeError(
             "validation-best checkpoint update disagrees with the training record"
@@ -682,8 +678,7 @@ def _run_training_worker(
     final_status = (
         "ok"
         if all(
-            metrics["loss"] is not None
-            and int(metrics["output_nonfinite_count"]) == 0
+            metrics["loss"] is not None and int(metrics["output_nonfinite_count"]) == 0
             for metrics in endpoint_metrics
         )
         else "nonfinite"

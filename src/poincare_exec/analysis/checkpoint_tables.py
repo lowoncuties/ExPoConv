@@ -64,9 +64,7 @@ def checkpoint_compatibility_summary(
             "source_checkpoint_seed": row.get("source_checkpoint_seed"),
             "source_checkpoint_update": row.get("source_checkpoint_update"),
             "source_checkpoint_sha256": row.get("source_checkpoint_sha256"),
-            "source_checkpoint_code_commit": row.get(
-                "source_checkpoint_code_commit"
-            ),
+            "source_checkpoint_code_commit": row.get("source_checkpoint_code_commit"),
             "source_checkpoint_code_dirty": row.get("source_checkpoint_code_dirty"),
             "split": row["split"],
             "variant": row["variant"],
@@ -116,9 +114,7 @@ def trained_checkpoint_campaign_audit(
         if source_experiment is not None:
             grouped[(str(source_experiment), str(row["task"]))].append(row)
 
-    task_entries = {
-        str(entry["task"]): entry for entry in checkpoint_config["tasks"]
-    }
+    task_entries = {str(entry["task"]): entry for entry in checkpoint_config["tasks"]}
     expected_seeds = {int(value) for value in protocol["seeds"]["training"]}
     source_variants = {str(value) for value in checkpoint_config["update_variants"]}
     comparison_variants = {str(value) for value in checkpoint_config["variants"]}
@@ -177,8 +173,7 @@ def trained_checkpoint_campaign_audit(
             and row.get("task") == task
         ]
         observed_attempts = [
-            (str(row["source_variant"]), int(row["seed"]))
-            for row in selected_attempts
+            (str(row["source_variant"]), int(row["seed"])) for row in selected_attempts
         ]
         source_metadata: dict[tuple[str, int], set[tuple[Any, ...]]] = defaultdict(set)
         for row in selected:
@@ -223,8 +218,7 @@ def trained_checkpoint_campaign_audit(
             and int(row["returncode"]) == 0
             and row["gpu_snapshot_before"]["status"] == "ok"
             and row["gpu_snapshot_after"]["status"] == "ok"
-            and row["gpu_snapshot_before"]["uuid"]
-            == row["gpu_snapshot_after"]["uuid"]
+            and row["gpu_snapshot_before"]["uuid"] == row["gpu_snapshot_after"]["uuid"]
             for row in selected_attempts
         )
         idle_snapshots = all(
@@ -296,9 +290,7 @@ def trained_checkpoint_campaign_audit(
                 "config_hashes": json.dumps(sorted(config_hashes)),
                 "evaluation_code_commits": json.dumps(sorted(evaluation_commits)),
                 "source_checkpoint_code_commits": json.dumps(
-                    sorted(
-                        {str(row["source_checkpoint_code_commit"]) for row in selected}
-                    )
+                    sorted({str(row["source_checkpoint_code_commit"]) for row in selected})
                 ),
                 "device_ids": json.dumps(sorted(device_ids)),
                 "physical_gpu_indices": json.dumps(
@@ -317,9 +309,7 @@ def trained_checkpoint_campaign_audit(
                         }
                     )
                 ),
-                "source_checkpoint_sha256": json.dumps(
-                    checkpoint_hashes, sort_keys=True
-                ),
+                "source_checkpoint_sha256": json.dumps(checkpoint_hashes, sort_keys=True),
                 "evidence_paths": json.dumps(
                     sorted({str(row["_evidence_path"]) for row in selected})
                 ),
@@ -349,9 +339,7 @@ def trained_checkpoint_task_agreement(
             and row["variable_group"] == "logits"
             and row["status"] == "ok"
         ):
-            grouped[(row["task"], row["checkpoint"], row["split"])][
-                row["variant"]
-            ] = row
+            grouped[(row["task"], row["checkpoint"], row["split"])][row["variant"]] = row
 
     output = []
     for (task, checkpoint, split), variants in sorted(grouped.items()):
@@ -360,26 +348,18 @@ def trained_checkpoint_task_agreement(
         reference = variants[baseline]
         for candidate in sorted(candidates):
             row = variants[candidate]
-            task_difference = float(row["task_metric"]) - float(
-                reference["task_metric"]
-            )
+            task_difference = float(row["task_metric"]) - float(reference["task_metric"])
             output.append(
                 {
-                    "source_checkpoint_experiment": row[
-                        "source_checkpoint_experiment"
-                    ],
+                    "source_checkpoint_experiment": row["source_checkpoint_experiment"],
                     "task": task,
                     "checkpoint": checkpoint,
                     "source_checkpoint_variant": row["source_checkpoint_variant"],
                     "source_checkpoint_seed": int(row["source_checkpoint_seed"]),
                     "source_checkpoint_update": int(row["source_checkpoint_update"]),
                     "source_checkpoint_sha256": row["source_checkpoint_sha256"],
-                    "source_checkpoint_code_commit": row[
-                        "source_checkpoint_code_commit"
-                    ],
-                    "source_checkpoint_code_dirty": row[
-                        "source_checkpoint_code_dirty"
-                    ],
+                    "source_checkpoint_code_commit": row["source_checkpoint_code_commit"],
+                    "source_checkpoint_code_dirty": row["source_checkpoint_code_dirty"],
                     "evaluation_code_commit": row["code_commit"],
                     "evaluation_code_dirty": row["code_dirty"],
                     "protocol_version": row["protocol_version"],
@@ -395,23 +375,15 @@ def trained_checkpoint_task_agreement(
                     "absolute_task_metric_difference": abs(task_difference),
                     "logit_max_absolute_error": row["max_absolute_error"],
                     "logit_relative_l2_error": row["relative_l2_error"],
-                    "decision_disagreement_fraction": row[
-                        "decision_disagreement_fraction"
-                    ],
+                    "decision_disagreement_fraction": row["decision_disagreement_fraction"],
                     "affected_examples": row["affected_examples"],
                     "affected_example_fraction": row["affected_example_fraction"],
                     "examples": row["examples"],
                     "logit_nonfinite_count": row["nonfinite_count"],
                     "reference_nonfinite_count": row["reference_nonfinite_count"],
-                    "comparison_nonfinite_count": row[
-                        "comparison_nonfinite_count"
-                    ],
-                    "nonfinite_probability_count": row[
-                        "nonfinite_probability_count"
-                    ],
-                    "projection_saturation_count": row[
-                        "projection_saturation_count"
-                    ],
+                    "comparison_nonfinite_count": row["comparison_nonfinite_count"],
+                    "nonfinite_probability_count": row["nonfinite_probability_count"],
+                    "projection_saturation_count": row["projection_saturation_count"],
                     "projection_vector_count": row["projection_vector_count"],
                     "maximum_normalized_radius": row["maximum_normalized_radius"],
                     "evidence_path": row.get("_evidence_path"),
@@ -442,9 +414,7 @@ def trained_checkpoint_compatibility_aggregate(
             continue
         if row["record_type"] != "activation" or row["status"] != "ok":
             continue
-        activation_rows[(row["checkpoint"], row["split"], row["variant"])].append(
-            row
-        )
+        activation_rows[(row["checkpoint"], row["split"], row["variant"])].append(row)
 
     output = []
     for key, selected in sorted(grouped.items()):
@@ -452,9 +422,7 @@ def trained_checkpoint_compatibility_aggregate(
         activations = [
             activation
             for row in selected
-            for activation in activation_rows[
-                (row["checkpoint"], row["split"], candidate)
-            ]
+            for activation in activation_rows[(row["checkpoint"], row["split"], candidate)]
         ]
         task_differences = [float(row["task_metric_difference"]) for row in selected]
         absolute_task_differences = [abs(value) for value in task_differences]
@@ -475,9 +443,7 @@ def trained_checkpoint_compatibility_aggregate(
                 ),
                 "mean_task_metric_difference": statistics.mean(task_differences),
                 "median_task_metric_difference": statistics.median(task_differences),
-                "maximum_absolute_task_metric_difference": max(
-                    absolute_task_differences
-                ),
+                "maximum_absolute_task_metric_difference": max(absolute_task_differences),
                 "mean_absolute_task_metric_difference": statistics.mean(
                     absolute_task_differences
                 ),
@@ -522,9 +488,7 @@ def trained_checkpoint_compatibility_aggregate(
                     sorted({str(row["evaluation_code_commit"]) for row in selected})
                 ),
                 "source_checkpoint_code_commits": json.dumps(
-                    sorted(
-                        {str(row["source_checkpoint_code_commit"]) for row in selected}
-                    )
+                    sorted({str(row["source_checkpoint_code_commit"]) for row in selected})
                 ),
                 "config_hashes": json.dumps(
                     sorted({str(row["config_hash"]) for row in selected})

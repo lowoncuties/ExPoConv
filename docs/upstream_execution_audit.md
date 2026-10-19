@@ -30,7 +30,7 @@ patch-extraction and score-evaluation order in standalone JAX. F instead
 computes directional products and patch energy without constructing the
 ball-valued patch tensor.
 
-Neither audited official revision contains the energy--projection
+Neither audited official revision contains the patch-statistics
 factorization. This supports a comparison against those pinned upstream
 paths, not an exhaustive priority claim over forks, unpublished code, or
 independent implementations.

@@ -21,8 +21,7 @@ def finite_float(value: Any) -> float | None:
 @jax.jit
 def _tree_nonfinite_count(tree: Any):
     counts = [
-        jnp.count_nonzero(~jnp.isfinite(leaf))
-        for leaf in jax.tree_util.tree_leaves(tree)
+        jnp.count_nonzero(~jnp.isfinite(leaf)) for leaf in jax.tree_util.tree_leaves(tree)
     ]
     if not counts:
         return jnp.asarray(0, dtype=jnp.int32)

@@ -55,9 +55,7 @@ def _read_mapping(path: Path) -> dict[str, Any]:
 def _only_file(root: Path, pattern: str, *, label: str) -> Path:
     matches = sorted(root.glob(pattern))
     if len(matches) != 1:
-        raise ValueError(
-            f"expected exactly one {label} under {root}, found {len(matches)}"
-        )
+        raise ValueError(f"expected exactly one {label} under {root}, found {len(matches)}")
     return matches[0]
 
 
@@ -205,9 +203,7 @@ def _device_process_id(
     return identifiers.pop()
 
 
-def _classify_kernel(
-    event: dict[str, Any], categories: list[dict[str, Any]]
-) -> str:
+def _classify_kernel(event: dict[str, Any], categories: list[dict[str, Any]]) -> str:
     arguments = event.get("args") or {}
     searchable = " ".join(
         str(value)
@@ -230,7 +226,7 @@ def _classify_kernel(
 
 
 def _audit_accepted_source(
-    manifest: dict[str, Any]
+    manifest: dict[str, Any],
 ) -> tuple[list[dict[str, Any]], list[dict[str, Any]], dict[str, Any]]:
     expected = manifest["expected"]
     source = manifest["source"]
@@ -361,8 +357,7 @@ def _audit_accepted_source(
         module_durations_ms = [
             float(event["dur"]) / duration_scale
             for event in events
-            if event.get("ph") == "X"
-            and event.get("name") == contract["module_event_name"]
+            if event.get("ph") == "X" and event.get("name") == contract["module_event_name"]
         ]
         _expect(
             len(module_durations_ms),
@@ -379,19 +374,13 @@ def _audit_accepted_source(
         memset_marker = str(contract["memset_marker_argument"])
         memcpy_marker = str(contract["memcpy_marker_argument"])
         kernels = [
-            event
-            for event in device_events
-            if kernel_marker in (event.get("args") or {})
+            event for event in device_events if kernel_marker in (event.get("args") or {})
         ]
         memsets = [
-            event
-            for event in device_events
-            if memset_marker in (event.get("args") or {})
+            event for event in device_events if memset_marker in (event.get("args") or {})
         ]
         memcpys = [
-            event
-            for event in device_events
-            if memcpy_marker in (event.get("args") or {})
+            event for event in device_events if memcpy_marker in (event.get("args") or {})
         ]
         if not kernels:
             raise ValueError(f"no device kernel events found in {trace_path}")
@@ -430,8 +419,7 @@ def _audit_accepted_source(
             "device_memsets_per_call": len(memsets) / expected_calls,
             "device_memcpys_total": len(memcpys),
             "device_memcpys_per_call": len(memcpys) / expected_calls,
-            "cumulative_device_kernel_time_ms_total": cumulative_duration
-            / duration_scale,
+            "cumulative_device_kernel_time_ms_total": cumulative_duration / duration_scale,
             "cumulative_device_kernel_time_ms_per_call": cumulative_duration
             / duration_scale
             / expected_calls,
@@ -460,8 +448,7 @@ def _audit_accepted_source(
                     "variant": variant,
                     "category": category,
                     "kernel_launches_total": int(category_counts[category]),
-                    "kernel_launches_per_call": category_counts[category]
-                    / expected_calls,
+                    "kernel_launches_per_call": category_counts[category] / expected_calls,
                     "cumulative_kernel_time_ms_total": duration / duration_scale,
                     "cumulative_kernel_time_ms_per_call": duration
                     / duration_scale
@@ -596,9 +583,7 @@ def main() -> None:
         "trace_duration_scope": manifest["trace_contract"]["duration_scope"],
         "compiler_memory_policy": manifest["compiler_memory_policy"],
         "table_evidence": {
-            name: _evidence(path)
-            for name, path in paths.items()
-            if name != "audit_summary"
+            name: _evidence(path) for name, path in paths.items() if name != "audit_summary"
         },
         "profile_rows": len(summaries),
         "category_rows": len(categories),

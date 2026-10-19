@@ -81,9 +81,7 @@ def _published_score_output(
     sqrt_curvature = jnp.sqrt(curvature)
     sinh_scores = jnp.sinh(sqrt_curvature * scores)
     norm_square = jnp.sum(jnp.square(sinh_scores), axis=-1, keepdims=True)
-    point = sinh_scores / (
-        sqrt_curvature * (1.0 + jnp.sqrt(1.0 + norm_square))
-    )
+    point = sinh_scores / (sqrt_curvature * (1.0 + jnp.sqrt(1.0 + norm_square)))
     return logmap0(project_ball(point, curvature, margin=margin), curvature)
 
 
@@ -159,12 +157,8 @@ def _score_rows(
                     )
                     primal, derivative = jax.jvp(function, (scores,), (direction,))
                     jax.block_until_ready((primal, derivative))
-                    output_metrics = _finite_metrics(
-                        expected_output, primal, 1.0e-12
-                    )
-                    derivative_metrics = _finite_metrics(
-                        expected, derivative, 1.0e-12
-                    )
+                    output_metrics = _finite_metrics(expected_output, primal, 1.0e-12)
+                    derivative_metrics = _finite_metrics(expected, derivative, 1.0e-12)
                     rows.append(
                         _row(
                             protocol,
@@ -172,10 +166,7 @@ def _score_rows(
                             suite_hash,
                             variant=variant,
                             precision=precision,
-                            case_id=(
-                                f"score:{case['id']}:c={curvature_value}:"
-                                f"{precision}"
-                            ),
+                            case_id=(f"score:{case['id']}:c={curvature_value}:{precision}"),
                             check_kind="score_reconstruction_jvp",
                             curvature=curvature_value,
                             projection_margin=margin,
@@ -196,9 +187,7 @@ def _score_rows(
                             ),
                             within_tolerance=(
                                 _within_tolerance(output_metrics, tolerance)
-                                and _within_tolerance(
-                                    derivative_metrics, tolerance
-                                )
+                                and _within_tolerance(derivative_metrics, tolerance)
                             ),
                             **{
                                 f"output_{name}": value
@@ -240,16 +229,14 @@ def _projection_rows(
             curvature = jnp.asarray(curvature_value, dtype=dtype)
             for normalized_radius in config["projection"]["normalized_radii"]:
                 normalized = jnp.asarray(normalized_radius, dtype=dtype)
-                maximum_array = (
-                    1.0 - jnp.asarray(margin, dtype=dtype)
-                ) / jnp.sqrt(curvature)
+                maximum_array = (1.0 - jnp.asarray(margin, dtype=dtype)) / jnp.sqrt(
+                    curvature
+                )
                 if normalized_radius == exact_cap:
                     first_coordinate = maximum_array
                 else:
                     first_coordinate = normalized / jnp.sqrt(curvature)
-                point = jnp.stack(
-                    (first_coordinate, jnp.asarray(0.0, dtype=dtype))
-                )
+                point = jnp.stack((first_coordinate, jnp.asarray(0.0, dtype=dtype)))
                 point_np = np.asarray(point)
                 maximum = float(np.asarray(maximum_array))
                 for direction_case in config["projection"]["directions"]:
@@ -353,9 +340,7 @@ def _selected_case_rows(
             case, params, tangent, curvature, margin
         )
         references = {"R_same_precision": evaluated["R"]}
-        high_precision_evaluated: dict[
-            str, tuple[Array, tuple[Any, Array, Array]]
-        ] = {}
+        high_precision_evaluated: dict[str, tuple[Array, tuple[Any, Array, Array]]] = {}
         if case["precision"] == "float32":
             cast_params = _cast_tree(params, jnp.float64)
             cast_tangent = tangent.astype(jnp.float64)
@@ -372,9 +357,7 @@ def _selected_case_rows(
                 )
                 for variant in ("R", "F", "T")
             }
-            references["R_float64_fixed_float32_margin"] = (
-                high_precision_evaluated["R"]
-            )
+            references["R_float64_fixed_float32_margin"] = high_precision_evaluated["R"]
             references["R_float64_dtype_default"] = _evaluate(
                 "R", cast_params, cast_tangent, cast_curvature, cast_cotangent
             )
@@ -385,9 +368,7 @@ def _selected_case_rows(
                     continue
                 for group_name, candidate_group in _groups(*candidate).items():
                     reference_group = _groups(*reference)[group_name]
-                    metrics = _finite_metrics(
-                        reference_group, candidate_group, norm_floor
-                    )
+                    metrics = _finite_metrics(reference_group, candidate_group, norm_floor)
                     rows.append(
                         _row(
                             protocol,
@@ -441,18 +422,14 @@ def _selected_case_rows(
                             comparison_reference="R_float64_fixed_float32_margin",
                             curvature=case["curvature"],
                             projection_margin=margin,
-                            within_tolerance=_within_tolerance(
-                                metrics, high_tolerance
-                            ),
+                            within_tolerance=_within_tolerance(metrics, high_tolerance),
                             **metrics,
                         )
                     )
         if case["case_id"] == "N084":
             precision_evaluations = [(case["precision"], evaluated)]
             if high_precision_evaluated:
-                precision_evaluations.append(
-                    ("float64", high_precision_evaluated)
-                )
+                precision_evaluations.append(("float64", high_precision_evaluated))
             for evaluation_precision, precision_values in precision_evaluations:
                 analytic_tolerance = protocol["numerics"]["tolerances"][
                     evaluation_precision
@@ -481,9 +458,7 @@ def _selected_case_rows(
                             comparison_reference="analytic_zero",
                             curvature=case["curvature"],
                             projection_margin=margin,
-                            within_tolerance=_within_tolerance(
-                                metrics, analytic_tolerance
-                            ),
+                            within_tolerance=_within_tolerance(metrics, analytic_tolerance),
                             **metrics,
                         )
                     )
@@ -562,12 +537,8 @@ def _variant_numerical_diagnostics(
     result: dict[str, dict[str, Any]] = {}
     for variant, scores in score_sets.items():
         point, _ = _reconstruct_scores(scores, curvature)
-        normalized_radius = sqrt_curvature * safe_norm(
-            point, axis=-1, keepdims=True
-        )
-        maximum_score = jnp.max(
-            jnp.abs(sqrt_curvature * scores), axis=-1, keepdims=True
-        )
+        normalized_radius = sqrt_curvature * safe_norm(point, axis=-1, keepdims=True)
+        maximum_score = jnp.max(jnp.abs(sqrt_curvature * scores), axis=-1, keepdims=True)
         radius_np = np.asarray(normalized_radius, dtype=np.float64)
         maximum_score_np = np.asarray(maximum_score, dtype=np.float64)
         result[variant] = {
@@ -577,12 +548,8 @@ def _variant_numerical_diagnostics(
             "output_exact_cap_count": int(np.count_nonzero(radius_np == cap)),
             "minimum_output_cap_gap": float(np.min(cap - radius_np)),
             "maximum_output_cap_gap": float(np.max(cap - radius_np)),
-            "scaled_reconstruction_count": int(
-                np.count_nonzero(maximum_score_np > 20.0)
-            ),
-            "maximum_abs_dimensionless_score": float(
-                np.max(maximum_score_np)
-            ),
+            "scaled_reconstruction_count": int(np.count_nonzero(maximum_score_np > 20.0)),
+            "maximum_abs_dimensionless_score": float(np.max(maximum_score_np)),
         }
     return result
 
@@ -634,9 +601,7 @@ def _n088_stage_rows(
             name: int(np.size(value) - np.isfinite(np.asarray(value)).sum())
             for name, value in arrays.items()
         }
-        expected_archived_nonfinite = realization in request[
-            "archived_nonfinite_expected"
-        ]
+        expected_archived_nonfinite = realization in request["archived_nonfinite_expected"]
         rows.append(
             _row(
                 protocol,
@@ -712,8 +677,7 @@ def run_numerical_repair(
     analytic = [
         row
         for row in rows
-        if row["check_kind"]
-        in {"score_reconstruction_jvp", "projection_jvp"}
+        if row["check_kind"] in {"score_reconstruction_jvp", "projection_jvp"}
     ]
     threshold_diagnostics = [
         row
@@ -723,9 +687,7 @@ def run_numerical_repair(
     smooth_analytic = [
         row
         for row in analytic
-        if not (
-            row["check_kind"] == "projection_jvp" and row["exact_cap_case"]
-        )
+        if not (row["check_kind"] == "projection_jvp" and row["exact_cap_case"])
     ]
     same_precision = [
         row
@@ -746,16 +708,12 @@ def run_numerical_repair(
         row for row in same_precision if row["source_case_id"] in diagnostic_ids
     ]
     high_precision = [
-        row
-        for row in rows
-        if row["check_kind"] == "selected_high_precision_equivalence"
+        row for row in rows if row["check_kind"] == "selected_high_precision_equivalence"
     ]
     curvature_oracle = [
         row for row in rows if row["check_kind"] == "n084_zero_curvature_oracle"
     ]
-    stages = [
-        row for row in rows if row["check_kind"] == "n088_first_failing_stage"
-    ]
+    stages = [row for row in rows if row["check_kind"] == "n088_first_failing_stage"]
     summary = {
         "status": "ok",
         "experiment_id": config["experiment_id"],
@@ -801,17 +759,13 @@ def run_numerical_repair(
             bool(row["within_tolerance"]) for row in curvature_oracle
         ),
         "n088_stage_rows": len(stages),
-        "n088_mechanism_confirmed": all(
-            bool(row["mechanism_confirmed"]) for row in stages
-        ),
+        "n088_mechanism_confirmed": all(bool(row["mechanism_confirmed"]) for row in stages),
         "n088_corrected_finite": all(bool(row["corrected_finite"]) for row in stages),
         "required_contract_pass": bool(
             smooth_analytic
             and all(bool(row["within_tolerance"]) for row in smooth_analytic)
             and required_same_precision
-            and all(
-                bool(row["within_tolerance"]) for row in required_same_precision
-            )
+            and all(bool(row["within_tolerance"]) for row in required_same_precision)
             and stages
             and all(bool(row["mechanism_confirmed"]) for row in stages)
             and all(bool(row["corrected_finite"]) for row in stages)

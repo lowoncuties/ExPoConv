@@ -12,6 +12,7 @@ cuda_library_path=$(
   find "$site_packages/nvidia" -mindepth 2 -maxdepth 2 -type d -name lib \
     -printf '%p:' | sort
 )
-export LD_LIBRARY_PATH="${cuda_library_path}/usr/local/cuda-11.8/targets/x86_64-linux/lib"
+cuda_toolkit_lib=${EXPOCONV_CUDA_TOOLKIT_LIB:-/usr/local/cuda-11.8/targets/x86_64-linux/lib}
+export LD_LIBRARY_PATH="${cuda_library_path}${cuda_toolkit_lib}"
 export XLA_PYTHON_CLIENT_PREALLOCATE=${XLA_PYTHON_CLIENT_PREALLOCATE:-false}
 exec "$@"

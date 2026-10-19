@@ -260,9 +260,7 @@ def _validate_manifest(manifest: Mapping[str, Any]) -> dict[str, dict[str, Any]]
 def _allocator_limit_reference(manifest: Mapping[str, Any]) -> dict[str, Any]:
     """Validate and return the captured JAX allocator ceiling used in the plot."""
 
-    relative, sha256 = validate_hashed_document(
-        manifest, field="allocator_limit_evidence"
-    )
+    relative, sha256 = validate_hashed_document(manifest, field="allocator_limit_evidence")
     evidence_path = REPOSITORY_ROOT / relative
     evidence = json.loads(evidence_path.read_text(encoding="utf-8"))
     if not isinstance(evidence, Mapping):
@@ -279,8 +277,7 @@ def _allocator_limit_reference(manifest: Mapping[str, Any]) -> dict[str, Any]:
     physical_memory_mib = _optional_int(hardware.get("accelerator_memory_mib"))
     if physical_memory_mib is None or physical_memory_mib <= 0:
         raise ValueError(
-            "allocator limit evidence must contain positive "
-            "hardware.accelerator_memory_mib"
+            "allocator limit evidence must contain positive hardware.accelerator_memory_mib"
         )
     nominal_budget_bytes = int(manifest["memory_budget_bytes"])
     if physical_memory_mib * 1024**2 != nominal_budget_bytes:
@@ -1112,9 +1109,7 @@ def _plot_panel(
         lower, upper = axis.get_ylim()
         ticks = [value for value in tick_candidates if lower <= value <= upper]
         tick_labels = [
-            f"{value:.2f}"
-            if math.isclose(value, allocator_limit_gib)
-            else f"{value:g}"
+            f"{value:.2f}" if math.isclose(value, allocator_limit_gib) else f"{value:g}"
             for value in ticks
         ]
         axis.set_yticks(ticks, tick_labels)

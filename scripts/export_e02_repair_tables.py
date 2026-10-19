@@ -162,9 +162,7 @@ def _agreement_tables(
                 "rows": len(selected),
                 "finite_rows": sum(bool(row["finite"]) for row in selected),
                 "accepted_rows": sum(_accepted(row, protocol) for row in selected),
-                "acceptance_fraction": sum(
-                    _accepted(row, protocol) for row in selected
-                )
+                "acceptance_fraction": sum(_accepted(row, protocol) for row in selected)
                 / len(selected),
                 "median_absolute_error": statistics.median(absolute),
                 "p95_absolute_error": _quantile(absolute, 0.95),
@@ -180,14 +178,12 @@ def _agreement_tables(
 def _finite_difference_tables(
     rows: list[dict[str, Any]],
 ) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
-    finite_difference = [
-        row for row in rows if row["record_type"] == "finite_difference"
-    ]
-    step_groups: dict[tuple[str, str, str, str, float], list[dict[str, Any]]] = (
-        defaultdict(list)
+    finite_difference = [row for row in rows if row["record_type"] == "finite_difference"]
+    step_groups: dict[tuple[str, str, str, str, float], list[dict[str, Any]]] = defaultdict(
+        list
     )
-    sweep_groups: dict[tuple[str, str, int, str, str], list[dict[str, Any]]] = (
-        defaultdict(list)
+    sweep_groups: dict[tuple[str, str, int, str, str], list[dict[str, Any]]] = defaultdict(
+        list
     )
     for row in finite_difference:
         step_groups[
@@ -250,18 +246,14 @@ def _finite_difference_tables(
     return step_summary, best_rows
 
 
-def _completeness(
-    rows: list[dict[str, Any]], config: dict[str, Any]
-) -> dict[str, Any]:
+def _completeness(rows: list[dict[str, Any]], config: dict[str, Any]) -> dict[str, Any]:
     expected = {
         (case["id"], dtype, realization)
         for case in config["cases"]
         for dtype in config["precisions"]
         for realization in range(int(config["realizations"]))
     }
-    actual = {
-        (row["case_id"], row["dtype"], int(row["realization"])) for row in rows
-    }
+    actual = {(row["case_id"], row["dtype"], int(row["realization"])) for row in rows}
     counts: dict[tuple[str, str], set[int]] = defaultdict(set)
     per_realization: dict[tuple[str, str, int], int] = defaultdict(int)
     for row in rows:
@@ -299,9 +291,7 @@ def export(
     output_dir.mkdir(parents=True, exist_ok=False)
 
     bounded_table = _bounded_check_table(bounded_rows)
-    agreement_overview, agreement_failures = _agreement_tables(
-        structured_rows, protocol
-    )
+    agreement_overview, agreement_failures = _agreement_tables(structured_rows, protocol)
     step_summary, best_rows = _finite_difference_tables(structured_rows)
     _atomic_csv(output_dir / "bounded_check_summary.csv", bounded_table)
     _atomic_csv(output_dir / "structured_agreement_overview.csv", agreement_overview)
@@ -309,9 +299,7 @@ def export(
     _atomic_csv(output_dir / "finite_difference_step_summary.csv", step_summary)
     _atomic_csv(output_dir / "finite_difference_best_steps.csv", best_rows)
 
-    agreements = [
-        row for row in structured_rows if row["record_type"] == "agreement"
-    ]
+    agreements = [row for row in structured_rows if row["record_type"] == "agreement"]
     finite_differences = [
         row for row in structured_rows if row["record_type"] == "finite_difference"
     ]
@@ -320,14 +308,10 @@ def export(
         "bounded": bounded_summary,
         "structured": {
             "result_rows": len(structured_rows),
-            "status_non_ok_rows": sum(
-                row["status"] != "ok" for row in structured_rows
-            ),
+            "status_non_ok_rows": sum(row["status"] != "ok" for row in structured_rows),
             "agreement_rows": len(agreements),
             "agreement_finite_rows": sum(bool(row["finite"]) for row in agreements),
-            "agreement_accepted_rows": sum(
-                _accepted(row, protocol) for row in agreements
-            ),
+            "agreement_accepted_rows": sum(_accepted(row, protocol) for row in agreements),
             "agreement_acceptance_rule": (
                 "finite and max_absolute_error <= absolute_tolerance + "
                 "relative_tolerance * reference_l2_norm"
@@ -350,9 +334,7 @@ def export(
         },
         "execution_environment": {
             "hostname": environment["hostname"],
-            "cuda_visible_devices": environment["environment"][
-                "CUDA_VISIBLE_DEVICES"
-            ],
+            "cuda_visible_devices": environment["environment"]["CUDA_VISIBLE_DEVICES"],
             "jax_backend": environment["jax"]["backend"],
             "jax_devices": environment["jax"]["devices"],
             "git": environment["git"],

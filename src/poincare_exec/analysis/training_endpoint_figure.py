@@ -155,9 +155,7 @@ def _values_by_seed(
     selected: dict[int, dict[str, float]] = {seed: {} for seed in SEEDS}
     for row in rows:
         if row["task"] == task and row["endpoint"] == endpoint:
-            selected[int(row["seed"])][str(row["variant"])] = float(
-                row["official_metric"]
-            )
+            selected[int(row["seed"])][str(row["variant"])] = float(row["official_metric"])
     return selected
 
 

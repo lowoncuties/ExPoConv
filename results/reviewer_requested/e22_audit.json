@@ -1,0 +1,94 @@
+{
+  "allocator_provenance": {
+    "allocator_fraction": 0.95,
+    "bytes": 911,
+    "file": "run_e22.sh",
+    "note": "XLA_PYTHON_CLIENT_MEM_FRACTION and XLA_PYTHON_CLIENT_PREALLOCATE are not embedded in E22 result rows. Their values are verified against the frozen run_e22.sh contract and are therefore wrapper-derived provenance.",
+    "preallocate": false,
+    "provenance_status": "frozen_wrapper_contract_not_raw_row_embedded",
+    "sha256": "eabac2a0599a6c830531693dfcd4b5ed46b82b45a32b31eb5b50355642351426"
+  },
+  "analysis_code": {
+    "commit": "a569cb4d09d69aa12c6e2de70c3cd20ed5ea0bb1",
+    "dirty": false,
+    "status_porcelain": []
+  },
+  "analysis_status": "post_hoc_allocator_fraction_and_capacity_diagnostic",
+  "failure_diagnostic_note": "Requested bytes and total-allocation GiB are parsed from explicit worker stderr. The 30.4-GiB capacity is the nominal 0.95 fraction of the registered 32-GiB budget, not a measured free-memory value.",
+  "identity": {
+    "code_commit": "30142ce2c9f60a115fa77cf844cac14166446b27",
+    "code_dirty": false,
+    "config_hashes": {
+      "unet_update_b16_r512": "5db29c5d6155744983c81acba7a32fb764ae4c96070b641954bd675d55a8e715",
+      "unet_update_b8_r256": "c5ba10a857be2f2552695edb281676721a9b387c69503ed189ce8734f7ceb204",
+      "unet_update_b8_r512": "7174ae527bc9e4f729c589b67e7b0ed181a063128810270903cf9f26b3ade969"
+    },
+    "device_id": "argexpr3.vsb.cz::gpu:0::Tesla V100-PCIE-32GB",
+    "experiment_id": "E22",
+    "physical_gpu_uuid": "GPU-a37e9fd0-2d52-1766-149e-64287a10103d",
+    "protocol_version": "1.15"
+  },
+  "interpretation": "Paired contrasts include only session/workload cells in which both R and F completed. Every explicit worker failure remains in the session and failure diagnostic tables.",
+  "matrix": {
+    "expected_groups": 30,
+    "failure_groups": 15,
+    "outcome_counts": {
+      "ok": 15,
+      "oom": 15
+    },
+    "paired_complete_sessions_by_workload": {
+      "unet_update_b16_r512": 0,
+      "unet_update_b8_r256": 5,
+      "unet_update_b8_r512": 0
+    },
+    "successful_groups": 15
+  },
+  "output_evidence": {
+    "e22_failure_diagnostics.csv": {
+      "bytes": 14381,
+      "file": "e22_failure_diagnostics.csv",
+      "sha256": "4e517e3829f2732bda469ca3970a25bcd6c59de74905b3e66a8a3b336418db9b"
+    },
+    "e22_paired_contrasts.csv": {
+      "bytes": 1108,
+      "file": "e22_paired_contrasts.csv",
+      "sha256": "ef7ed157f91ca7664a818ae0c3a52d4af243d8aa226a53085d786e6dab88ba0e"
+    },
+    "e22_session_outcomes.csv": {
+      "bytes": 21625,
+      "file": "e22_session_outcomes.csv",
+      "sha256": "0c3ec1e9c8d4a922f44f4a0f5428c7cded2bdac60c8255f56d29ae55e2a8cd37"
+    },
+    "e22_workload_variant_summary.csv": {
+      "bytes": 2752,
+      "file": "e22_workload_variant_summary.csv",
+      "sha256": "59f6ff72dbe160edfd3ee418e7c3d8e71a308b76132d26e45284491a29b70fa7"
+    }
+  },
+  "output_rows": {
+    "e22_failure_diagnostics.csv": 15,
+    "e22_paired_contrasts.csv": 5,
+    "e22_session_outcomes.csv": 30,
+    "e22_workload_variant_summary.csv": 6
+  },
+  "pilot_exclusion": {
+    "excluded_protocol_version": "1.11",
+    "rule": "Every accepted CSV and failure row must have protocol_version=1.15, code_commit=30142ce2c9f60a115fa77cf844cac14166446b27, code_dirty=false, and the frozen workload-specific config hash."
+  },
+  "schema_version": "1.0",
+  "scientific_behavior_change": false,
+  "sources": {
+    "failures": {
+      "bytes": 268646,
+      "file": "e22_allocator_fraction_protocol115.csv.failures.jsonl",
+      "rows": 15,
+      "sha256": "f2c68f7a6ce2c8e4faf43fead1074577157865c2335e01e7901d4a1cc068c1a9"
+    },
+    "success": {
+      "bytes": 5738280,
+      "file": "e22_allocator_fraction_protocol115.csv",
+      "rows": 3045,
+      "sha256": "69bec95c4695c3d28ba7149e39ceea5107dc27bae786f101250ba6c58e8925c3"
+    }
+  }
+}

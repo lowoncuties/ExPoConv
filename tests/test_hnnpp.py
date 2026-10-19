@@ -201,9 +201,7 @@ def test_source_zero_orientation_convention_is_finite() -> None:
             (input_direction,),
         )
         assert jnp.array_equal(output[..., 2:], jnp.zeros_like(output[..., 2:]))
-        assert jnp.array_equal(
-            derivative[..., 2:], jnp.zeros_like(derivative[..., 2:])
-        )
+        assert jnp.array_equal(derivative[..., 2:], jnp.zeros_like(derivative[..., 2:]))
 
 
 def test_scaled_single_score_reconstruction_matches_closed_form() -> None:
@@ -214,9 +212,7 @@ def test_scaled_single_score_reconstruction_matches_closed_form() -> None:
 
     ball = scores_to_ball(scores, curvature, margin=margin)
     tangent, tangent_jvp = jax.jvp(
-        lambda value: scores_to_projected_tangent(
-            value, curvature, margin=margin
-        ),
+        lambda value: scores_to_projected_tangent(value, curvature, margin=margin),
         (scores,),
         (direction,),
     )

@@ -1,0 +1,313 @@
+protocol_version: "1.14"
+protocol_date: "2026-10-07"
+target_journal: "Neural Networks"
+working_title: "Exact and Efficient Execution of Poincare Neural Networks"
+study_scope: "HNN++ and Poincare operator-preserving execution"
+framework: "JAX standalone; HyperJAX-independent"
+confirmatory_status: "initial_task_quality_complete; prospective replication frozen"
+
+source_documents:
+  experiment_plan:
+    path: "/data2/joc0027/optimizatio-paper/Neural_Networks_Experiment_Plan.md"
+    sha256: "a491a34d8926b11e5180d3f45fa1dcdb18cb3536f2f4cc14e930a3d56fc00ac1"
+  derivation_addendum:
+    path: "/data2/joc0027/bone-suppression/HyperbolicGAN_Block_Optimization_Addendum.md"
+    sha256: "90afe9d116e67654b0a2245f43e829bfaec467af53a582ef46bbad4388825fd7"
+
+reference_commits:
+  hyperbolic_unet: "bec504e2f4d198ee4c438579b86d72f9d8186d78"
+  poincare_resnet: "fbbbbf890571115444b89b114f9ed52d128d5aa3"
+  hnnpp: "28737e22822562ac18d5ea03f8c3e3929e945a83"
+candidate_commit: "c1884541ec5b090b5997cb7017dd2ce7afffffdc"
+
+protocol_amendments:
+  - version: "1.1"
+    date: "2026-09-06"
+    affected_experiments: [E02, E06, E07, E08, E09, E10, E12, E13, E14]
+    reason: "Preserve R's zero Jacobian convention at an all-zero HNN++ score vector."
+    case_manifest_changed: false
+  - version: "1.2"
+    date: "2026-09-06"
+    affected_experiments: [E03, E04, E05, E08, E11, E12, E13]
+    reason: "Require zero competing compute processes and at most 5% pre-run GPU utilization; archive physical-GPU snapshots before and after every measurement process."
+    case_manifest_changed: false
+  - version: "1.3"
+    date: "2026-09-06"
+    affected_experiments: [E02]
+    reason: "Freeze topology-level and directional finite-difference cases, and reject resumption across protocol, configuration, or code identities."
+    case_manifest_changed: true
+  - version: "1.4"
+    date: "2026-09-07"
+    affected_experiments: [E06, E07, E08, E10, E11, E12, E13]
+    reason: "Use the scalar additive identity for average pooling so JAX 0.4.25 dispatches its differentiable reduce-window-sum primitive; the averaging equation and forward computation are unchanged."
+    case_manifest_changed: false
+  - version: "1.5"
+    date: "2026-09-07"
+    affected_experiments: [E02, E03, E04, E05, E06, E07, E08, E09, E10, E11, E12, E13, E14]
+    reason: "Correct the smooth all-zero score Jacobian and projection origin derivative consistently in R/F/T; use a backward-stable norm rule and separate fixed-margin from dtype-default high-precision oracle comparisons."
+    case_manifest_changed: true
+  - version: "1.6"
+    date: "2026-09-10"
+    affected_experiments: [E08, E11, E12, E13]
+    reason: "Dereference each completed benchmark output before invoking the next call so process-lifetime peak memory is not inflated by accidental Python retention; retain only the final output for finite-value validation. Timing boundaries and model mathematics are unchanged."
+    case_manifest_changed: false
+  - version: "1.7"
+    date: "2026-09-10"
+    affected_experiments: [E08, E11]
+    reason: "Prioritize the registered complete Poincare U-Net inference and optimizer-step workloads plus its full-model profile as the bounded model-level gain gate. ResNet, dense, standalone backward, and broader profiles are deferred until this gate is interpreted; variants and measurement counts are unchanged."
+    case_manifest_changed: false
+  - version: "1.8"
+    date: "2026-09-10"
+    affected_experiments: [E07, E08, E09, E10, E12, E13, E14]
+    reason: "Materialize Adam hyperparameters in each array leaf's dtype so state-evolving FP32 computations remain FP32 when the FP64 oracle is enabled globally. This fixes a compiled-signature mismatch after the first update; the optimizer equations, clipping policy, and experiment workloads are unchanged."
+    case_manifest_changed: false
+  - version: "1.9"
+    date: "2026-09-12"
+    affected_experiments: [E06, E09, E10, E14]
+    reason: "Before any fixed-budget training run began, designate F as the primary optimized method after corrected E08 showed equivalent F/T update speed while F used less peak live memory. Add F to the predeclared R/T task-quality matrix and retain T as a mechanistic ablation; seeds, datasets, models, optimizer settings, and update budgets are unchanged."
+    case_manifest_changed: true
+  - version: "1.10"
+    date: "2026-09-12"
+    affected_experiments: [E09, E10, E14]
+    reason: "Create one JIT evaluation callable per fresh training worker and reuse its compiled batch-shape executables across epochs and final endpoints. This removes redundant per-epoch compilation; evaluation equations, batch grouping, current-batch normalization, predictions, metrics, checkpoints, and all training updates are unchanged."
+    case_manifest_changed: false
+  - version: "1.11"
+    date: "2026-09-28"
+    affected_experiments: [E13]
+    reason: "Before E13 execution, replace the older R/T capacity wording with the reference-versus-primary R/F comparison selected after corrected E08. Restrict E13 to the prespecified one-factor Poincare U-Net complete-update batch and resolution sweeps; retain every planned case and any failure or OOM. The model, loss, optimizer, precision, timing boundary, session count, warmup count, and observation count are unchanged."
+    case_manifest_changed: true
+  - version: "1.12"
+    date: "2026-10-07"
+    affected_experiments: [E12, E20, E21]
+    reason: "Before any extension run, freeze a prospective R/F-only replication cohort of 15 new matched seeds per task and a bounded R/F CUDA-12 portability timing matrix. The new training cohort is analyzed separately from the completed five-seed V100 study, has no interim endpoint stopping or seed replacement, and is not silently pooled across platforms. T remains an ablation and is not extended."
+    case_manifest_changed: true
+  - version: "1.13"
+    date: "2026-10-07"
+    affected_experiments: [E12, E20, E21]
+    reason: "After the retained pre-update E20/JAX 0.5.3 compile failure, lower the U-Net's kernel-equals-stride, zero-padding transpose fold as an exact reshape and transpose instead of four disjoint scatter-adds. The general overlapping fold is unchanged. Targeted forward, cotangent-gradient, and complete-update checks are required before restarting the frozen campaigns; no failed seed is replaced."
+    case_manifest_changed: false
+  - version: "1.14"
+    date: "2026-10-07"
+    affected_experiments: [E20, E21]
+    reason: "The protocol-1.13 disjoint-fold lowering passed bitwise value/gradient checks but did not resolve the retained JAX 0.5.3 GPU compiler failure and is reverted before accepted training. Freeze E20/E21 to the unchanged scientific implementation and the original JAX/JAXLIB 0.4.25 CUDA-11.8 user-space stack on one RTX A6000. Exact batch-2/256 backward and complete-update diagnostics compiled and completed finitely before restart. E12 remains a separate unrun CUDA-12 portability experiment."
+    case_manifest_changed: false
+
+variants:
+  numerical: [R, F, T]
+  timing: [R, F, T]
+  core_training: [R, F, T]
+  training_roles:
+    baseline: R
+    primary_method: F
+    ablation: T
+  contextual: [E]
+  official_cross_framework: [O]
+
+seeds:
+  training: [11, 29, 47, 71, 101]
+  development: [3, 5]
+  split: 1729
+  measurement_order: 314159
+  numerical: 20260906
+  bootstrap: 20260907
+
+training_extensions:
+  E20:
+    role: "prospective independent-platform replication"
+    task: isic16_poincare_unet
+    dataset: isic16
+    variants: [R, F]
+    runtime_profile: "JAX/JAXLIB 0.4.25 with pinned CUDA-11.8 user-space libraries on RTX A6000"
+    seeds: [1898335833, 205785622, 1338995025, 1192596770, 864171589, 1052495617, 1147609747, 1619140427, 458014223, 646228129, 821637680, 1059645469, 1209522243, 1985788232, 565813932]
+  E21:
+    role: "prospective independent-platform replication"
+    task: cifar100_poincare_resnet20
+    dataset: cifar100
+    variants: [R, F]
+    runtime_profile: "JAX/JAXLIB 0.4.25 with pinned CUDA-11.8 user-space libraries on RTX A6000"
+    seeds: [1898335833, 205785622, 1338995025, 1192596770, 864171589, 1052495617, 1147609747, 1619140427, 458014223, 646228129, 821637680, 1059645469, 1209522243, 1985788232, 565813932]
+  analysis_policy:
+    seed_rule: "SHA-256 first-31-bit values of ExPoConv-E09E10-RF-extension-v1:{i}, rejecting zero, prior seeds, and duplicates"
+    no_interim_endpoint_stopping: true
+    replace_failed_seeds: false
+    inspect_official_test_aggregate_only_after_all_pairs_complete: true
+    primary_reporting: "report E20/E21 separately from E09/E10"
+    pooled_reporting: "secondary descriptive platform-stratified estimate only"
+
+precision:
+  oracle: float64
+  primary: float32
+  reduced_precision_enabled: false
+  matmul_precision: highest
+  tf32: false
+
+projection:
+  preserve_source_projection: true
+  float32_relative_margin: 0.004
+  float64_relative_margin: 0.00001
+  report_clip_count: true
+
+numerics:
+  configurations: 100
+  realizations_per_configuration: 10
+  norm_floor: 1.0e-12
+  curvatures: [0.001, 0.1, 1.0, 10.0]
+  normalized_radii: [0.0, 1.0e-6, 0.1, 0.5, 0.9, 0.99, 0.9999, 0.999999]
+  finite_difference_relative_steps: [0.0001, 0.00001, 0.000001]
+  structured_config: "configs/numerics/e02_structured.yaml"
+  repair_config: "configs/numerics/e02_repair.yaml"
+  repair_structured_config: "configs/numerics/e02_repair_structured.yaml"
+  float32_contract_oracle_projection_margin: 0.004
+  dtype_default_float64_oracle_is_context_only: true
+  structured_scope: "isolated layer, two/eight-layer stacks, Conv-BN-ReLU, beta skip, ordered residual, transpose decoder, decoder block, and small U-Net"
+  tolerances:
+    float64: {absolute: 1.0e-10, relative: 1.0e-10}
+    float32: {absolute: 2.0e-5, relative: 2.0e-5}
+
+timing:
+  sessions: 5
+  warmup_calls: 50
+  timed_calls_per_session: 200
+  synchronize_full_state: true
+  fresh_process_per_variant: true
+  randomized_order: true
+  checkpointing_policy: "disabled"
+  require_idle_gpu: true
+  max_preexisting_memory_mib: 512
+  max_preexisting_utilization_percent: 5
+  output_retention_policy: "dereference completed output before next invocation; retain only final output for validation"
+  peak_memory_scope: "process lifetime including initialization, compilation, and warmup; not an isolated activation/workspace peak"
+
+quality:
+  primary_checkpoint: "fixed_final_update"
+  secondary_checkpoint: "validation_best_with_earliest_update_tie_break"
+  validation_cadence_epochs: 1
+  formal_noninferiority: false
+  margins_and_rationale: null
+  evaluation_bootstrap_replicates: 10000
+
+data_independence:
+  linked_source_definition: "byte-identical raw input SHA-256"
+  primary_test_partition: "official_test"
+  secondary_test_partition: "official_test_excluding_exact_official-training_duplicates"
+  patient_or_lesion_independence_claimed: false
+  split_manifests:
+    isic16: "81cfd817749daf15c4093d3d81d5b5185d8484f7aa6f31658f013c6d58f29466"
+    cifar100: "fb6ed7e666e6f3fde78671be5120df60b580790e57fe698ba38117a2133d1eca"
+    fashion_mnist: "0505c07db913e0ecbbb33f4d12fa2cc9cc81ee981cb10c412eb1a76ff010c227"
+
+campaign:
+  core_tasks: [isic16_poincare_unet, cifar100_poincare_resnet20]
+  include_dense_training_extension: true
+  include_euclidean_quality_context: false
+  primary_training_runs: 30
+  dense_extension_runs: 15
+
+tasks:
+  isic16_poincare_unet:
+    model: {levels: 4, initial_width: 8, decoder: transpose_convolution}
+    input: {height: 256, width: 256, channels: 3, scaling: zero_to_one}
+    classes: 2
+    normalization: {kind: poincare_midpoint_batch_norm, epsilon: 1.0e-6}
+    curvature: {trainable: true, initial_magnitude: 0.1, transform: softplus}
+    optimizer:
+      name: adam
+      learning_rate: 0.001
+      weight_decay: 0.0001
+      weight_decay_mode: coupled_l2
+      scheduler: none
+      gradient_clip_global_norm: 1.0
+      parameter_coordinates: euclidean_source_coordinates
+    loss:
+      name: dice_plus_focal
+      dice_weight: 1.0
+      focal_weight: 1.0
+      dice_classes: [0, 1]
+      dice_aggregation: batch_and_spatial_per_class_then_class_mean
+      dice_smoothing: 1.0e-6
+      dice_denominator_epsilon: 1.0e-7
+      focal_mode: summed_one_vs_all_binary_logits
+      focal_alpha: 0.25
+      focal_gamma: 2.0
+    batch_size: 8
+    epochs: 50
+    max_updates: 5100
+    remainder_handling: variable_shape_keep_all
+    evaluation_batch_size: 8
+    evaluation_order: manifest_order
+    augmentation: none
+    primary_metric: mean_per_image_foreground_dice
+  cifar100_poincare_resnet20:
+    model: {channels: [8, 16, 32], blocks_per_group: [3, 3, 3], skip_order: fr}
+    input: {height: 32, width: 32, channels: 3, normalization: minus_one_to_one}
+    classes: 100
+    normalization: {kind: poincare_midpoint_batch_norm, epsilon: 1.0e-6}
+    curvature: {trainable: false, initial_magnitude: 0.1, transform: identity}
+    optimizer:
+      name: adam
+      learning_rate: 0.001
+      weight_decay: 0.0001
+      weight_decay_mode: coupled_l2
+      scheduler: none
+      gradient_clip_global_norm: null
+      parameter_coordinates: euclidean_source_coordinates
+    loss: {name: cross_entropy, label_smoothing: 0.0}
+    batch_size: 128
+    epochs: 100
+    max_updates: 35200
+    remainder_handling: variable_shape_keep_all
+    evaluation_batch_size: 128
+    evaluation_order: manifest_order
+    augmentation: {random_crop_padding: 4, horizontal_flip_probability: 0.5}
+    primary_metric: top1_accuracy
+  fashion_mnist_hnnpp_mlp:
+    model: {hidden_widths: [256, 256, 256], activation: tangent_relu}
+    input: {features: 784, scaling: zero_to_one}
+    classes: 10
+    curvature: {trainable: false, initial_magnitude: 0.1, transform: identity}
+    optimizer:
+      name: adam
+      learning_rate: 0.001
+      weight_decay: 0.0
+      weight_decay_mode: coupled_l2
+      scheduler: none
+      gradient_clip_global_norm: null
+      parameter_coordinates: euclidean_source_coordinates
+    loss: {name: cross_entropy, label_smoothing: 0.0}
+    batch_size: 128
+    epochs: 50
+    max_updates: 21100
+    remainder_handling: variable_shape_keep_all
+    evaluation_batch_size: 128
+    evaluation_order: manifest_order
+    primary_metric: top1_accuracy
+
+hardware:
+  primary_gpu: "Tesla V100-PCIE-32GB"
+  primary_runtime: "JAX/JAXLIB 0.4.25, CUDA 11.8, cuDNN 8.6"
+  secondary_training_runtime: "JAX/JAXLIB 0.4.25 with the pinned CUDA 11.8 and cuDNN 8.6 user-space libraries on RTX A6000"
+  secondary_runtime: "JAX/JAXLIB 0.5.3 CUDA 12 plugin; joint hardware/runtime portability"
+  secondary_gpus:
+    - host: "aibox1a6000"
+      endpoint_alias: "AIVSBCLUSTER1A"
+      physical_index: 0
+      uuid: "GPU-aeea9beb-30cf-3743-3165-4b3c9dfd78d6"
+      model: "NVIDIA RTX A6000"
+      driver: "560.35.03"
+      advertised_cuda: "12.6"
+    - host: "aibox2a6000"
+      endpoint_alias: "AIVSBCLUSTER1B"
+      physical_index: 0
+      uuid: "GPU-5da09691-8c31-e018-5324-7e17bc805bcb"
+      model: "NVIDIA RTX A6000"
+      driver: "560.35.03"
+      advertised_cuda: "12.6"
+    - host: "aibox2a6000"
+      endpoint_alias: "AIVSBCLUSTER1B"
+      physical_index: 1
+      uuid: "GPU-6daddab9-4b59-fdde-bf0b-09ecd8f31723"
+      model: "NVIDIA RTX A6000"
+      driver: "560.35.03"
+      advertised_cuda: "12.6"
+      authorization: "user-authorized for E12/E20/E21 on 2026-10-07 when idle"
+  memory_budget_bytes: 34359738368
