@@ -1,0 +1,261 @@
+{
+  "all_planned_groups_accounted_for": true,
+  "allocator_limit_reference": {
+    "bytes": 25567444992,
+    "exists": true,
+    "field": "hardware.jax_allocator_bytes_limit",
+    "name": "environment.json",
+    "path": "results/environment.json",
+    "sha256": "3a7a509ad6f04d197ede3a75c9c9aec0d6e3778e8ab3bf0d221d9a6602cabd6a"
+  },
+  "analysis_code": {
+    "commit": "20a886e431de9cc5e38264f4bc4781f0434fe944",
+    "dirty": true,
+    "status_porcelain": [
+      "?? scripts/export_e29_e30_tables.py",
+      "?? scripts/plot_scaling_with_euclidean.py",
+      "?? tests/test_e29_e30_export.py"
+    ]
+  },
+  "analysis_id": "e29_v100_reviewer_requested_export",
+  "cohort": {
+    "config": {
+      "bytes": 4276,
+      "exists": true,
+      "name": "e29_v100_euclidean_reference.yaml",
+      "path": "configs/benchmarks/e29_v100_euclidean_reference.yaml",
+      "sha256": "6fac8c1d62049221c3fd5176b604d65fc1c5c07fe508aa109fdc888392b19366"
+    },
+    "expected_config_hashes": {
+      "unet_b1_forward": "e31a4b877281b96005515d9624b688e6a7d0642af1aacf261bc5f8088c31db5e",
+      "unet_b8_forward": "1e1ef14f5519ec18430018d6ac1d8de1aa2efe0998ebd875f668546dcee84e63",
+      "unet_b8_update": "5774966bdf0b912fa569e2df5288c8d62997dd9c97652d49fc8d918a5749cb93",
+      "unet_update_b16_r256": "8931591745940107a89f02dc56be256ee0d03727e47f49d2aef66c057190f804",
+      "unet_update_b1_r256": "b27aed22946a18766c92f4a4a10258b33ee70caef5bbc79992e215db74d2f014",
+      "unet_update_b2_r256": "b1e60cf819f765b7e95f4e862dc94fb337a230bbadcd1634743b8a7e9dc40f10",
+      "unet_update_b4_r256": "c2da61cd84535d5d53f1013000409cb69422fb3653e391c4954c03d573c44913",
+      "unet_update_b8_r128": "fabf928d2fbd0d3dfa8f3bdc89b09ec9e5736e95674b2e8161ebc4ba8900d8a2",
+      "unet_update_b8_r256": "c8004efcd037272e2f08bf0683a72217e04dca50c83deb2e5b49e4967f9c5312",
+      "unet_update_b8_r512": "ca532295b7fdc999a1fe741cd72326c7de2e6a88dd48288efbf73c3e9a385d76"
+    },
+    "experiment_id": "E29",
+    "failed_worker_groups": 0,
+    "failures": {
+      "exists": false,
+      "name": "e29_v100_euclidean_reference.csv.failures.jsonl"
+    },
+    "outcomes": {
+      "ok": 50
+    },
+    "planned_groups": 50,
+    "raw": {
+      "bytes": 19116073,
+      "exists": true,
+      "name": "e29_v100_euclidean_reference.csv",
+      "sha256": "643599b3b3b934970625a0073f9d3dd72d7c2a2c0284fcf552c8a2f91df1d663"
+    },
+    "raw_rows": 10150,
+    "successful_worker_groups": 50
+  },
+  "derivation": "CPU-only validation and deterministic aggregation of existing raw GPU artifacts; no benchmark is launched by this exporter. Failed groups are retained as planned outcomes and excluded explicitly from paired ratios.",
+  "execution_schedule": {
+    "driver_stall_intervals_utc": [
+      [
+        "2026-10-18T16:02:13Z",
+        "2026-10-18T16:13:34Z"
+      ],
+      [
+        "2026-10-18T16:25:28Z",
+        "2026-10-18T17:13:59Z"
+      ]
+    ],
+    "driver_stall_rule": "groups whose window intersects a merged kernel soft-lockup or harness nvidia-smi-timeout interval, widened by 180 s, are excluded from primary medians and paired contrasts; all-session values are reported beside them",
+    "e29_and_e30_ran_concurrently": true,
+    "e29_pause_signals": [],
+    "e29_window_utc": [
+      "2026-10-18T15:16:47Z",
+      "2026-10-18T17:50:25.877000Z"
+    ],
+    "e30_gpu1_activity_window_utc": [
+      "2026-10-18T15:59:57Z",
+      "2026-10-18T18:27:55Z"
+    ],
+    "e34_windows_utc": [],
+    "evidence": [
+      {
+        "file": "logs/e29_resume.log",
+        "sha256": "2f40e975b02e093aa21451656e74ed10545a8f84a5ca5f88395ebb33507a9130"
+      },
+      {
+        "file": "logs/e30_resume.log",
+        "sha256": "0e33a400d95cc702b59d49081468c2472b01db8e013c34ba4ca9f44cf7643e28"
+      },
+      {
+        "file": "logs/driver_stall_rule.txt",
+        "sha256": "237b0b098db23c904e7ac3cee8e16ea7852301babfca6eeb0b9c31da36d7cd65"
+      },
+      {
+        "file": "logs/kernel_driver_lockups.log",
+        "sha256": "d57bd23dec0eac811287f882144fc60178e18045b5b26051adbb32c98be06606"
+      }
+    ],
+    "group_window_rule": "a group window opens at the later of the previous group completion of the same experiment (or its start marker) and the latest resume-attempt or SIGCONT time before its completion, and closes at its own completion",
+    "groups_with_other_gpu_activity": 36,
+    "markers": [
+      {
+        "file": "logs/e29.started",
+        "sha256": "7dfd169ef0be2a4e847dbfe3701530f9d228314529bd882a02406b7b17988314",
+        "text": "2026-10-18T15:16:47Z",
+        "utc": "2026-10-18T15:16:47Z"
+      },
+      {
+        "file": "logs/e30.started",
+        "sha256": "8b616480561196b12f1f454b4badc27646c477c7a31717b78f6aa8c9e7dd320e",
+        "text": "2026-10-18T16:01:03Z",
+        "utc": "2026-10-18T16:01:03Z"
+      },
+      {
+        "file": "logs/e30.finished",
+        "sha256": "9da9f85997fcf90bc5ab58ed3a973e1b9c63899e19074c798c65531a76b6a98a",
+        "text": "2026-10-18T18:27:55Z",
+        "utc": "2026-10-18T18:27:55Z"
+      },
+      {
+        "file": "logs/e30_parallel_note.log",
+        "sha256": "06e3436760f49f8788e21c7bff4740cec97ad1ecbf90576529f76133023087f8",
+        "text": "2026-10-18T15:59:57Z E30 started on GPU 1 in parallel with E29 on GPU 0\n2026-10-18T17:11:06Z NVML keepalive started: nvidia-smi --query-gpu=index,memory.used --format=csv,noheader -l 300 (user-space substitute for persistence mode; no CUDA context)\n2026-10-18T18:28:50Z e29_e30.finished written by the parallel-run watcher (E30 ran in parallel; the orchestrator's E30 stage refuses to reuse the runtime capture)",
+        "utc": "2026-10-18T15:59:57Z"
+      }
+    ],
+    "other_gpu_activity_use": "descriptive only; isolated-session medians are a sensitivity check",
+    "planned_groups": 50,
+    "registered_schedule": "E29 alone on physical GPU 0 with GPU 1 idle, then E30 on GPU 1"
+  },
+  "expected_run_commit": "20a886e431de9cc5e38264f4bc4781f0434fe944",
+  "experiment_id": "E29",
+  "launcher": {
+    "bytes": 1092,
+    "exists": true,
+    "name": "run_e29.sh",
+    "path": "scripts/run_e29.sh",
+    "sha256": "b0588ec286b3c2b155c7456d33cc4fefc692327ac86741d801f90b0860f506cc"
+  },
+  "output_evidence": {
+    "e29_published_reference_ratios.csv": {
+      "bytes": 5996,
+      "exists": true,
+      "name": "e29_published_reference_ratios.csv",
+      "sha256": "9362e24ee5a88492d1c6734af369083b4cdc2736c107a5a340d4aa7c6988158f"
+    },
+    "e29_session_outcomes.csv": {
+      "bytes": 26828,
+      "exists": true,
+      "name": "e29_session_outcomes.csv",
+      "sha256": "3d9d52a2516bae8b3de40e3445026cd54b8ed6d09d99c848ec916fcd5d557b53"
+    },
+    "e29_variant_summary.csv": {
+      "bytes": 10439,
+      "exists": true,
+      "name": "e29_variant_summary.csv",
+      "sha256": "5cfbdfcb6c9d97a49386a7fc79c7dec30e847daa1413e69fa9a3bc731f068ed2"
+    }
+  },
+  "output_rows": {
+    "e29_published_reference_ratios.csv": 10,
+    "e29_session_outcomes.csv": 50,
+    "e29_variant_summary.csv": 10
+  },
+  "physical_device": {
+    "hostname": "argexpr3.vsb.cz",
+    "name": "Tesla V100-PCIE-32GB",
+    "physical_index": 0,
+    "uuid": "GPU-a37e9fd0-2d52-1766-149e-64287a10103d"
+  },
+  "protocol": {
+    "bytes": 24344,
+    "exists": true,
+    "name": "protocol.yaml",
+    "path": "protocol.yaml",
+    "sha256": "10cc5ee225af096fba21fc3846354afdb46b7b1311de08c4076880e413450a0b"
+  },
+  "protocol_version": "1.18",
+  "published_reference_sources": {
+    "E08": {
+      "bytes": 6077,
+      "exists": true,
+      "name": "workload_latency_memory_summary.csv",
+      "path": "results/unet_timing/workload_latency_memory_summary.csv",
+      "sha256": "b2997480889fa6c3e3d186043b242dfe496df9039a7f921274391a426d31e86f"
+    },
+    "E13": {
+      "bytes": 5603,
+      "exists": true,
+      "name": "workload_summary.csv",
+      "path": "results/e13_scaling/workload_summary.csv",
+      "sha256": "d3d2ec1b1fa778f9f3838bda5bbeacce1c3d5b05cfc98e5b006558ad4ec6782b"
+    },
+    "E13_paired": {
+      "bytes": 3550,
+      "exists": true,
+      "name": "paired_ratio_summary.csv",
+      "path": "results/e13_scaling/paired_ratio_summary.csv",
+      "sha256": "9068ed6805bec296d5436284987c18ad51b8ab54ad1035fc17d8e66c2f4d9b44"
+    }
+  },
+  "registration": {
+    "allocator_fraction": "default",
+    "config": "configs/benchmarks/e29_v100_euclidean_reference.yaml",
+    "preallocate": false,
+    "reference_experiments": [
+      "E08",
+      "E13"
+    ],
+    "reporting_policy": "Report E medians and descriptive unpaired ratios against the published E08/E13 R/F medians; no paired interval across experiments; do not pool with E25.",
+    "role": "unpaired same-platform Euclidean throughput and memory reference for the published V100 E08 and E13 R/F values; E is contextual, not an equivalence candidate",
+    "runtime_profile": "primary V100 JAX/JAXLIB 0.4.25 CUDA-11.8 stack",
+    "sessions": 5,
+    "timed_calls_per_session": 200,
+    "variants": [
+      "E"
+    ],
+    "warmup_calls": 50,
+    "workloads": [
+      "unet_b1_forward",
+      "unet_b8_forward",
+      "unet_b8_update",
+      "unet_update_b1_r256",
+      "unet_update_b2_r256",
+      "unet_update_b4_r256",
+      "unet_update_b8_r256",
+      "unet_update_b16_r256",
+      "unet_update_b8_r128",
+      "unet_update_b8_r512"
+    ]
+  },
+  "runtime_capture": {
+    "allocator_bytes_limit": 25567444992,
+    "allocator_bytes_limit_gib": 23.811538696289062,
+    "allocator_environment": {
+      "JAX_PLATFORMS": null,
+      "NVIDIA_TF32_OVERRIDE": null,
+      "XLA_FLAGS": null,
+      "XLA_PYTHON_CLIENT_ALLOCATOR": null,
+      "XLA_PYTHON_CLIENT_MEM_FRACTION": null,
+      "XLA_PYTHON_CLIENT_PREALLOCATE": "false"
+    },
+    "cuda_visible_devices": "0",
+    "environment": {
+      "bytes": 22628,
+      "exists": true,
+      "name": "e29_environment.json",
+      "sha256": "78b7397f8b71562d2376bc7cd6d9c4f00bf96567170da5db3e3a4d2276f0cdda"
+    },
+    "runtime_gate": {
+      "bytes": 1359,
+      "exists": true,
+      "name": "e29_runtime_gate.json",
+      "sha256": "831fbfe2eaa85a6ae904c6dc11eccea61123ead0f9b7526043eb6ebe791eb454"
+    }
+  },
+  "schema_version": "1.0"
+}
