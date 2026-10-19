@@ -1,5 +1,5 @@
-protocol_version: "1.19"
-protocol_date: "2026-10-18"
+protocol_version: "1.20"
+protocol_date: "2026-10-19"
 target_journal: "Neural Networks"
 working_title: "Exact and Efficient Execution of Poincare Neural Networks"
 study_scope: "HNN++ and Poincare operator-preserving execution"
@@ -115,6 +115,10 @@ protocol_amendments:
     date: "2026-10-18"
     affected_experiments: [E31]
     reason: "Before any E31 outcome was generated, freeze a post-hoc reviewer-requested gather-based reference control. R builds its explicit patch with jax.lax.conv_general_dilated_patches, which JAX 0.4.25 lowers to a grouped convolution with a one-hot filter followed by a patch transpose; the official HNN++ code instead concatenates shifted slices. Benchmark-only Rg and Mg are R and M with the same beta-scaled tangent patch built by zero padding and concatenating the kernel-offset strided slices directly in R's (kernel row, kernel column, channel) order; every operation after the patch is shared with R or M, and R, M, F, and T are unchanged. E31 times R, Rg, Mg, and F in the same paired randomized fresh-process sessions on the three E24 U-Net workloads and the E25 ResNet-20 batch-128 complete update, on the RTX A6000 and JAX/JAXLIB 0.4.25 CUDA-11.8 stack of E24/E25 with allocator fraction 0.95 and preallocation disabled. A separate compile-only memory_analysis capture of R, Rg, and F for the batch-8 U-Net update reports compiler temporary, argument, and output bytes, and a descriptive GPU check compares the R and Rg patch tensors and one compiled call of R with Rg and M with Mg for every E31 workload. Version 1.18 is reserved for the E29/E30 registration on a parallel branch and is not used here. Protocol 1.17 is preserved verbatim as configs/protocols/protocol_1_17.yaml for the E24/E25/E27 exports whose configuration hashes bind it. No earlier result, registered matrix, or analysis is changed."
+  - version: "1.20"
+    date: "2026-10-19"
+    affected_experiments: [E35]
+    reason: "Before any E35 outcome was generated, freeze a post-hoc reviewer-requested accuracy check of the E07-J2 ResNet-20 gradient differences. At the three retained seed-11 E10 final-update states (R, F, and T sources), the E07-J2 update-0 batch (first post-budget batch of epoch 101, 128 examples) and the raw loss gradient before clipping, L2 regularization, or Adam, FP32 R, F, and T are evaluated as E07-J2 evaluated them, in one process with 64-bit types disabled on the E07-J2 device and stack (argexpr3 physical V100 GPU 1, JAX/JAXLIB 0.4.25, CUDA 11.8). A separate process on the same GPU evaluates the E33 fixed-margin oracle R_float64_fixed_float32_margin: R in FP64 on the FP32 state and batch cast to FP64, with every projection margin fixed to the FP32 value; if FP64 cannot run on that GPU, the oracle runs on the host CPU and the device is recorded. E35 reports the relative L2 error of every parameter-gradient tensor of R, F, and T against the oracle, the median and maximum over tensors per path, and the whole-gradient F-versus-R relative L2 recomputed in the same run as a descriptive reproduction check of E07-J2. U-Net sources, repeated-R and one-ULP controls, and FP64 F and T are not part of E35. Versions 1.18 and 1.19 are reserved for the E29/E30 and E31 registrations on parallel branches and are not used here. Protocol 1.17 is preserved verbatim as configs/protocols/protocol_1_17.yaml for the E24/E25/E27 exports whose configuration hashes bind it, and 1.20 is preserved as configs/protocols/protocol_1_20.yaml for E35. No earlier result, claim, registered matrix, or analysis is changed."
     case_manifest_changed: true
 
 variants:
@@ -288,6 +292,17 @@ revision_benchmarks:
       script: "scripts/check_e31_gpu_equivalence.py"
       pairs: [[R, Rg], [M, Mg]]
     reporting_policy: "Report E31 separately with paired geometric-mean session-median ratios and log-t 95% intervals; do not pool with or replace E24/E25; compiler memory_analysis bytes are compile-time buffer-assignment sizes, not measured allocator peaks."
+  E35:
+    role: "post-hoc descriptive FP64-oracle accuracy of the E07-J2 retained-state ResNet-20 FP32 gradients"
+    config: "configs/checkpoints/e35_retained_oracle.yaml"
+    variants: [R, F, T]
+    dtype: float32
+    oracle: R_float64_fixed_float32_margin
+    reference_experiment: E07-J2
+    sources: "E10 cifar100_poincare_resnet20 seed 11, final-update R, F, and T checkpoints"
+    batch: "E07-J2 update 0: first post-budget batch of epoch 101"
+    runtime_profile: "primary V100 JAX/JAXLIB 0.4.25 CUDA-11.8 stack on argexpr3 physical GPU 1, the E07-J2 device"
+    interpretation: "Report every source state and path separately; E35 measures accuracy against one oracle at one batch and does not replace E07-J2 or change C09."
 
 precision:
   oracle: float64

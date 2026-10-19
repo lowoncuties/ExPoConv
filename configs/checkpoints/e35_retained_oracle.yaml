@@ -1,0 +1,68 @@
+schema_version: "1.0"
+experiment_id: E35
+description: >-
+  Post-hoc FP64-oracle accuracy of the FP32 R, F and T raw loss gradients that
+  E07-J2 compared at the retained seed-11 CIFAR-100 ResNet-20 source states.
+question: >-
+  E07-J2 measured whole-gradient F-versus-R relative L2 differences of 0.06 to
+  0.11 at these states. Which FP32 path is closer to the fixed-margin FP64 oracle?
+reference_experiment: E07-J2
+reference_config:
+  path: configs/checkpoints/e07_journal_diagnostics_v2.yaml
+  sha256: c6bdd1b12d1296ea497c628be8f779aae00471b6ae2c08051b44e7a27405dcc7
+reference_gradient_table:
+  path: results/diagnostics/gradient_agreement_summary.csv
+  sha256: fcb28a75f84458ee808b2a880baa4cffa7e38a0eb44927cde94fdc23e67e12d3
+checkpoint_inventory:
+  path: results/checkpoints/checkpoint_inventory.csv
+  sha256: ca85215d5c078b438620f60b763411fffc4c260e0610457ce8a0b5878372cdb9
+task: cifar100_poincare_resnet20
+training_experiment_id: E10
+training_config: configs/training/e10_cifar100_resnet20.yaml
+source_seed: 11
+source_variants: [R, F, T]
+source_role: final
+source_update: 35200
+continuation_epoch: 101
+batch_position: 0
+batch_policy: >-
+  The E07-J2 update-0 batch: position 0 of the seed/epoch-indexed order of epoch
+  101 with its example-indexed augmentation, rebuilt from the frozen data path and
+  required to equal the inputs, targets and indices retained by E07-J2.
+gradient: >-
+  Raw loss gradient before clipping, L2 regularization or Adam, from the E07-J2
+  loss-gradient function (value_and_grad of the task loss through forward_task).
+execution_variants: [R, F, T]
+execution_dtype: float32
+oracle:
+  name: R_float64_fixed_float32_margin
+  variant: R
+  dtype: float64
+  projection_margin_key: numerics.float32_contract_oracle_projection_margin
+  definition: >-
+    R evaluated in FP64 on the FP32 source state and batch cast to FP64, with every
+    projection margin fixed to the FP32 value (the E33 oracle).
+processes:
+  float32: >-
+    One process with 64-bit types disabled and matmul precision highest, as in
+    E07-J2; R, F and T are evaluated once each per source state.
+  float64: >-
+    A separate process with 64-bit types enabled and matmul precision highest.
+device:
+  host: argexpr3
+  physical_gpu_index: 1
+  gpu_uuid: GPU-4e0547c3-d65d-7d8b-9f6a-d40ad61a0f0f
+  model: Tesla V100-PCIE-32GB
+  runtime: "JAX/JAXLIB 0.4.25, CUDA 11.8, cuDNN 8.6"
+  oracle_fallback: cpu
+require_idle_gpu: true
+max_preexisting_memory_mib: 512
+max_preexisting_utilization_percent: 5
+metrics:
+  tensor_relative_l2: "||g - g_oracle||_2 / max(||g_oracle||_2, 1e-12) for each parameter-gradient tensor"
+  path_summary: [median_over_tensors, max_over_tensors, whole_gradient]
+  whole_gradient_relative_l2: "sqrt(sum ||g - g_oracle||^2) / sqrt(sum ||g_oracle||^2) over all tensors"
+  reproduction_check: "whole-gradient ||g_F - g_R|| / ||g_R|| in the same FP32 run, compared descriptively with the E07-J2 update-0 value"
+reporting_policy: >-
+  Report every source state and path separately. E35 measures accuracy against
+  one oracle at one batch per state; it does not replace E07-J2 or change C09.

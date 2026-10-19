@@ -1,0 +1,109 @@
+{
+  "analysis_status": "post_hoc_reviewer_requested_accuracy_diagnostic",
+  "batch": {
+    "batch_position": 0,
+    "continuation_epoch": 101,
+    "examples": 128,
+    "indices_sha256": "1f9ca1c0edb26f6b48e126d707533a375f9ec22c13a6554c9d77b03ab19d42fd"
+  },
+  "batch_equal_to_e07_j2": true,
+  "definitions": {
+    "f_vs_r": "sqrt(sum ||g_F - g_R||^2) / sqrt(sum ||g_R||^2), FP32, same run",
+    "tensor_relative_l2": "||g - g_oracle||_2 / max(||g_oracle||_2, 1e-12)",
+    "tensors_closer_than_R": "tensors whose relative L2 error is below R's",
+    "whole_gradient_relative_l2": "sqrt(sum ||g - g_oracle||^2) / sqrt(sum ||g_oracle||^2) over all tensors"
+  },
+  "devices": {
+    "float32": {
+      "cuda_visible_devices": "1",
+      "device": "cuda:0",
+      "device_kind": "Tesla V100-PCIE-32GB",
+      "gpu_uuid": "GPU-4e0547c3-d65d-7d8b-9f6a-d40ad61a0f0f",
+      "jax_version": "0.4.25",
+      "jaxlib_version": "0.4.25",
+      "platform": "gpu"
+    },
+    "float64": {
+      "cuda_visible_devices": "1",
+      "device": "cuda:0",
+      "device_kind": "Tesla V100-PCIE-32GB",
+      "gpu_uuid": "GPU-4e0547c3-d65d-7d8b-9f6a-d40ad61a0f0f",
+      "jax_version": "0.4.25",
+      "jaxlib_version": "0.4.25",
+      "platform": "gpu"
+    }
+  },
+  "experiment_id": "E35",
+  "identity": {
+    "code_commit": "e98d313fa9140ca3bf55917d18ba105d466a2caa",
+    "code_dirty": false,
+    "config_hash": "57a0ab55744f74db843f29d23ca63be30a888843dbec8029bfe9f4a8730a9aec",
+    "config_path": "configs/checkpoints/e35_retained_oracle.yaml",
+    "protocol_path": "configs/protocols/protocol_1_20.yaml",
+    "protocol_version": "1.20"
+  },
+  "oracle": {
+    "definition": "R evaluated in FP64 on the FP32 source state and batch cast to FP64, with every projection margin fixed to the FP32 value (the E33 oracle).",
+    "name": "R_float64_fixed_float32_margin",
+    "projection_margin": 0.004
+  },
+  "output_rows": {
+    "e35_retained_oracle_f_vs_r.csv": 3,
+    "e35_retained_oracle_path_summary.csv": 9,
+    "e35_retained_oracle_tensor_errors.csv": 738
+  },
+  "reference_experiment": {
+    "code_commit": "04aca39f7c99b9881995889ca4f50ff42d2c0425",
+    "device_id": "argexpr3.vsb.cz::gpu:0::Tesla V100-PCIE-32GB",
+    "experiment_id": "E07-J2",
+    "gradient_table": "results/diagnostics/gradient_agreement_summary.csv"
+  },
+  "schema_version": "1.0",
+  "scientific_behavior_change": false,
+  "sources": {
+    "F": {
+      "checkpoint_path": "artifacts/training/e10/F/seed_11/checkpoints/final.pkl",
+      "checkpoint_sha256": "c4816ddde754768a2b43d2a4d48bf8bb710dd52d88e106fa935c47f393f0a438",
+      "fp32_logits_bitwise_equal_to_e07_j2": {
+        "F": false,
+        "R": false,
+        "T": false
+      }
+    },
+    "R": {
+      "checkpoint_path": "artifacts/training/e10/R/seed_11/checkpoints/final.pkl",
+      "checkpoint_sha256": "7a5a994b903f8a7f6d7d505f3a8cd4696f0d93ab8e16231353a48ee5c9fcf616",
+      "fp32_logits_bitwise_equal_to_e07_j2": {
+        "F": false,
+        "R": true,
+        "T": false
+      }
+    },
+    "T": {
+      "checkpoint_path": "artifacts/training/e10/T/seed_11/checkpoints/final.pkl",
+      "checkpoint_sha256": "b79d227b65c0b17f4d88f719f37bdd845f636a7885c685b8db761474b70a20b4",
+      "fp32_logits_bitwise_equal_to_e07_j2": {
+        "F": true,
+        "R": false,
+        "T": true
+      }
+    }
+  },
+  "whole_gradient_relative_l2_error": {
+    "F": {
+      "F": 0.023012516997167783,
+      "R": 0.04472679737134663,
+      "T": 0.023043823618995922
+    },
+    "R": {
+      "F": 0.009065863010274214,
+      "R": 0.0562792966604364,
+      "T": 0.009030311782723016
+    },
+    "T": {
+      "F": 0.03986308383434086,
+      "R": 0.07399966826392912,
+      "T": 0.039835712500947966
+    }
+  }
+}

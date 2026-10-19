@@ -1,0 +1,10 @@
+source_variant,path,dtype,reference,tensor_count,elements,median_tensor_relative_l2_error,max_tensor_relative_l2_error,max_tensor_parameter_path,whole_gradient_relative_l2_error,tensors_closer_than_R,tensors_farther_than_R
+R,R,float32,R_float64_fixed_float32_margin,82,71727,0.0009032994908024089,0.25898507577724583,stem_conv/weight,0.0562792966604364,,
+R,F,float32,R_float64_fixed_float32_margin,82,71727,1.803919444159366e-05,0.04158048482196605,stem_conv/weight,0.009065863010274214,57,25
+R,T,float32,R_float64_fixed_float32_margin,82,71727,0.00010264913104999266,0.04137193524251564,stem_conv/weight,0.009030311782723016,49,33
+F,R,float32,R_float64_fixed_float32_margin,82,71727,0.000661018056953004,0.20577890679851316,stem_conv/weight,0.04472679737134663,,
+F,F,float32,R_float64_fixed_float32_margin,82,71727,0.0006485095719148653,0.10586238161377329,stem_conv/weight,0.023012516997167783,59,23
+F,T,float32,R_float64_fixed_float32_margin,82,71727,0.0017125425039840223,0.1058549991684819,stem_conv/weight,0.023043823618995922,8,74
+T,R,float32,R_float64_fixed_float32_margin,82,71727,7.86413670193963e-05,0.3132200217153577,stem_conv/weight,0.07399966826392912,,
+T,F,float32,R_float64_fixed_float32_margin,82,71727,0.0008705912472984468,0.16865021494540156,stem_conv/weight,0.03986308383434086,10,72
+T,T,float32,R_float64_fixed_float32_margin,82,71727,0.00035214928873820474,0.16861546792276097,stem_conv/weight,0.039835712500947966,19,63
