@@ -43,7 +43,9 @@ from scripts.export_e24_e25_e27_tables import (
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
 RESULTS_DIR = REPOSITORY_ROOT / "results"
-PROTOCOL_PATH = REPOSITORY_ROOT / "protocol.yaml"
+# Protocol 1.19 registered E31 after these runs; the 1.18 snapshot is byte-identical
+# to the protocol.yaml that the E29/E30 configuration hashes bind.
+PROTOCOL_PATH = REPOSITORY_ROOT / "configs" / "protocols" / "protocol_1_18.yaml"
 EXPECTED_COMMIT = "20a886e431de9cc5e38264f4bc4781f0434fe944"
 EXPECTED_PROTOCOL_VERSION = "1.18"
 EXPORT_SCHEMA_VERSION = "1.0"

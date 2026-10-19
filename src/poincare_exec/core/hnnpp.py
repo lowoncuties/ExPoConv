@@ -307,7 +307,7 @@ def _variant_output(
 ) -> Array:
     if variant == "T":
         return scores_to_projected_tangent(scores, curvature, margin=margin)
-    if variant in {"R", "F", "M"}:
+    if variant in {"R", "F", "M", "Rg", "Mg"}:
         return logmap0(scores_to_ball(scores, curvature, margin=margin), curvature)
     raise ValueError(f"unsupported hyperbolic variant: {variant}")
 
@@ -328,10 +328,11 @@ def dense(
     variant: str,
     margin: Array | None = None,
 ) -> Array:
-    """Apply one R/F/T/M/E dense layer at a common coordinate boundary.
+    """Apply one R/F/T/M/E/Rg/Mg dense layer at a common coordinate boundary.
 
-    A dense layer has no patch to materialize, so M executes as F. E applies the
-    parameter-shape-matched Euclidean affine map and does not use curvature.
+    A dense layer has no patch to materialize, so M and Mg execute as F and Rg
+    executes as R. E applies the parameter-shape-matched Euclidean affine map and
+    does not use curvature.
     """
 
     if variant not in EXECUTION_VARIANTS:
@@ -343,7 +344,7 @@ def dense(
         raise ValueError("dense offset has the wrong shape")
     if variant == "E":
         return jnp.einsum("...i,io->...o", tangent, weight) + params.offset
-    if variant == "R":
+    if variant in {"R", "Rg"}:
         point = expmap0(tangent, curvature, margin=margin)
         scores = hyperplane_scores_ball(point, weight, params.offset, curvature)
     else:
@@ -394,6 +395,61 @@ def _extract_patches(
             kernel_height * kernel_width * input_channels,
         ),
     )
+
+
+def _gather_patches(
+    tangent: Array,
+    kernel_shape: tuple[int, int],
+    *,
+    stride: tuple[int, int],
+    padding: str,
+    dilation: tuple[int, int],
+) -> Array:
+    """Gather the patches of :func:`_extract_patches` from shifted slices (Rg/Mg).
+
+    The input is zero-padded by the convolution's own SAME/VALID rule. The
+    ``kernel_height * kernel_width`` strided slices, one per kernel offset in
+    row-major order, are concatenated on the channel axis. That yields R's
+    ``(kernel_row, kernel_column, channel)`` flattening directly, with no
+    one-hot convolution and no patch transpose, as in the HNN++ reference's
+    concatenation of shifted ``narrow`` slices.
+    """
+
+    kernel_height, kernel_width = kernel_shape
+    batch, height, width, channels = tangent.shape
+    window = (
+        (kernel_height - 1) * dilation[0] + 1,
+        (kernel_width - 1) * dilation[1] + 1,
+    )
+    (top, bottom), (left, right) = lax.padtype_to_pads(
+        (height, width), window, stride, padding
+    )
+    padded = lax.pad(
+        tangent,
+        jnp.zeros((), dtype=tangent.dtype),
+        ((0, 0, 0), (top, bottom, 0), (left, right, 0), (0, 0, 0)),
+    )
+    output_height = (height + top + bottom - window[0]) // stride[0] + 1
+    output_width = (width + left + right - window[1]) // stride[1] + 1
+    slices = []
+    for row in range(kernel_height):
+        for column in range(kernel_width):
+            start_row = row * dilation[0]
+            start_column = column * dilation[1]
+            slices.append(
+                lax.slice(
+                    padded,
+                    (0, start_row, start_column, 0),
+                    (
+                        batch,
+                        start_row + (output_height - 1) * stride[0] + 1,
+                        start_column + (output_width - 1) * stride[1] + 1,
+                        channels,
+                    ),
+                    (1, stride[0], stride[1], 1),
+                )
+            )
+    return jnp.concatenate(slices, axis=-1)
 
 
 def _factorized_conv_scores(
@@ -481,7 +537,11 @@ def conv2d(
     dilation: int | Sequence[int] = 1,
     margin: Array | None = None,
 ) -> Array:
-    """Apply R/F/T/M HNN++ or E Euclidean Conv2D in BHWC layout."""
+    """Apply R/F/T/M/Rg/Mg HNN++ or E Euclidean Conv2D in BHWC layout.
+
+    Rg and Mg are R and M with the patch built by :func:`_gather_patches`
+    instead of :func:`_extract_patches`; everything after the patch is shared.
+    """
 
     if variant not in EXECUTION_VARIANTS:
         raise ValueError(f"variant must be one of {EXECUTION_VARIANTS}")
@@ -509,9 +569,10 @@ def conv2d(
         )
         return products + params.offset
 
-    if variant in {"R", "M"}:
+    if variant in {"R", "M", "Rg", "Mg"}:
         kernel_height, kernel_width, input_channels, output_channels = kernel.shape
-        patches = _extract_patches(
+        patch_builder = _gather_patches if variant in {"Rg", "Mg"} else _extract_patches
+        patches = patch_builder(
             tangent,
             (kernel_height, kernel_width),
             stride=strides,
@@ -520,7 +581,7 @@ def conv2d(
         )
         patch_dimension = kernel_height * kernel_width * input_channels
         patches *= beta_ratio(patch_dimension, input_channels, dtype=tangent.dtype)
-        if variant == "R":
+        if variant in {"R", "Rg"}:
             patch_points = expmap0(patches, curvature, margin=margin)
             scores = hyperplane_scores_ball(
                 patch_points,

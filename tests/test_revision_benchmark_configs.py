@@ -74,8 +74,11 @@ def _assert_matches_registration(registered: dict, config: dict) -> None:
 
 
 def test_protocol_1_18_registers_e29_and_e30_before_execution() -> None:
-    protocol = load_yaml(REPOSITORY_ROOT / "protocol.yaml")
+    protocol = load_yaml(REPOSITORY_ROOT / "configs/protocols/protocol_1_18.yaml")
     amendment = protocol["protocol_amendments"][-1]
+    current = load_yaml(REPOSITORY_ROOT / "protocol.yaml")
+
+    assert amendment in current["protocol_amendments"]
 
     assert protocol["protocol_version"] == "1.18"
     assert amendment["version"] == "1.18"

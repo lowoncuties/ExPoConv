@@ -1,0 +1,132 @@
+{
+  "all_planned_groups_accounted_for": true,
+  "analysis_code": {
+    "commit": "60d47b6fbdc05e6e2ce27bf450292f130ebd5e07",
+    "dirty": false,
+    "status_porcelain": []
+  },
+  "analysis_id": "e31_gather_reference_export",
+  "cohort": {
+    "config": {
+      "bytes": 2361,
+      "exists": true,
+      "name": "e31_gather_reference.yaml",
+      "sha256": "374cf33f280225173d9fc60dcad6bc7a1d21c68be2556a114707fda728f63a44"
+    },
+    "expected_config_hashes": {
+      "resnet20_b128_update": "f6bf27b288831768010ff18219fd63d0c8137af14a40c69fd5d1f1c90881c9de",
+      "unet_b1_forward": "3e74b6ccb45603697b731338179777630310d7c5b917a881c50db54680cc2aae",
+      "unet_b8_forward": "e86e934f4d5f6a63741941b3a2937e0227313b17f6c19a65ebbe6253e3d8317d",
+      "unet_b8_update": "f33421a10cb3517bf235bb64b3317dfa830cd3ce26e8c31a91cd08f5b0f564fe"
+    },
+    "experiment_id": "E31",
+    "failed_worker_groups": 0,
+    "failures": {
+      "exists": false,
+      "name": "e31_gather_reference.csv.failures.jsonl"
+    },
+    "outcomes": {
+      "ok": 80
+    },
+    "planned_groups": 80,
+    "raw": {
+      "bytes": 30235440,
+      "exists": true,
+      "name": "e31_gather_reference.csv",
+      "sha256": "da1d1f9d2b0b7d49a0b970ef541918e5fbbb786730c2b1aa0d9f5816922d5928"
+    },
+    "raw_rows": 16240,
+    "successful_worker_groups": 80
+  },
+  "compiled_memory": {
+    "buffer_assignment_bytes_all_zero": true,
+    "capture": {
+      "bytes": 4355,
+      "exists": true,
+      "name": "e31_compiled_memory.json",
+      "sha256": "efdb89dfa3c38195ae8e5c0f1bd119f2f039ed1b0030c614a6845d7b59ec9b5c"
+    },
+    "captured_at_utc": "2026-10-18T20:36:56.268Z",
+    "note": "The compiled buffer-assignment byte fields are zero in this capture and in every raw benchmark row, so no compiled-memory estimate is reported.",
+    "reported": false
+  },
+  "derivation": "CPU-only validation and deterministic aggregation of existing raw GPU artifacts; no benchmark is launched by this exporter. Failed groups are retained as planned outcomes and excluded explicitly from paired ratios.",
+  "expected_run_commit": "486b5bd274a4c384d1f754f77f37dd6c43c3c46b",
+  "gpu_equivalence": {
+    "capture": {
+      "bytes": 31586,
+      "exists": true,
+      "name": "e31_gpu_equivalence.json",
+      "sha256": "4aa792341dcaf4f58c1f4b3cb41b447e7d8d980f4fbf288e159b4aa1ad1d2b33"
+    },
+    "captured_at_utc": "2026-10-18T20:59:31.463Z",
+    "model_comparisons": 8,
+    "model_comparisons_bitwise_equal": 0,
+    "patch_comparisons": 53,
+    "patch_comparisons_bitwise_equal": 53
+  },
+  "output_evidence": {
+    "e31_contrasts.csv": {
+      "bytes": 23595,
+      "exists": true,
+      "name": "e31_contrasts.csv",
+      "sha256": "be37092f115ccf72416d4ce99f1c4704a67093bd6dbf548d9318855a404d0c59"
+    },
+    "e31_gpu_equivalence.csv": {
+      "bytes": 13873,
+      "exists": true,
+      "name": "e31_gpu_equivalence.csv",
+      "sha256": "3640fdcf16db5d54780330f555a89c5ec2af32e730f4648bae1b22b338485580"
+    },
+    "e31_session_outcomes.csv": {
+      "bytes": 38409,
+      "exists": true,
+      "name": "e31_session_outcomes.csv",
+      "sha256": "92e6f9af5d96101a4c1d7f3cfb746058c337b7f1e8bc0311528551410028ba7a"
+    },
+    "e31_variant_summary.csv": {
+      "bytes": 11161,
+      "exists": true,
+      "name": "e31_variant_summary.csv",
+      "sha256": "6eafa1344d99ca2be97d1c099074fe8527c23b638f0bcdaa51dc72b786e08566"
+    }
+  },
+  "output_rows": {
+    "e31_contrasts.csv": 24,
+    "e31_gpu_equivalence.csv": 61,
+    "e31_session_outcomes.csv": 80,
+    "e31_variant_summary.csv": 16
+  },
+  "physical_device": {
+    "hostname": "aibox2a6000",
+    "logical_id": 0,
+    "name": "NVIDIA RTX A6000",
+    "physical_index": 1,
+    "uuid": "GPU-6daddab9-4b59-fdde-bf0b-09ecd8f31723"
+  },
+  "protocol": {
+    "bytes": 24568,
+    "exists": true,
+    "name": "protocol_1_19.yaml",
+    "sha256": "e39d1f658fc9e963c517e06388adee754ba2f8621fc9bf8d9c7921a388620de5"
+  },
+  "protocol_version": "1.19",
+  "runtime_capture": {
+    "environment": {
+      "bytes": 27903,
+      "exists": true,
+      "name": "e31_environment.json",
+      "sha256": "feb80a4dcc3f2437315e172002c6e183e790f3e26a133865c180cd8625b42625"
+    },
+    "jax_version": "0.4.25",
+    "jaxlib_version": "0.4.25",
+    "runtime_gate": {
+      "bytes": 1492,
+      "exists": true,
+      "name": "e31_runtime_gate.json",
+      "sha256": "89246d7826623305e4e196594a069e4d88520a89f1660e41db23e83e9062063a"
+    },
+    "runtime_role": "pinned_jax_0_4_25_cuda_11_8"
+  },
+  "schema_version": "1.0"
+}

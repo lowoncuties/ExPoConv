@@ -1,4 +1,4 @@
-protocol_version: "1.18"
+protocol_version: "1.19"
 protocol_date: "2026-10-18"
 target_journal: "Neural Networks"
 working_title: "Exact and Efficient Execution of Poincare Neural Networks"
@@ -111,6 +111,11 @@ protocol_amendments:
     affected_experiments: [E29, E30]
     reason: "Before any E29 or E30 outcome was generated, freeze two post-hoc reviewer-requested V100 checks on the primary JAX/JAXLIB 0.4.25 CUDA-11.8 stack under the default JAX allocator fraction with preallocation disabled, the conditions of E08 and E13. E29 times only the contextual Euclidean path E on the three E08 workloads and the seven E13 workloads, with workload definitions copied verbatim; it is an unpaired reference against the published R/F values, reported descriptively, and is not pooled with E25. E30 times paired R/F complete updates at batch 8 and 256-by-256 with U-Net initial width 16 and 32 through a new optional benchmark workload key whose absence leaves every earlier workload unchanged; it reports where the F advantage changes as channels widen and retains any OOM under the default cap. Protocol 1.17 is preserved verbatim as configs/protocols/protocol_1_17.yaml for the E24/E25/E27 exports whose configuration hashes bind it. No earlier result, registered matrix, or analysis is changed."
     case_manifest_changed: true
+  - version: "1.19"
+    date: "2026-10-18"
+    affected_experiments: [E31]
+    reason: "Before any E31 outcome was generated, freeze a post-hoc reviewer-requested gather-based reference control. R builds its explicit patch with jax.lax.conv_general_dilated_patches, which JAX 0.4.25 lowers to a grouped convolution with a one-hot filter followed by a patch transpose; the official HNN++ code instead concatenates shifted slices. Benchmark-only Rg and Mg are R and M with the same beta-scaled tangent patch built by zero padding and concatenating the kernel-offset strided slices directly in R's (kernel row, kernel column, channel) order; every operation after the patch is shared with R or M, and R, M, F, and T are unchanged. E31 times R, Rg, Mg, and F in the same paired randomized fresh-process sessions on the three E24 U-Net workloads and the E25 ResNet-20 batch-128 complete update, on the RTX A6000 and JAX/JAXLIB 0.4.25 CUDA-11.8 stack of E24/E25 with allocator fraction 0.95 and preallocation disabled. A separate compile-only memory_analysis capture of R, Rg, and F for the batch-8 U-Net update reports compiler temporary, argument, and output bytes, and a descriptive GPU check compares the R and Rg patch tensors and one compiled call of R with Rg and M with Mg for every E31 workload. Version 1.18 is reserved for the E29/E30 registration on a parallel branch and is not used here. Protocol 1.17 is preserved verbatim as configs/protocols/protocol_1_17.yaml for the E24/E25/E27 exports whose configuration hashes bind it. No earlier result, registered matrix, or analysis is changed."
+    case_manifest_changed: true
 
 variants:
   numerical: [R, F, T]
@@ -125,11 +130,15 @@ variants:
   revision_benchmark_controls:
     materialized_patch_exact_score: M
     euclidean_same_topology_context: E
+    gathered_patch_reference: Rg
+    gathered_patch_exact_score: Mg
   revision_benchmark_roles:
     reference: R
     primary_method: F
     mechanism_ablation: M
     contextual_reference: E
+    gathered_patch_reference: Rg
+    gathered_patch_mechanism_ablation: Mg
 
 seeds:
   training: [11, 29, 47, 71, 101]
@@ -258,6 +267,27 @@ revision_benchmarks:
     preallocate: false
     runtime_profile: "primary V100 JAX/JAXLIB 0.4.25 CUDA-11.8 stack"
     reporting_policy: "Report each width separately with paired R/F intervals; compare with the E13 width-8 pivot descriptively only; retain every OOM under the default allocator cap."
+  E31:
+    role: "paired gather-based reference control; Rg and Mg are benchmark-only controls with R's patch, not new numerical or training variants"
+    config: "configs/benchmarks/e31_gather_reference.yaml"
+    variants: [R, Rg, Mg, F]
+    workloads: [unet_b1_forward, unet_b8_forward, unet_b8_update, resnet20_b128_update]
+    reference_experiments: [E24, E25]
+    sessions: 5
+    warmup_calls: 50
+    timed_calls_per_session: 200
+    allocator_fraction: 0.95
+    preallocate: false
+    runtime_profile: "JAX/JAXLIB 0.4.25 with pinned CUDA-11.8 user-space libraries on the same idle RTX A6000 as E24/E25"
+    contrasts: [[R, Rg], [Rg, F], [R, F], [Rg, Mg], [Mg, F]]
+    compiled_memory_analysis:
+      script: "scripts/capture_e31_compiled_memory.py"
+      workload: unet_b8_update
+      variants: [R, Rg, F]
+    gpu_equivalence_check:
+      script: "scripts/check_e31_gpu_equivalence.py"
+      pairs: [[R, Rg], [M, Mg]]
+    reporting_policy: "Report E31 separately with paired geometric-mean session-median ratios and log-t 95% intervals; do not pool with or replace E24/E25; compiler memory_analysis bytes are compile-time buffer-assignment sizes, not measured allocator peaks."
 
 precision:
   oracle: float64
