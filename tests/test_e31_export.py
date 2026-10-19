@@ -292,7 +292,7 @@ def test_registration_binds_protocol_contrasts_and_variants() -> None:
     ]
 
 
-def test_exports_paired_contrasts_memory_and_equivalence(tmp_path: Path) -> None:
+def test_exports_paired_contrasts_and_equivalence(tmp_path: Path) -> None:
     artifacts = tmp_path / "artifacts"
     artifacts.mkdir()
     _write_artifacts(artifacts)
@@ -303,15 +303,15 @@ def test_exports_paired_contrasts_memory_and_equivalence(tmp_path: Path) -> None
     assert summary["output_rows"] == {
         "e31_session_outcomes.csv": 80,
         "e31_variant_summary.csv": 16,
-        "e31_contrasts.csv": 20,
-        "e31_compiled_memory.csv": 3,
+        "e31_contrasts.csv": 24,
         "e31_gpu_equivalence.csv": 12,
     }
     contrasts = {
         (row["workload_id"], row["reference_variant"], row["candidate_variant"]): row
         for row in _read(output / "e31_contrasts.csv")
     }
-    for (reference, candidate), _ in exporter.CONTRAST_ROLES.items():
+    pairs = [*exporter.CONTRAST_ROLES, *exporter.POST_HOC_CONTRAST_ROLES]
+    for reference, candidate in pairs:
         row = contrasts[("unet_b8_update", reference, candidate)]
         expected = LATENCY[reference] / LATENCY[candidate]
         assert math.isclose(
@@ -324,16 +324,16 @@ def test_exports_paired_contrasts_memory_and_equivalence(tmp_path: Path) -> None
             PEAK_GIB[reference] / PEAK_GIB[candidate],
         )
         assert row["accepted_paired_sessions"] == "5"
-    variants = {
-        (row["workload_id"], row["variant"]): row
-        for row in _read(output / "e31_variant_summary.csv")
+    registration = {
+        pair: contrasts[("unet_b8_update", *pair)]["contrast_registration"]
+        for pair in (("R", "Mg"), ("Rg", "Mg"))
     }
-    assert float(variants[("unet_b8_update", "Rg")]["median_compiler_temporary_gib"]) == 6.0
-    memory = {row["variant"]: row for row in _read(output / "e31_compiled_memory.csv")}
-    assert list(memory) == ["R", "Rg", "F"]
-    assert float(memory["F"]["compiled_temporary_gib"]) == 3.0
-    assert float(memory["F"]["benchmark_median_peak_live_gib"]) == 6.0
+    assert registration == {("R", "Mg"): "post_hoc", ("Rg", "Mg"): "registered"}
+    variant_table = (output / "e31_variant_summary.csv").read_text(encoding="utf-8")
+    assert "compiler" not in variant_table.splitlines()[0]
+    assert not (output / "e31_compiled_memory.csv").exists()
     audit = json.loads((output / "e31_audit.json").read_text(encoding="utf-8"))
+    assert audit["compiled_memory"]["reported"] is False
     assert audit["gpu_equivalence"]["model_comparisons_bitwise_equal"] == 4
     assert audit["cohort"]["outcomes"] == {"ok": 80}
 

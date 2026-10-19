@@ -4,8 +4,10 @@
 E31 times R, Rg, Mg, and F in paired fresh-process sessions on one RTX A6000.
 This exporter is CPU-only: it validates the raw benchmark rows, the runtime
 captures, the compile-only memory capture, and the GPU equivalence capture,
-then writes deterministic session, variant, contrast, memory, and equivalence
-tables. It launches nothing.
+then writes deterministic session, variant, contrast, and equivalence tables.
+It launches nothing. The compiled buffer-assignment byte fields of this run are
+zero, both in the raw rows and in the compile-only capture, so they are
+validated and hashed but not reported.
 """
 
 from __future__ import annotations
@@ -24,8 +26,8 @@ from scripts import export_e24_e25_e27_tables as shared
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
 EXPERIMENT_ID = "E31"
-# Replaced by the E31 run commit once it exists; the analysis is frozen before results.
-EXPECTED_COMMIT = "0000000000000000000000000000000000000000"
+# The clean E31 run commit; the analysis was frozen before results.
+EXPECTED_COMMIT = "486b5bd274a4c384d1f754f77f37dd6c43c3c46b"
 EXPECTED_PROTOCOL_VERSION = "1.19"
 # The E31 configuration hashes bind protocol 1.19; this snapshot is byte-identical
 # to the protocol.yaml of the run commit and keeps them verifiable after amendments.
@@ -59,6 +61,10 @@ CONTRAST_ROLES = {
     ("Rg", "Mg"): "geometry_removal_with_gathered_patch_fixed",
     ("Mg", "F"): "gathered_patch_materialization_and_backend_with_geometry_removed",
 }
+# Reported in addition to the registered contrasts and labelled post hoc.
+POST_HOC_CONTRAST_ROLES = {
+    ("R", "Mg"): "convolution_patch_reference_vs_gathered_patch_without_geometry",
+}
 COMPILER_FIELDS = (
     "compiler_argument_bytes",
     "compiler_output_bytes",
@@ -81,7 +87,6 @@ OUTPUT_FILES = {
     "sessions": "e31_session_outcomes.csv",
     "variants": "e31_variant_summary.csv",
     "contrasts": "e31_contrasts.csv",
-    "compiled_memory": "e31_compiled_memory.csv",
     "gpu_equivalence": "e31_gpu_equivalence.csv",
     "audit": "e31_audit.json",
 }
@@ -335,10 +340,8 @@ def _validate_success_group(
         context=f"{context} process reservation",
         minimum=0,
     )
-    compiler = {
-        field: shared._integer(exemplar.get(field), context=f"{context} {field}", minimum=0)
-        for field in COMPILER_FIELDS
-    }
+    for field in COMPILER_FIELDS:
+        shared._integer(exemplar.get(field), context=f"{context} {field}", minimum=0)
     output_nonfinite = shared._integer(
         exemplar.get("output_nonfinite_count"),
         context=f"{context} output_nonfinite_count",
@@ -370,10 +373,6 @@ def _validate_success_group(
         "peak_live_gib": peak_live / GIB,
         "peak_pool_gib": peak_pool / GIB,
         "process_reservation_mib": reservation,
-        "compiler_argument_gib": compiler["compiler_argument_bytes"] / GIB,
-        "compiler_output_gib": compiler["compiler_output_bytes"] / GIB,
-        "compiler_temporary_gib": compiler["compiler_temporary_bytes"] / GIB,
-        "compiler_alias_gib": compiler["compiler_alias_bytes"] / GIB,
         "failure_kind": None,
         "failure_phase": None,
         "failure_returncode": None,
@@ -425,10 +424,6 @@ def _validate_failure(
         "peak_live_gib": None,
         "peak_pool_gib": None,
         "process_reservation_mib": None,
-        "compiler_argument_gib": None,
-        "compiler_output_gib": None,
-        "compiler_temporary_gib": None,
-        "compiler_alias_gib": None,
         "failure_kind": failure_kind,
         "failure_phase": str(row.get("failure_phase", "unknown")),
         "failure_returncode": returncode,
@@ -565,7 +560,6 @@ def _variant_summaries(outcomes: Sequence[Mapping[str, Any]]) -> list[dict[str, 
         latencies = _values(accepted, "session_median_latency_ms")
         throughputs = _values(accepted, "session_median_throughput_samples_per_s")
         live = _spread(_values(accepted, "peak_live_gib"))
-        temporary = _spread(_values(accepted, "compiler_temporary_gib"))
         output.append(
             {
                 "experiment_id": EXPERIMENT_ID,
@@ -604,18 +598,6 @@ def _variant_summaries(outcomes: Sequence[Mapping[str, Any]]) -> list[dict[str, 
                 "median_process_reservation_mib": _spread(
                     _values(accepted, "process_reservation_mib")
                 )[0],
-                "median_compiler_argument_gib": _spread(
-                    _values(accepted, "compiler_argument_gib")
-                )[0],
-                "median_compiler_output_gib": _spread(
-                    _values(accepted, "compiler_output_gib")
-                )[0],
-                "median_compiler_alias_gib": _spread(
-                    _values(accepted, "compiler_alias_gib")
-                )[0],
-                "median_compiler_temporary_gib": temporary[0],
-                "min_compiler_temporary_gib": temporary[1],
-                "max_compiler_temporary_gib": temporary[2],
                 "protocol_version": exemplar["protocol_version"],
                 "code_commit": exemplar["code_commit"],
                 "config_hash": exemplar["config_hash"],
@@ -641,7 +623,10 @@ def _contrasts(outcomes: Sequence[Mapping[str, Any]]) -> list[dict[str, Any]]:
         sessions = sorted(
             {int(row["session"]) for row in outcomes if row["workload_id"] == workload_id}
         )
-        for (reference, candidate), role in CONTRAST_ROLES.items():
+        roles = [(pair, role, "registered") for pair, role in CONTRAST_ROLES.items()] + [
+            (pair, role, "post_hoc") for pair, role in POST_HOC_CONTRAST_ROLES.items()
+        ]
+        for (reference, candidate), role, registration in roles:
             paired = []
             exclusions = {}
             for session in sessions:
@@ -661,13 +646,11 @@ def _contrasts(outcomes: Sequence[Mapping[str, Any]]) -> list[dict[str, Any]]:
                 candidate_over_reference=True,
             )
             live_ratios = _paired_ratios(paired, "peak_live_gib")
-            temporary_ratios = _paired_ratios(paired, "compiler_temporary_gib")
             latency, latency_lower, latency_upper = _ratio_summary(latency_ratios)
             throughput, throughput_lower, throughput_upper = _ratio_summary(
                 throughput_ratios
             )
             live, live_lower, live_upper = _ratio_summary(live_ratios)
-            temporary = shared._geometric_mean(temporary_ratios)
             exemplar = indexed[(workload_id, sessions[0], reference)]
             output.append(
                 {
@@ -681,6 +664,7 @@ def _contrasts(outcomes: Sequence[Mapping[str, Any]]) -> list[dict[str, Any]]:
                     "shape": exemplar["shape"],
                     "batch_size": exemplar["batch_size"],
                     "contrast_role": role,
+                    "contrast_registration": registration,
                     "reference_variant": reference,
                     "reference_variant_role": VARIANT_ROLES[reference],
                     "candidate_variant": candidate,
@@ -716,7 +700,6 @@ def _contrasts(outcomes: Sequence[Mapping[str, Any]]) -> list[dict[str, Any]]:
                     "paired_peak_live_ratios": json.dumps(
                         live_ratios, separators=(",", ":")
                     ),
-                    "geometric_mean_compiler_temporary_ratio": temporary,
                     "protocol_version": exemplar["protocol_version"],
                     "code_commit": exemplar["code_commit"],
                     "config_hash": exemplar["config_hash"],
@@ -749,10 +732,11 @@ def _validate_capture_provenance(
 def _compiled_memory(
     artifact_dir: Path,
     registration: Mapping[str, Any],
-    variant_rows: Sequence[Mapping[str, Any]],
     *,
     expected_commit: str,
-) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+) -> dict[str, Any]:
+    """Validate and hash the compile-only capture; its byte fields are not reported."""
+
     path = artifact_dir / MEMORY_CAPTURE
     capture = shared._read_json(path)
     _validate_capture_provenance(capture, name=path.name, expected_commit=expected_commit)
@@ -761,64 +745,29 @@ def _compiled_memory(
     captures = capture.get("captures", [])
     if tuple(item.get("variant") for item in captures) != MEMORY_VARIANTS:
         raise ValueError(f"{path.name}: expected variants {MEMORY_VARIANTS}")
-    measured = {
-        row["variant"]: row for row in variant_rows if row["workload_id"] == MEMORY_WORKLOAD
-    }
     expected_hash = registration["workloads"][MEMORY_WORKLOAD]["config_hash"]
-    rows = []
+    buffer_bytes = []
     for item in captures:
-        variant = item["variant"]
-        context = f"{path.name}/{variant}"
+        context = f"{path.name}/{item['variant']}"
         if item.get("config_hash") != expected_hash:
             raise ValueError(f"{context}: configuration hash mismatch")
         if item.get("device_kind") != EXPECTED_DEVICE["name"]:
             raise ValueError(f"{context}: unexpected device")
-        compiled = {
-            field: shared._integer(
+        buffer_bytes.extend(
+            shared._integer(
                 item["compiled_bytes"].get(field), context=f"{context} {field}", minimum=0
             )
-            for field in ("argument", "output", "alias", "temp", "generated_code")
-        }
-        scratch = item["optimized_hlo"]
-        after_state = item["allocator_after_state"]
-        after_compile = item["allocator_after_compile"]
-        footprint = compiled["argument"] + compiled["output"] - compiled["alias"]
-        footprint += compiled["temp"]
-        rows.append(
-            {
-                "experiment_id": EXPERIMENT_ID,
-                "workload_id": MEMORY_WORKLOAD,
-                "variant": variant,
-                "variant_role": VARIANT_ROLES[variant],
-                "compiled_argument_gib": compiled["argument"] / GIB,
-                "compiled_output_gib": compiled["output"] / GIB,
-                "compiled_alias_gib": compiled["alias"] / GIB,
-                "compiled_temporary_gib": compiled["temp"] / GIB,
-                "compiled_footprint_gib": footprint / GIB,
-                "footprint_estimand": (
-                    "argument + output - alias + temporary bytes of the compiled "
-                    "executable's buffer assignment"
-                ),
-                "cudnn_convolution_calls": shared._integer(
-                    scratch["cudnn_convolution_calls"], context=context, minimum=0
-                ),
-                "cudnn_scratch_sum_gib": scratch["cudnn_scratch_bytes_sum"] / GIB,
-                "cudnn_scratch_max_gib": scratch["cudnn_scratch_bytes_max"] / GIB,
-                "allocator_in_use_after_state_gib": after_state["bytes_in_use"] / GIB,
-                "allocator_peak_after_compile_gib": after_compile["peak_bytes_in_use"]
-                / GIB,
-                "benchmark_median_peak_live_gib": measured[variant]["median_peak_live_gib"],
-                "benchmark_median_compiler_temporary_gib": measured[variant][
-                    "median_compiler_temporary_gib"
-                ],
-                "code_commit": expected_commit,
-                "config_hash": expected_hash,
-                "physical_gpu_uuid": EXPECTED_DEVICE["uuid"],
-            }
+            for field in ("argument", "output", "alias", "temp")
         )
-    return rows, {
+    return {
         "capture": shared._evidence(path),
         "captured_at_utc": capture.get("captured_at_utc"),
+        "buffer_assignment_bytes_all_zero": not any(buffer_bytes),
+        "reported": False,
+        "note": (
+            "The compiled buffer-assignment byte fields are zero in this capture and "
+            "in every raw benchmark row, so no compiled-memory estimate is reported."
+        ),
     }
 
 
@@ -931,8 +880,8 @@ def export(
         raise ValueError("E31 does not bind to the registered physical GPU")
     variants = _variant_summaries(outcomes)
     contrasts = _contrasts(outcomes)
-    memory, memory_audit = _compiled_memory(
-        artifact_dir, registration, variants, expected_commit=expected_commit
+    memory_audit = _compiled_memory(
+        artifact_dir, registration, expected_commit=expected_commit
     )
     equivalence, equivalence_audit = _gpu_equivalence(
         artifact_dir, registration, expected_commit=expected_commit
@@ -941,7 +890,6 @@ def export(
         "sessions": outcomes,
         "variants": variants,
         "contrasts": contrasts,
-        "compiled_memory": memory,
         "gpu_equivalence": equivalence,
     }
     paths = {name: output_dir / filename for name, filename in OUTPUT_FILES.items()}
