@@ -1,5 +1,5 @@
-protocol_version: "1.17"
-protocol_date: "2026-10-16"
+protocol_version: "1.18"
+protocol_date: "2026-10-18"
 target_journal: "Neural Networks"
 working_title: "Exact and Efficient Execution of Poincare Neural Networks"
 study_scope: "HNN++ and Poincare operator-preserving execution"
@@ -105,6 +105,11 @@ protocol_amendments:
     date: "2026-10-16"
     affected_experiments: [E28]
     reason: "After inspecting the fresh E26 diagnostic, freeze a post-hoc replay-stability check for its only mixed-criterion exception pattern: the first three deterministic FP32 realizations of both original structured cases, repeated in three independent processes. E28 is descriptive, cannot replace E02 or E26, and is intended only to distinguish a stable replay result from process-to-process numerical sensitivity."
+    case_manifest_changed: true
+  - version: "1.18"
+    date: "2026-10-18"
+    affected_experiments: [E29, E30]
+    reason: "Before any E29 or E30 outcome was generated, freeze two post-hoc reviewer-requested V100 checks on the primary JAX/JAXLIB 0.4.25 CUDA-11.8 stack under the default JAX allocator fraction with preallocation disabled, the conditions of E08 and E13. E29 times only the contextual Euclidean path E on the three E08 workloads and the seven E13 workloads, with workload definitions copied verbatim; it is an unpaired reference against the published R/F values, reported descriptively, and is not pooled with E25. E30 times paired R/F complete updates at batch 8 and 256-by-256 with U-Net initial width 16 and 32 through a new optional benchmark workload key whose absence leaves every earlier workload unchanged; it reports where the F advantage changes as channels widen and retains any OOM under the default cap. Protocol 1.17 is preserved verbatim as configs/protocols/protocol_1_17.yaml for the E24/E25/E27 exports whose configuration hashes bind it. No earlier result, registered matrix, or analysis is changed."
     case_manifest_changed: true
 
 variants:
@@ -226,6 +231,33 @@ revision_benchmarks:
     independent_process_replays: 3
     reference_experiment: E26
     interpretation: "Report every replay separately; do not select a favorable replay, pool it into E02/E26, or use it as a new acceptance gate."
+  E29:
+    role: "unpaired same-platform Euclidean throughput and memory reference for the published V100 E08 and E13 R/F values; E is contextual, not an equivalence candidate"
+    config: "configs/benchmarks/e29_v100_euclidean_reference.yaml"
+    variants: [E]
+    workloads: [unet_b1_forward, unet_b8_forward, unet_b8_update, unet_update_b1_r256, unet_update_b2_r256, unet_update_b4_r256, unet_update_b8_r256, unet_update_b16_r256, unet_update_b8_r128, unet_update_b8_r512]
+    reference_experiments: [E08, E13]
+    sessions: 5
+    warmup_calls: 50
+    timed_calls_per_session: 200
+    allocator_fraction: default
+    preallocate: false
+    runtime_profile: "primary V100 JAX/JAXLIB 0.4.25 CUDA-11.8 stack"
+    reporting_policy: "Report E medians and descriptive unpaired ratios against the published E08/E13 R/F medians; no paired interval across experiments; do not pool with E25."
+  E30:
+    role: "paired R/F channel-width sensitivity of the complete-update advantage"
+    config: "configs/benchmarks/e30_v100_unet_width.yaml"
+    variants: [R, F]
+    workloads: [unet_update_b8_r256_iw16, unet_update_b8_r256_iw32]
+    initial_widths: [16, 32]
+    reference_workload: "E13 unet_update_b8_r256 (initial width 8)"
+    sessions: 5
+    warmup_calls: 50
+    timed_calls_per_session: 200
+    allocator_fraction: default
+    preallocate: false
+    runtime_profile: "primary V100 JAX/JAXLIB 0.4.25 CUDA-11.8 stack"
+    reporting_policy: "Report each width separately with paired R/F intervals; compare with the E13 width-8 pivot descriptively only; retain every OOM under the default allocator cap."
 
 precision:
   oracle: float64

@@ -233,7 +233,7 @@ def _write_artifacts(
         jax_version="0.11.2",
         ld_library_path=None,
     )
-    _, registrations = exporter._load_registration(Path("protocol.yaml").resolve())
+    _, registrations = exporter._load_registration(exporter.PROTOCOL_PATH)
     for experiment_id, cohort in exporter.COHORTS.items():
         registration = registrations[experiment_id]
         rows = []
@@ -459,7 +459,7 @@ def test_rejects_mixed_runtime_stack(tmp_path: Path) -> None:
 
 
 def test_role_specs_cover_exact_frozen_variant_matrices() -> None:
-    _, registrations = exporter._load_registration(Path("protocol.yaml").resolve())
+    _, registrations = exporter._load_registration(exporter.PROTOCOL_PATH)
     observed = {
         experiment_id: tuple(registration["config"]["variants"])
         for experiment_id, registration in registrations.items()

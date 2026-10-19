@@ -1,0 +1,87 @@
+schema_version: "1.0"
+experiment_id: E29
+description: "Unpaired V100 Euclidean (E) reference for the published E08 complete U-Net timing table and the E13 complete-update scaling figure, under the default JAX allocator (XLA_PYTHON_CLIENT_MEM_FRACTION unset) with preallocation disabled by scripts/run_e29.sh."
+campaign_scope: "Measure E latency and process-lifetime peak allocation on the primary V100 JAX/JAXLIB 0.4.25 CUDA-11.8 stack for the three E08 workloads and the seven E13 workloads. Workload definitions are copied verbatim from the E08 and E13 configurations. E is a contextual same-topology cost reference, not an equivalence candidate, and is not paired with the published R/F sessions."
+variants: [E]
+sessions: 5
+warmup_calls: 50
+timed_calls_per_session: 200
+require_idle_gpu: true
+max_preexisting_memory_mib: 512
+max_preexisting_utilization_percent: 5
+memory_budget_bytes: 34359738368
+shared_state_policy: "Each session uses the E08/E13 measurement seed for that session, so E receives the same deterministic inputs, targets, and initial weight arrays as the published R/F sessions; E omits the U-Net curvature scalar because Euclidean execution has no curvature. Complete updates evolve the state through the same number of calls."
+euclidean_contract: "E uses fused affine convolution/dense layers, current-batch Euclidean normalization over the same axes, ordinary skip concatenation, and the same FC-plus-fold decoder topology. It introduces no running statistics and does not use curvature."
+timing_scope: "Compilation and the first compiled call are recorded but excluded from steady-state latency. Every measured call is synchronized. Complete updates include the same loss, reverse-mode gradient, gradient clipping, coupled L2, and Adam update boundary as E08 and E13."
+memory_evidence_policy: "Process-lifetime JAX allocator peak through the final synchronized measured call; includes initialization, compilation, first call, and warmup and is not isolated activation memory."
+failure_policy: "Retain every failed group. Explicit allocator diagnostics are classified as oom and the last entered phase distinguishes initialization, compilation, first call or update, warmup, measured calls, and post-measurement work. Signal-only termination is not labeled OOM."
+allocator_policy: "Default JAX allocator fraction (XLA_PYTHON_CLIENT_MEM_FRACTION unset) and XLA_PYTHON_CLIENT_PREALLOCATE=false, the conditions of E08 and E13."
+reporting_policy: "Report E medians and descriptive unpaired ratios against the published E08/E13 R/F medians only; do not form paired intervals across experiments or pool E29 with E25."
+workloads:
+  - id: unet_b1_forward
+    kind: unet
+    mode: forward
+    shape: {batch: 1, height: 256, width: 256}
+    curvature: 0.1
+    dtype: float32
+  - id: unet_b8_forward
+    kind: unet
+    mode: forward
+    shape: {batch: 8, height: 256, width: 256}
+    curvature: 0.1
+    dtype: float32
+  - id: unet_b8_update
+    kind: unet
+    mode: update
+    shape: {batch: 8, height: 256, width: 256}
+    curvature: 0.1
+    dtype: float32
+  - id: unet_update_b1_r256
+    kind: unet
+    mode: update
+    sweep_axes: [batch]
+    shape: {batch: 1, height: 256, width: 256}
+    curvature: 0.1
+    dtype: float32
+  - id: unet_update_b2_r256
+    kind: unet
+    mode: update
+    sweep_axes: [batch]
+    shape: {batch: 2, height: 256, width: 256}
+    curvature: 0.1
+    dtype: float32
+  - id: unet_update_b4_r256
+    kind: unet
+    mode: update
+    sweep_axes: [batch]
+    shape: {batch: 4, height: 256, width: 256}
+    curvature: 0.1
+    dtype: float32
+  - id: unet_update_b8_r256
+    kind: unet
+    mode: update
+    sweep_axes: [batch, resolution]
+    shape: {batch: 8, height: 256, width: 256}
+    curvature: 0.1
+    dtype: float32
+  - id: unet_update_b16_r256
+    kind: unet
+    mode: update
+    sweep_axes: [batch]
+    shape: {batch: 16, height: 256, width: 256}
+    curvature: 0.1
+    dtype: float32
+  - id: unet_update_b8_r128
+    kind: unet
+    mode: update
+    sweep_axes: [resolution]
+    shape: {batch: 8, height: 128, width: 128}
+    curvature: 0.1
+    dtype: float32
+  - id: unet_update_b8_r512
+    kind: unet
+    mode: update
+    sweep_axes: [resolution]
+    shape: {batch: 8, height: 512, width: 512}
+    curvature: 0.1
+    dtype: float32

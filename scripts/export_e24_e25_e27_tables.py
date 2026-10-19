@@ -24,6 +24,9 @@ from poincare_exec.config.loader import canonical_json, config_hash, load_yaml
 REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
 EXPECTED_COMMIT = "df3f6f556a314f74a6966701b38ac5d135a10a62"
 EXPECTED_PROTOCOL_VERSION = "1.17"
+# Protocol 1.18 registered E29/E30 after these runs; the 1.17 snapshot is byte-identical
+# to the protocol.yaml that the E24/E25/E27 configuration hashes bind.
+PROTOCOL_PATH = REPOSITORY_ROOT / "configs" / "protocols" / "protocol_1_17.yaml"
 EXPORT_SCHEMA_VERSION = "1.1"
 EXPECTED_DEVICE = {
     "hostname": "aibox2a6000",
@@ -117,7 +120,7 @@ def _parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--artifact-dir", type=Path, required=True)
     parser.add_argument("--output-dir", type=Path, required=True)
-    parser.add_argument("--protocol", type=Path, default=REPOSITORY_ROOT / "protocol.yaml")
+    parser.add_argument("--protocol", type=Path, default=PROTOCOL_PATH)
     parser.add_argument("--expected-code-commit", default=EXPECTED_COMMIT)
     return parser
 
@@ -1112,7 +1115,7 @@ def export(
     artifact_dir: Path,
     output_dir: Path,
     *,
-    protocol_path: Path = REPOSITORY_ROOT / "protocol.yaml",
+    protocol_path: Path = PROTOCOL_PATH,
     expected_commit: str = EXPECTED_COMMIT,
 ) -> dict[str, Any]:
     artifact_dir = artifact_dir.expanduser().resolve()

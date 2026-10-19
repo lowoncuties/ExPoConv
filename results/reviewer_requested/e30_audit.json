@@ -1,0 +1,257 @@
+{
+  "all_planned_groups_accounted_for": true,
+  "allocator_limit_reference": {
+    "bytes": 25567444992,
+    "exists": true,
+    "field": "hardware.jax_allocator_bytes_limit",
+    "name": "environment.json",
+    "path": "results/environment.json",
+    "sha256": "3a7a509ad6f04d197ede3a75c9c9aec0d6e3778e8ab3bf0d221d9a6602cabd6a"
+  },
+  "analysis_code": {
+    "commit": "20a886e431de9cc5e38264f4bc4781f0434fe944",
+    "dirty": true,
+    "status_porcelain": [
+      "?? scripts/export_e29_e30_tables.py",
+      "?? scripts/plot_scaling_with_euclidean.py",
+      "?? tests/test_e29_e30_export.py"
+    ]
+  },
+  "analysis_id": "e30_v100_reviewer_requested_export",
+  "cohort": {
+    "config": {
+      "bytes": 2683,
+      "exists": true,
+      "name": "e30_v100_unet_width.yaml",
+      "path": "configs/benchmarks/e30_v100_unet_width.yaml",
+      "sha256": "704a36a093901410851b95b9844a540e461f90dc4644358e3fc10acc720a5d6a"
+    },
+    "expected_config_hashes": {
+      "unet_update_b8_r256_iw16": "5415147034a9627519629a67a333afd16aca20f7b48c5ca3b23e10868307acb8",
+      "unet_update_b8_r256_iw32": "15ef6ba42b3b0fdbc7c49ad2c2acc319f6fd6b5cfae88340b0da7e02d015b758"
+    },
+    "experiment_id": "E30",
+    "failed_worker_groups": 10,
+    "failures": {
+      "bytes": 165832,
+      "exists": true,
+      "name": "e30_v100_unet_width.csv.failures.jsonl",
+      "sha256": "090de6c406fa015a070ecf35303fed567fd20dea82382518f7762276b19076df"
+    },
+    "outcomes": {
+      "ok": 10,
+      "oom": 10
+    },
+    "planned_groups": 20,
+    "raw": {
+      "bytes": 3839632,
+      "exists": true,
+      "name": "e30_v100_unet_width.csv",
+      "sha256": "98d03411c0507be7265da4453760ae06acaba5e83de41dac4f72e8841adc5245"
+    },
+    "raw_rows": 2030,
+    "successful_worker_groups": 10
+  },
+  "derivation": "CPU-only validation and deterministic aggregation of existing raw GPU artifacts; no benchmark is launched by this exporter. Failed groups are retained as planned outcomes and excluded explicitly from paired ratios.",
+  "execution_schedule": {
+    "driver_stall_intervals_utc": [
+      [
+        "2026-10-18T16:02:13Z",
+        "2026-10-18T16:13:34Z"
+      ],
+      [
+        "2026-10-18T16:25:28Z",
+        "2026-10-18T17:13:59Z"
+      ]
+    ],
+    "driver_stall_rule": "groups whose window intersects a merged kernel soft-lockup or harness nvidia-smi-timeout interval, widened by 180 s, are excluded from primary medians and paired contrasts; all-session values are reported beside them",
+    "e29_and_e30_ran_concurrently": true,
+    "e29_pause_signals": [],
+    "e29_window_utc": [
+      "2026-10-18T15:16:47Z",
+      "2026-10-18T17:50:25.877000Z"
+    ],
+    "e30_gpu1_activity_window_utc": [
+      "2026-10-18T15:59:57Z",
+      "2026-10-18T18:27:55Z"
+    ],
+    "e34_windows_utc": [],
+    "evidence": [
+      {
+        "file": "logs/e29_resume.log",
+        "sha256": "2f40e975b02e093aa21451656e74ed10545a8f84a5ca5f88395ebb33507a9130"
+      },
+      {
+        "file": "logs/e30_resume.log",
+        "sha256": "0e33a400d95cc702b59d49081468c2472b01db8e013c34ba4ca9f44cf7643e28"
+      },
+      {
+        "file": "logs/driver_stall_rule.txt",
+        "sha256": "237b0b098db23c904e7ac3cee8e16ea7852301babfca6eeb0b9c31da36d7cd65"
+      },
+      {
+        "file": "logs/kernel_driver_lockups.log",
+        "sha256": "d57bd23dec0eac811287f882144fc60178e18045b5b26051adbb32c98be06606"
+      }
+    ],
+    "group_window_rule": "a group window opens at the later of the previous group completion of the same experiment (or its start marker) and the latest resume-attempt or SIGCONT time before its completion, and closes at its own completion",
+    "groups_with_other_gpu_activity": 11,
+    "markers": [
+      {
+        "file": "logs/e29.started",
+        "sha256": "7dfd169ef0be2a4e847dbfe3701530f9d228314529bd882a02406b7b17988314",
+        "text": "2026-10-18T15:16:47Z",
+        "utc": "2026-10-18T15:16:47Z"
+      },
+      {
+        "file": "logs/e30.started",
+        "sha256": "8b616480561196b12f1f454b4badc27646c477c7a31717b78f6aa8c9e7dd320e",
+        "text": "2026-10-18T16:01:03Z",
+        "utc": "2026-10-18T16:01:03Z"
+      },
+      {
+        "file": "logs/e30.finished",
+        "sha256": "9da9f85997fcf90bc5ab58ed3a973e1b9c63899e19074c798c65531a76b6a98a",
+        "text": "2026-10-18T18:27:55Z",
+        "utc": "2026-10-18T18:27:55Z"
+      },
+      {
+        "file": "logs/e30_parallel_note.log",
+        "sha256": "06e3436760f49f8788e21c7bff4740cec97ad1ecbf90576529f76133023087f8",
+        "text": "2026-10-18T15:59:57Z E30 started on GPU 1 in parallel with E29 on GPU 0\n2026-10-18T17:11:06Z NVML keepalive started: nvidia-smi --query-gpu=index,memory.used --format=csv,noheader -l 300 (user-space substitute for persistence mode; no CUDA context)\n2026-10-18T18:28:50Z e29_e30.finished written by the parallel-run watcher (E30 ran in parallel; the orchestrator's E30 stage refuses to reuse the runtime capture)",
+        "utc": "2026-10-18T15:59:57Z"
+      }
+    ],
+    "other_gpu_activity_use": "descriptive only; isolated-session medians are a sensitivity check",
+    "planned_groups": 20,
+    "registered_schedule": "E29 alone on physical GPU 0 with GPU 1 idle, then E30 on GPU 1"
+  },
+  "expected_run_commit": "20a886e431de9cc5e38264f4bc4781f0434fe944",
+  "experiment_id": "E30",
+  "launcher": {
+    "bytes": 1076,
+    "exists": true,
+    "name": "run_e30.sh",
+    "path": "scripts/run_e30.sh",
+    "sha256": "08168e5eede8b76af86e95061710911d8a948649a07b6caa047d616d5e568be6"
+  },
+  "output_evidence": {
+    "e30_contrasts.csv": {
+      "bytes": 2231,
+      "exists": true,
+      "name": "e30_contrasts.csv",
+      "sha256": "ef812d70eb72ecca90d5bd9adf1d72260c998d23f15ee56ca3d5c9dcedeba32a"
+    },
+    "e30_session_outcomes.csv": {
+      "bytes": 13540,
+      "exists": true,
+      "name": "e30_session_outcomes.csv",
+      "sha256": "017af93465f8b15e515cfe7e39fee6bdff3f8f6aee3945f5a4ffe96be2cf1ecf"
+    },
+    "e30_variant_summary.csv": {
+      "bytes": 4039,
+      "exists": true,
+      "name": "e30_variant_summary.csv",
+      "sha256": "73083ec4c497ef79fc047f698af63b787e9712040b63dad920008c0b37cb99a2"
+    },
+    "e30_width_series.csv": {
+      "bytes": 1273,
+      "exists": true,
+      "name": "e30_width_series.csv",
+      "sha256": "4127055d08cc149d48ce98bf0aabdabcea2caa24d46733d2b1ea725dbcf734ef"
+    }
+  },
+  "output_rows": {
+    "e30_contrasts.csv": 2,
+    "e30_session_outcomes.csv": 20,
+    "e30_variant_summary.csv": 4,
+    "e30_width_series.csv": 3
+  },
+  "physical_device": {
+    "hostname": "argexpr3.vsb.cz",
+    "name": "Tesla V100-PCIE-32GB",
+    "physical_index": 1,
+    "uuid": "GPU-4e0547c3-d65d-7d8b-9f6a-d40ad61a0f0f"
+  },
+  "protocol": {
+    "bytes": 24344,
+    "exists": true,
+    "name": "protocol.yaml",
+    "path": "protocol.yaml",
+    "sha256": "10cc5ee225af096fba21fc3846354afdb46b7b1311de08c4076880e413450a0b"
+  },
+  "protocol_version": "1.18",
+  "published_reference_sources": {
+    "E08": {
+      "bytes": 6077,
+      "exists": true,
+      "name": "workload_latency_memory_summary.csv",
+      "path": "results/unet_timing/workload_latency_memory_summary.csv",
+      "sha256": "b2997480889fa6c3e3d186043b242dfe496df9039a7f921274391a426d31e86f"
+    },
+    "E13": {
+      "bytes": 5603,
+      "exists": true,
+      "name": "workload_summary.csv",
+      "path": "results/e13_scaling/workload_summary.csv",
+      "sha256": "d3d2ec1b1fa778f9f3838bda5bbeacce1c3d5b05cfc98e5b006558ad4ec6782b"
+    },
+    "E13_paired": {
+      "bytes": 3550,
+      "exists": true,
+      "name": "paired_ratio_summary.csv",
+      "path": "results/e13_scaling/paired_ratio_summary.csv",
+      "sha256": "9068ed6805bec296d5436284987c18ad51b8ab54ad1035fc17d8e66c2f4d9b44"
+    }
+  },
+  "registration": {
+    "allocator_fraction": "default",
+    "config": "configs/benchmarks/e30_v100_unet_width.yaml",
+    "initial_widths": [
+      16,
+      32
+    ],
+    "preallocate": false,
+    "reference_workload": "E13 unet_update_b8_r256 (initial width 8)",
+    "reporting_policy": "Report each width separately with paired R/F intervals; compare with the E13 width-8 pivot descriptively only; retain every OOM under the default allocator cap.",
+    "role": "paired R/F channel-width sensitivity of the complete-update advantage",
+    "runtime_profile": "primary V100 JAX/JAXLIB 0.4.25 CUDA-11.8 stack",
+    "sessions": 5,
+    "timed_calls_per_session": 200,
+    "variants": [
+      "R",
+      "F"
+    ],
+    "warmup_calls": 50,
+    "workloads": [
+      "unet_update_b8_r256_iw16",
+      "unet_update_b8_r256_iw32"
+    ]
+  },
+  "runtime_capture": {
+    "allocator_bytes_limit": 25567444992,
+    "allocator_bytes_limit_gib": 23.811538696289062,
+    "allocator_environment": {
+      "JAX_PLATFORMS": null,
+      "NVIDIA_TF32_OVERRIDE": null,
+      "XLA_FLAGS": null,
+      "XLA_PYTHON_CLIENT_ALLOCATOR": null,
+      "XLA_PYTHON_CLIENT_MEM_FRACTION": null,
+      "XLA_PYTHON_CLIENT_PREALLOCATE": "false"
+    },
+    "cuda_visible_devices": "1",
+    "environment": {
+      "bytes": 22939,
+      "exists": true,
+      "name": "e30_environment.json",
+      "sha256": "32f55560fa432584def81dc77a3f35617a3b5d46c783b4cca778acf4435ff09d"
+    },
+    "runtime_gate": {
+      "bytes": 1359,
+      "exists": true,
+      "name": "e30_runtime_gate.json",
+      "sha256": "c83c32a9285a698411bce0d30a0b1191584af908c2e2d11d50fa4014cc70485c"
+    }
+  },
+  "schema_version": "1.0"
+}
